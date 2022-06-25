@@ -1,5 +1,5 @@
-import keras
 from keras import layers
+from tensorflow import keras
 
 
 class AddNoise(layers.Layer):
