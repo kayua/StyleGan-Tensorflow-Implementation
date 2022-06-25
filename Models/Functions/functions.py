@@ -1,3 +1,4 @@
+import numpy
 import tensorflow
 from keras import layers
 
@@ -11,6 +12,8 @@ def fade_in(alpha, a, b):
 def wasserstein_loss(y_true, y_pred):
     return -tensorflow.reduce_mean(y_true * y_pred)
 
+def log2(x):
+    return int(numpy.log2(x))
 
 def pixel_norm(x, epsilon=1e-8):
     return x / tensorflow.math.sqrt(tensorflow.reduce_mean(x ** 2, axis=-1, keepdims=True) + epsilon)
