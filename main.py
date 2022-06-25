@@ -1,10 +1,64 @@
+import os
+from functools import partial
+from zipfile import ZipFile
+
+import gdown
 import numpy
 import tensorflow
 
 from Models.StyleGan.StyleGan import StyleGAN
+from Models.tools.plot_image import plot_images
 
 START_RES = 4
 TARGET_RES = 128
+
+
+def log2(x):
+    return int(numpy.log2(x))
+
+
+batch_sizes = {2: 16, 3: 16, 4: 16, 5: 16, 6: 16, 7: 8, 8: 4, 9: 2, 10: 1}
+# We adjust the train step accordingly
+train_step_ratio = {k: batch_sizes[2] / v for k, v in batch_sizes.items()}
+
+
+os.makedirs("celeba_gan")
+
+url = "https://drive.google.com/uc?id=1O7m1010EJjLE5QxLZiM9Fpjs7Oj6e684"
+output = "celeba_gan/data.zip"
+gdown.download(url, output, quiet=True)
+
+with ZipFile("celeba_gan/data.zip", "r") as zipobj:
+    zipobj.extractall("celeba_gan")
+
+# Create a dataset from our folder, and rescale the images to the [0-1] range:
+
+ds_train = tensorflow.keras.preprocessing.image_dataset_from_directory(
+    "celeba_gan", label_mode=None, image_size=(64, 64), batch_size=32
+)
+ds_train = ds_train.map(lambda x: x / 255.0)
+
+
+def resize_image(res, image):
+    # only donwsampling, so use nearest neighbor that is faster to run
+    image = tensorflow.image.resize(
+        image, (res, res), method=tensorflow.image.ResizeMethod.NEAREST_NEIGHBOR
+    )
+    image = tensorflow.cast(image, tensorflow.float32) / 127.5 - 1.0
+    return image
+
+
+def create_dataloader(res):
+    batch_size = batch_sizes[log2(res)]
+    # NOTE: we unbatch the dataset so we can `batch()` it again with the `drop_remainder=True` option
+    # since the model only supports a single batch size
+    dl = ds_train.map(partial(resize_image, res), num_parallel_calls=tensorflow.data.AUTOTUNE).unbatch()
+    dl = dl.shuffle(200).batch(batch_size, drop_remainder=True).prefetch(1).repeat()
+    return dl
+
+
+
+
 
 style_gan = StyleGAN(start_res=START_RES, target_res=TARGET_RES)
 
