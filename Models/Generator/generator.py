@@ -5,7 +5,7 @@ from tensorflow_addons.layers import InstanceNormalization
 from Models.Layers.AdaIN import AdaIN
 from Models.Layers.AddNoise import AddNoise
 from Models.Layers.EqualizedConv import EqualizedConv
-from Models.functions.functions import fade_in
+from Models.Functions.functions import fade_in
 
 
 class Generator:
