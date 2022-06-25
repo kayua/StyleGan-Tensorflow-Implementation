@@ -22,14 +22,14 @@ batch_sizes = {2: 16, 3: 16, 4: 16, 5: 16, 6: 16, 7: 8, 8: 4, 9: 2, 10: 1}
 train_step_ratio = {k: batch_sizes[2] / v for k, v in batch_sizes.items()}
 
 
-os.makedirs("celeba_gan")
+#os.makedirs("celeba_gan")
 
-url = "https://drive.google.com/uc?id=1O7m1010EJjLE5QxLZiM9Fpjs7Oj6e684"
-output = "celeba_gan/data.zip"
-gdown.download(url, output, quiet=True)
+#url = "https://drive.google.com/uc?id=1O7m1010EJjLE5QxLZiM9Fpjs7Oj6e684"
+#output = "celeba_gan/data.zip"
+#gdown.download(url, output, quiet=True)
 
-with ZipFile("celeba_gan/data.zip", "r") as zipobj:
-    zipobj.extractall("celeba_gan")
+#with ZipFile("celeba_gan/data.zip", "r") as zipobj:
+#    zipobj.extractall("celeba_gan")
 
 # Create a dataset from our folder, and rescale the images to the [0-1] range:
 
@@ -116,4 +116,4 @@ def train(
 
 
 
-train(start_res=4, target_res=16, steps_per_epoch=1, display_images=False)
+train(start_res=4, target_res=16, steps_per_epoch=20, display_images=False)

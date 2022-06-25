@@ -21,14 +21,14 @@ class Generator:
         self.noise_inputs = []
         # filter size to use at each stage, keys are log2(resolution)
         self.filter_nums = {
-            0: 512,
-            1: 512,
-            2: 512,  # 4x4
-            3: 512,  # 8x8
-            4: 512,  # 16x16
-            5: 512,  # 32x32
-            6: 256,  # 64x64
-            7: 128,  # 128x128
+            0: 64,
+            1: 64,
+            2: 64,  # 4x4
+            3: 64,  # 8x8
+            4: 64,  # 16x16
+            5: 64,  # 32x32
+            6: 64,  # 64x64
+            7: 64,  # 128x128
             8: 64,  # 256x256
             9: 32,  # 512x512
             10: 16,
