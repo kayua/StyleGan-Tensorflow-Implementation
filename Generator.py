@@ -1,6 +1,9 @@
 from keras import Model, Input
-from keras.layers import Dense, LeakyReLU, Reshape
+from keras.layers import Dense, LeakyReLU, Reshape, Conv2D, UpSampling2D
 from tensorflow import keras
+from tensorflow_addons.layers import InstanceNormalization
+
+from Layers.AdaIN import AdaIN
 
 
 class Generator:
@@ -25,8 +28,6 @@ class Generator:
 
 
 
-
-
     def __block_mapping_network(self, latent_dimension_input):
 
         if self.num_mapping_blocks > 1:
@@ -42,9 +43,6 @@ class Generator:
             network_model.summary()
             return network_model
 
-
-
-
     def __constant_block(self):
 
         dimension_latent_vector = 2**self.initial_dimension * self.initial_num_channels
@@ -54,6 +52,31 @@ class Generator:
         network_model = Model(latent_input, gradient_flow, name="Constant_Block")
         network_model.summary()
         return network_model
+
+
+    def __block_synthesis(self, resolution_block):
+
+
+        input_tensor = Input(shape=input_shape)
+        noise = Input(shape=(res, res, 1))
+        w = Input(shape=512)
+        x = input_tensor
+
+        if not is_base:
+            x = UpSampling2D((2, 2))(x)
+            x = Conv2D(filter_num)(x)
+
+        x = AddNoise()([x, noise])
+        x = LeakyReLU(0.2)(x)
+        x = InstanceNormalization()(x)
+        x = AdaIN()([x, w])
+
+        x = EqualizedConv(filter_num, 3)(x)
+        x = AddNoise()([x, noise])
+        x = LeakyReLU(0.2)(x)
+        x = InstanceNormalization()(x)
+        x = AdaIN()([x, w])
+        return keras.Model([input_tensor, w, noise], x, name=f"genblock_{res}x{res}")
 
 
 
