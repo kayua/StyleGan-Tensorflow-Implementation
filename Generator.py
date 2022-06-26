@@ -1,7 +1,5 @@
 from keras import Model, Input
 from keras.layers import Dense, LeakyReLU, Reshape, Conv2D, UpSampling2D
-from tensorflow import keras
-from tensorflow_addons.layers import InstanceNormalization
 
 from Layers.AdaIN import AdaIN
 from Layers.AddNoise import AddNoise
@@ -12,22 +10,19 @@ class Generator:
     def __init__(self):
 
         self.latent_dimension = 512
-        self.num_neurons_mapping = 32
+        self.num_neurons_mapping = 512
         self.num_mapping_blocks = 4
         self.initial_dimension = 4
         self.initial_num_channels = 128
         self.mapping_neural_network = None
         self.size_kernel_filters = (3, 3)
-
-
-
-
+        self.num_synthesis_block = 4
+        self.list_block_level = []
+        self.num_filters_per_level = [32, 32, 32, 32]
 
     def build_blocks(self):
         latent_dimension_input = Input(shape=(self.latent_dimension, 1))
         self.mapping_neural_network = self.__block_mapping_network(latent_dimension_input)
-
-
 
     def __block_mapping_network(self, latent_dimension_input):
 
@@ -36,7 +31,6 @@ class Generator:
             gradient_flow = Dense(self.num_neurons_mapping)(latent_dimension_input)
 
             for i in range(self.num_mapping_blocks - 2):
-
                 gradient_flow = Dense(self.num_neurons_mapping)(gradient_flow)
                 gradient_flow = LeakyReLU(0.2)(gradient_flow)
 
@@ -45,18 +39,17 @@ class Generator:
             network_model.summary()
             return network_model
 
-    def __constant_block(self):
+    def constant_mapping_block(self):
 
-        dimension_latent_vector = 2**self.initial_dimension * self.initial_num_channels
+        dimension_latent_vector = 2 ** self.initial_dimension * self.initial_num_channels
         latent_input = Input(shape=(dimension_latent_vector, 1))
-        mapping_format = (self.initial_dimension, self.initial_dimension, self.initial_num_channels, 1)
+        mapping_format = (self.initial_dimension, self.initial_dimension, self.initial_num_channels)
         gradient_flow = Reshape(mapping_format)(latent_input)
         network_model = Model(latent_input, gradient_flow, name="Constant_Block")
         network_model.summary()
         return network_model
 
-
-    def basic_block_synthesis(self, resolution_block, number_filters):
+    def block_synthesis(self, resolution_block, number_filters):
 
         input_flow = Input(shape=(resolution_block, resolution_block, number_filters))
         input_noise = Input(shape=(resolution_block, resolution_block, number_filters))
@@ -68,14 +61,39 @@ class Generator:
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
         gradient_flow = AddNoise()([gradient_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
+        network_model = Model([input_flow, input_noise, input_latent], gradient_flow, name="Synthesis_Block")
+        network_model.summary()
+        return network_model
 
-        return keras.Model([input_flow, input_noise, input_latent], gradient_flow, name="Synthesis_Block").summary()
+    def build_synthesis_block(self):
+
+        constant_mapping = self.constant_mapping_block()
+        input_flow = Input(shape=(4, 4, 128))
+        input_noise = Input(shape=(4, 4, 128))
+        input_latent = Input(shape=(self.latent_dimension, 1))
+        first_level_block = self.block_synthesis(4, 128)([constant_mapping.output, input_noise, input_latent])
+        print(first_level_block.)
+        network_model = Model([input_flow, input_noise, input_latent], first_level_block.output)
+        network_model.summary()
+        #input_flow = Input(shape=(4, 4, self.num_filters_per_level[0]))
+        #input_noise = Input(shape=(4, 4, self.num_filters_per_level[0]))
+        #input_latent = Input(shape=(self.latent_dimension, 1))
+        #first_level_block = Model(first_level_block([input_flow, input_noise, input_latent]), first_level_block.output)
+       # first_level_block.summary()
 
 
+        #first_level_block = UpSampling2D()(first_level_block.output)
 
+        #self.list_block_level.append(first_level_block)
+        #last_resolution_block = self.num_mapping_blocks ** 2
+        #for i in range(self.num_synthesis_block):
+        #    last_level_block = self.list_block_level[-1]
+        #    last_resolution_block = last_resolution_block ** 2
+        #    level_block = self.block_synthesis(last_resolution_block, self.num_filters_per_level[i - 1])(last_level_block)
+        #    level_block = UpSampling2D()(level_block.output)
+        #    self.list_block_level.append(level_block)
 
 
 
 a = Generator()
-a.basic_block_synthesis(32, 16)
-
+a.build_synthesis_block()
