@@ -1,8 +1,9 @@
 from tensorflow import keras
-from tensorflow.keras import layers
+
+from tensorflow.python.layers.base import Layer
 
 
-class AddNoise(layers.Layer):
+class AddNoise(Layer):
     def build(self, input_shape):
         n, h, w, c = input_shape[0]
         initializer = keras.initializers.RandomNormal(mean=0.0, stddev=1.0)

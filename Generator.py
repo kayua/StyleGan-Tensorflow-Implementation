@@ -4,6 +4,7 @@ from tensorflow import keras
 from tensorflow_addons.layers import InstanceNormalization
 
 from Layers.AdaIN import AdaIN
+from Layers.AddNoise import AddNoise
 
 
 class Generator:

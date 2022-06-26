@@ -1,5 +1,5 @@
 import tensorflow
-from keras import layers
+from tensorflow.python.layers.base import Layer
 from tensorflow import keras
 
 
