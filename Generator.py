@@ -40,7 +40,7 @@ class Generator:
                 gradient_flow = Dense(self.num_neurons_mapping)(gradient_flow)
                 gradient_flow = LeakyReLU(0.2)(gradient_flow)
 
-            gradient_flow = Dense(self.num_neurons_mapping)(gradient_flow)
+            gradient_flow = Dense(self.latent_dimension)(gradient_flow)
             network_model = Model(latent_dimension_input, gradient_flow, name="Mapping_Network")
             network_model.summary()
             return network_model
@@ -60,14 +60,14 @@ class Generator:
 
         input_flow = Input(shape=(resolution_block, resolution_block, number_filters))
         input_noise = Input(shape=(resolution_block, resolution_block, number_filters))
-        input_latent = Input(shape=(self.num_neurons_mapping, 1))
+        input_latent = Input(shape=(self.latent_dimension, 1))
 
         gradient_flow = AddNoise()([input_flow, input_noise])
-        gradient_flow = AdaIN([gradient_flow, input_latent])
+        gradient_flow = AdaIN()([gradient_flow, input_latent])
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
         gradient_flow = AddNoise()([gradient_flow, input_noise])
-        gradient_flow = AdaIN([gradient_flow, input_latent])
+        gradient_flow = AdaIN()([gradient_flow, input_latent])
 
         return keras.Model([input_flow, input_noise, input_latent], gradient_flow, name="Synthesis_Block").summary()
 

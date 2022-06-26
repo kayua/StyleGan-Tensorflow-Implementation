@@ -3,7 +3,7 @@ from tensorflow.python.layers.base import Layer
 from tensorflow import keras
 
 
-class EqualizedDense(layers.Layer):
+class EqualizedDense(Layer):
     def __init__(self, units, gain=2, learning_rate_multiplier=1, **kwargs):
         super(EqualizedDense, self).__init__(**kwargs)
         self.units = units
