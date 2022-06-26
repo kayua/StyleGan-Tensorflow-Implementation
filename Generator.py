@@ -16,8 +16,6 @@ class Generator:
         self.num_mapping_blocks = 4
         self.initial_dimension = 4
         self.initial_num_channels = 128
-
-
         self.mapping_neural_network = None
 
 
@@ -55,30 +53,24 @@ class Generator:
         return network_model
 
 
-    def __block_synthesis(self, resolution_block):
+    def __basic_block_synthesis(self, resolution_block, number_filters, random_noise, latent_noise):
 
+        input_graph_flow = Input(shape=(resolution_block, resolution_block, number_filters))
+        gradient_flow = AddNoise()([input_graph_flow, noise])
+        gradient_flow = InstanceNormalization()(gradient_flow)
+        gradient_flow = AdaIN()([gradient_flow, w])
 
-        input_tensor = Input(shape=input_shape)
-        noise = Input(shape=(res, res, 1))
-        w = Input(shape=512)
-        x = input_tensor
+        gradient_flow = EqualizedConv(filter_num, 3)(gradient_flow)
+        gradient_flow = AddNoise()([gradient_flow, noise])
+        gradient_flow = LeakyReLU(0.2)(gradient_flow)
+        gradient_flow = InstanceNormalization()(gradient_flow)
+        gradient_flow = AdaIN()([gradient_flow, w])
+        return keras.Model([input_graph_flow, w, noise], gradient_flow, name=f"genblock_{res}x{res}")
 
-        if not is_base:
-            x = UpSampling2D((2, 2))(x)
-            x = Conv2D(filter_num)(x)
-
-        x = AddNoise()([x, noise])
-        x = LeakyReLU(0.2)(x)
-        x = InstanceNormalization()(x)
-        x = AdaIN()([x, w])
-
-        x = EqualizedConv(filter_num, 3)(x)
-        x = AddNoise()([x, noise])
-        x = LeakyReLU(0.2)(x)
-        x = InstanceNormalization()(x)
-        x = AdaIN()([x, w])
-        return keras.Model([input_tensor, w, noise], x, name=f"genblock_{res}x{res}")
-
+        #input_tensor = Input(shape=input_shape)
+        #noise = Input(shape=(res, res, 1))
+        #w = Input(shape=512)
+        #x = input_tensor
 
 
 
