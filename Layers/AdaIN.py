@@ -1,8 +1,10 @@
 import tensorflow
 from tensorflow.python.layers.base import Layer
 
+from Layers.EqualizedDense import EqualizedDense
 
-class AdaIN(layers.Layer):
+
+class AdaIN(Layer):
     def __init__(self, gain=1, **kwargs):
         super(AdaIN, self).__init__(**kwargs)
         self.gain = gain

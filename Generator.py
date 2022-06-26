@@ -17,6 +17,8 @@ class Generator:
         self.initial_dimension = 4
         self.initial_num_channels = 128
         self.mapping_neural_network = None
+        self.size_kernel_filters = (3, 3)
+
 
 
 
@@ -33,11 +35,12 @@ class Generator:
 
             gradient_flow = Dense(self.num_neurons_mapping)(latent_dimension_input)
 
-            for i in range(self.num_mapping_blocks - 1):
+            for i in range(self.num_mapping_blocks - 2):
 
                 gradient_flow = Dense(self.num_neurons_mapping)(gradient_flow)
                 gradient_flow = LeakyReLU(0.2)(gradient_flow)
 
+            gradient_flow = Dense(self.num_neurons_mapping)(gradient_flow)
             network_model = Model(latent_dimension_input, gradient_flow, name="Mapping_Network")
             network_model.summary()
             return network_model
@@ -53,28 +56,26 @@ class Generator:
         return network_model
 
 
-    def __basic_block_synthesis(self, resolution_block, number_filters, random_noise, latent_noise):
+    def basic_block_synthesis(self, resolution_block, number_filters):
 
-        input_graph_flow = Input(shape=(resolution_block, resolution_block, number_filters))
-        gradient_flow = AddNoise()([input_graph_flow, noise])
-        gradient_flow = InstanceNormalization()(gradient_flow)
-        gradient_flow = AdaIN()([gradient_flow, w])
+        input_flow = Input(shape=(resolution_block, resolution_block, number_filters))
+        input_noise = Input(shape=(resolution_block, resolution_block, number_filters))
+        input_latent = Input(shape=(self.num_neurons_mapping, 1))
 
-        gradient_flow = EqualizedConv(filter_num, 3)(gradient_flow)
-        gradient_flow = AddNoise()([gradient_flow, noise])
+        gradient_flow = AddNoise()([input_flow, input_noise])
+        gradient_flow = AdaIN([gradient_flow, input_latent])
+        gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
-        gradient_flow = InstanceNormalization()(gradient_flow)
-        gradient_flow = AdaIN()([gradient_flow, w])
-        return keras.Model([input_graph_flow, w, noise], gradient_flow, name=f"genblock_{res}x{res}")
+        gradient_flow = AddNoise()([gradient_flow, input_noise])
+        gradient_flow = AdaIN([gradient_flow, input_latent])
 
-        #input_tensor = Input(shape=input_shape)
-        #noise = Input(shape=(res, res, 1))
-        #w = Input(shape=512)
-        #x = input_tensor
+        return keras.Model([input_flow, input_noise, input_latent], gradient_flow, name="Synthesis_Block").summary()
+
 
 
 
 
 
 a = Generator()
+a.basic_block_synthesis(32, 16)
 
