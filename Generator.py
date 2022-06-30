@@ -45,9 +45,7 @@ class Generator:
         latent_input = Input(shape=(dimension_latent_vector, 1))
         mapping_format = (self.initial_dimension, self.initial_dimension, self.initial_num_channels)
         gradient_flow = Reshape(mapping_format)(latent_input)
-        network_model = Model(latent_input, gradient_flow, name="Constant_Block")
-        network_model.summary()
-        return network_model
+        return Model(latent_input, gradient_flow, name="Constant_Block")
 
     def block_synthesis(self, resolution_block, number_filters):
 
@@ -61,9 +59,9 @@ class Generator:
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
         gradient_flow = AddNoise()([gradient_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
-        network_model = Model([input_flow, input_noise, input_latent], gradient_flow, name="Synthesis_Block")
-        network_model.summary()
-        return network_model
+        gradient_flow = Model([input_flow, input_noise, input_latent], gradient_flow, name="Synthesis_Block")
+        gradient_flow.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        return gradient_flow
 
     def build_synthesis_block(self):
 
@@ -71,9 +69,12 @@ class Generator:
         input_flow = Input(shape=(4, 4, 128))
         input_noise = Input(shape=(4, 4, 128))
         input_latent = Input(shape=(self.latent_dimension, 1))
-        first_level_block = self.block_synthesis(4, 128)([constant_mapping.output, input_noise, input_latent])
-        print(first_level_block.)
-        network_model = Model([input_flow, input_noise, input_latent], first_level_block.output)
+        first_level_block = self.block_synthesis(4, 128)
+        first_level_block = first_level_block([input_flow, input_noise, input_latent])
+
+
+
+        network_model = Model([input_flow, input_noise, input_latent], [first_level_block])
         network_model.summary()
         #input_flow = Input(shape=(4, 4, self.num_filters_per_level[0]))
         #input_noise = Input(shape=(4, 4, self.num_filters_per_level[0]))
