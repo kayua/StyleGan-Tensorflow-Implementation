@@ -11,7 +11,7 @@ class Generator:
 
     def __init__(self):
 
-        self.latent_dimension = 512
+        self.latent_dimension = 128
         self.num_neurons_mapping = 512
         self.num_mapping_blocks = 4
         self.initial_dimension = 4
@@ -21,7 +21,7 @@ class Generator:
         self.num_synthesis_block = 3
 
         self.input_block = None
-        self.list_level_block_output = []
+        self.list_block_synthesis = []
         self.list_level_noise_input = []
         self.function_loss = "binary_crossentropy"
 
@@ -34,6 +34,7 @@ class Generator:
             gradient_flow = Dense(self.num_neurons_mapping)(latent_dimension_input)
 
             for i in range(self.num_mapping_blocks - 2):
+
                 gradient_flow = Dense(self.num_neurons_mapping)(gradient_flow)
                 gradient_flow = LeakyReLU(0.2)(gradient_flow)
 
@@ -89,7 +90,7 @@ class Generator:
         input_noise = Input(shape=(self.initial_dimension, self.initial_dimension, self.initial_num_channels))
         first_level_block = self.block_synthesis(4, self.initial_num_channels, True)
         first_level_block = first_level_block([input_flow, input_noise, input_latent])
-        self.list_level_block_output.append(first_level_block)
+        self.list_block_synthesis.append(first_level_block)
         self.list_level_noise_input.append(input_noise)
 
         for i in range(self.num_synthesis_block - 1):
@@ -97,8 +98,17 @@ class Generator:
             input_noise = Input(shape=(resolution_feature, resolution_feature, self.initial_num_channels))
             self.list_level_noise_input.append(input_noise)
             level_block = self.block_synthesis(level_size_feature_dimension[i], self.initial_num_channels, False)
-            level_block = level_block([self.list_level_block_output[-1], self.list_level_noise_input[-1], input_latent])
-            self.list_level_block_output.append(level_block)
+            level_block = level_block([self.list_block_synthesis[-1], self.list_level_noise_input[-1], input_latent])
+            self.list_block_synthesis.append(level_block)
+
+
+    def build_blocks(self):
+
+        self.build_synthesis_block()
+        self.block_mapping_network()
+
+
+
 
 
 
