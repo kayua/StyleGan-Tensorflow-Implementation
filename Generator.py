@@ -19,7 +19,7 @@ class Generator:
         self.mapping_neural_network = None
         self.size_kernel_filters = (3, 3)
         self.num_synthesis_block = 3
-
+        self.constant_mapping_neural_network = None
         self.input_block = None
         self.list_block_synthesis = []
         self.list_level_noise_input = []
@@ -28,13 +28,13 @@ class Generator:
         self.num_filters_per_level = [32, 32, 32, 32]
 
     def block_mapping_network(self):
+
         latent_dimension_input = Input(shape=(self.latent_dimension, 1))
         if self.num_mapping_blocks > 1:
 
             gradient_flow = Dense(self.num_neurons_mapping)(latent_dimension_input)
 
             for i in range(self.num_mapping_blocks - 2):
-
                 gradient_flow = Dense(self.num_neurons_mapping)(gradient_flow)
                 gradient_flow = LeakyReLU(0.2)(gradient_flow)
 
@@ -49,7 +49,9 @@ class Generator:
         latent_input = Input(shape=(dimension_latent_vector, 1))
         mapping_format = (self.initial_dimension, self.initial_dimension, self.initial_num_channels)
         gradient_flow = Reshape(mapping_format)(latent_input)
-        return Model(latent_input, gradient_flow, name="Constant_Block")
+        gradient_flow = Model(latent_input, gradient_flow, name="Constant_Block")
+        gradient_flow.compile(loss=self.function_loss, optimizer='adam', metrics=['accuracy'])
+        self.constant_mapping_neural_network = gradient_flow
 
     def block_synthesis(self, resolution_block, number_filters, initial_block):
 
@@ -88,7 +90,7 @@ class Generator:
         if self.num_synthesis_block <= 1: return -1
 
         input_noise = Input(shape=(self.initial_dimension, self.initial_dimension, self.initial_num_channels))
-        first_level_block = self.block_synthesis(4, self.initial_num_channels, True)
+        first_level_block = self.block_synthesis(self.initial_dimension, self.initial_num_channels, True)
         first_level_block = first_level_block([input_flow, input_noise, input_latent])
         self.list_block_synthesis.append(first_level_block)
         self.list_level_noise_input.append(input_noise)
@@ -101,18 +103,11 @@ class Generator:
             level_block = level_block([self.list_block_synthesis[-1], self.list_level_noise_input[-1], input_latent])
             self.list_block_synthesis.append(level_block)
 
-
     def build_blocks(self):
 
         self.build_synthesis_block()
         self.block_mapping_network()
-
-
-
-
-
-
-
+        self.constant_mapping_block()
 
 
 a = Generator()
