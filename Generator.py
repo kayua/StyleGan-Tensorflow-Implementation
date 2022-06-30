@@ -1,5 +1,10 @@
-from keras import Model, Input
-from keras.layers import Dense, LeakyReLU, Reshape, Conv2D, UpSampling2D
+from keras import Model
+from keras import Input
+from keras.layers import Dense
+from keras.layers import LeakyReLU
+from keras.layers import Reshape
+from keras.layers import Conv2D
+from keras.layers import UpSampling2D
 
 from Layers.AdaIN import AdaIN
 from Layers.AddNoise import AddNoise
@@ -119,6 +124,17 @@ class Generator:
         color_mapping.compile(loss=self.function_loss, optimizer='adam', metrics=['accuracy'])
 
         return color_mapping
+
+    def get_generator(self, number_level):
+
+        constant_input = self.constant_mapping_neural_network
+        list_input_noise = []
+
+
+
+
+
+
 
 
 a = Generator()
