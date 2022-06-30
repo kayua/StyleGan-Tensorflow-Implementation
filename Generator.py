@@ -112,10 +112,13 @@ class Generator:
         self.constant_mapping_block()
 
     def color_mapping(self, resolution, number_channels_flow):
+
         input_color_mapping = Input(shape=(resolution, resolution, number_channels_flow))
         color_mapping = Conv2D(self.number_output_channels, (1, 1), padding="same")(input_color_mapping)
+        color_mapping = Model([input_color_mapping], color_mapping)
+        color_mapping.compile(loss=self.function_loss, optimizer='adam', metrics=['accuracy'])
 
-
+        return color_mapping
 
 
 a = Generator()
