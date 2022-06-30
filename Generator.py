@@ -60,6 +60,7 @@ class Generator:
             gradient_flow = AddNoise()([gradient_flow, input_noise])
 
         else:
+
             input_flow = Input(shape=(resolution_block, resolution_block, number_filters))
             input_noise = Input(shape=(resolution_block, resolution_block, number_filters))
             input_latent = Input(shape=(self.latent_dimension, 1))
@@ -106,3 +107,4 @@ class Generator:
 
 a = Generator()
 a.build_synthesis_block()
+a.block_mapping_network()
