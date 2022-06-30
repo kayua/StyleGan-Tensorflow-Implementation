@@ -5,6 +5,9 @@ from Layers.AdaIN import AdaIN
 from Layers.AddNoise import AddNoise
 
 
+
+level_size_feature_dimension = [4, 8, 16, 32, 64]
+
 class Generator:
 
     def __init__(self):
@@ -20,6 +23,7 @@ class Generator:
 
         self.input_block = None
         self.list_level_block_output = []
+        self.list_level_noise_input = []
 
         self.num_filters_per_level = [32, 32, 32, 32]
 
@@ -52,16 +56,17 @@ class Generator:
 
     def block_synthesis(self, resolution_block, number_filters, initial_block):
 
-        input_flow = Input(shape=(resolution_block, resolution_block, number_filters))
-        input_noise = Input(shape=(resolution_block, resolution_block, number_filters))
-        input_latent = Input(shape=(self.latent_dimension, 1))
-
         if not initial_block:
+            input_flow = Input(shape=(int(resolution_block / 2), int(resolution_block / 2), number_filters))
+            input_noise = Input(shape=(resolution_block, resolution_block, number_filters))
+            input_latent = Input(shape=(self.latent_dimension, 1))
             gradient_flow = UpSampling2D((2, 2))(input_flow)
             gradient_flow = AddNoise()([gradient_flow, input_noise])
 
         else:
-
+            input_flow = Input(shape=(resolution_block, resolution_block, number_filters))
+            input_noise = Input(shape=(resolution_block, resolution_block, number_filters))
+            input_latent = Input(shape=(self.latent_dimension, 1))
             gradient_flow = AddNoise()([input_flow, input_noise])
 
         gradient_flow = AdaIN()([gradient_flow, input_latent])
@@ -79,29 +84,33 @@ class Generator:
 
 
         input_flow = Input(shape=(self.initial_dimension, self.initial_dimension, self.initial_num_channels))
-        input_noise = Input(shape=(self.initial_dimension, self.initial_dimension, self.initial_num_channels))
+
         input_latent = Input(shape=(self.latent_dimension, 1))
 
 
         if self.num_synthesis_block <= 1:
 
             return -1
-
+        input_noise = Input(shape=(self.initial_dimension, self.initial_dimension, self.initial_num_channels))
         first_level_block = self.block_synthesis(4, 128, True)
         first_level_block = first_level_block([input_flow, input_noise, input_latent])
         self.list_level_block_output.append(first_level_block)
-        last_resolution_feature = 2
+        self.list_level_noise_input.append(input_noise)
 
 
         for i in range(self.num_synthesis_block-1):
-            last_resolution_feature = last_resolution_feature * 2
-            level_block = self.block_synthesis(last_resolution_feature, 128, False)
-            level_block = level_block([self.list_level_block_output[-1], input_noise, input_latent])
+
+
+            input_noise = Input(shape=(level_size_feature_dimension[i+1], level_size_feature_dimension[i+1], self.initial_num_channels))
+            print(level_size_feature_dimension[i+1])
+            self.list_level_noise_input.append(input_noise)
+            level_block = self.block_synthesis(level_size_feature_dimension[i], 128, False)
+            level_block = level_block([self.list_level_block_output[-1], self.list_level_noise_input[-1], input_latent])
             self.list_level_block_output.append(level_block)
 
 
-        network_model = Model([input_flow, input_noise, input_latent], [self.list_level_block_output[-1]])
-        network_model.summary()
+        #network_model = Model([input_flow, input_noise, input_latent], [self.list_level_block_output[-1]])
+        #network_model.summary()
         #input_flow = Input(shape=(4, 4, self.num_filters_per_level[0]))
         #input_noise = Input(shape=(4, 4, self.num_filters_per_level[0]))
         #input_latent = Input(shape=(self.latent_dimension, 1))
