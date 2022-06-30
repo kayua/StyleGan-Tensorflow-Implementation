@@ -16,6 +16,7 @@ class Generator:
         self.num_mapping_blocks = 4
         self.initial_dimension = 4
         self.initial_num_channels = 64
+        self.number_output_channels = 3
         self.mapping_neural_network = None
         self.size_kernel_filters = (3, 3)
         self.num_synthesis_block = 3
@@ -24,8 +25,8 @@ class Generator:
         self.list_block_synthesis = []
         self.list_level_noise_input = []
         self.function_loss = "binary_crossentropy"
-
         self.num_filters_per_level = [32, 32, 32, 32]
+        self.build_blocks()
 
     def block_mapping_network(self):
 
@@ -96,6 +97,7 @@ class Generator:
         self.list_level_noise_input.append(input_noise)
 
         for i in range(self.num_synthesis_block - 1):
+
             resolution_feature = level_size_feature_dimension[i + 1]
             input_noise = Input(shape=(resolution_feature, resolution_feature, self.initial_num_channels))
             self.list_level_noise_input.append(input_noise)
@@ -109,7 +111,11 @@ class Generator:
         self.block_mapping_network()
         self.constant_mapping_block()
 
+    def color_mapping(self, resolution, number_channels_flow):
+        output_color_mapping = Input(shape=(resolution, resolution, number_channels_flow))
+        self.number_output_channels
+
+
+
 
 a = Generator()
-a.build_synthesis_block()
-a.block_mapping_network()
