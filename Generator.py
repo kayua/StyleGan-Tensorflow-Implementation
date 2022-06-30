@@ -16,7 +16,7 @@ class Generator:
         self.num_neurons_mapping = 512
         self.num_mapping_blocks = 4
         self.initial_dimension = 4
-        self.initial_num_channels = 128
+        self.initial_num_channels = 64
         self.mapping_neural_network = None
         self.size_kernel_filters = (3, 3)
         self.num_synthesis_block = 3
@@ -92,7 +92,7 @@ class Generator:
 
             return -1
         input_noise = Input(shape=(self.initial_dimension, self.initial_dimension, self.initial_num_channels))
-        first_level_block = self.block_synthesis(4, 128, True)
+        first_level_block = self.block_synthesis(4, self.initial_num_channels, True)
         first_level_block = first_level_block([input_flow, input_noise, input_latent])
         self.list_level_block_output.append(first_level_block)
         self.list_level_noise_input.append(input_noise)
@@ -104,7 +104,7 @@ class Generator:
             input_noise = Input(shape=(level_size_feature_dimension[i+1], level_size_feature_dimension[i+1], self.initial_num_channels))
             print(level_size_feature_dimension[i+1])
             self.list_level_noise_input.append(input_noise)
-            level_block = self.block_synthesis(level_size_feature_dimension[i], 128, False)
+            level_block = self.block_synthesis(level_size_feature_dimension[i], self.initial_num_channels, False)
             level_block = level_block([self.list_level_block_output[-1], self.list_level_noise_input[-1], input_latent])
             self.list_level_block_output.append(level_block)
 
