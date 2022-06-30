@@ -59,22 +59,26 @@ class Generator:
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
         gradient_flow = AddNoise()([gradient_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
-        gradient_flow = Model([input_flow, input_noise, input_latent], gradient_flow, name="Synthesis_Block")
+        gradient_flow = Model([input_flow, input_noise, input_latent], gradient_flow, name="Synthesis_Block_{}".format(resolution_block))
         gradient_flow.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
         return gradient_flow
 
     def build_synthesis_block(self):
 
-        constant_mapping = self.constant_mapping_block()
+        #constant_mapping = self.constant_mapping_block()
         input_flow = Input(shape=(4, 4, 128))
         input_noise = Input(shape=(4, 4, 128))
         input_latent = Input(shape=(self.latent_dimension, 1))
         first_level_block = self.block_synthesis(4, 128)
         first_level_block = first_level_block([input_flow, input_noise, input_latent])
+        second_level_block = self.block_synthesis(8, 128)
+        second_level_block = second_level_block([first_level_block, input_noise, input_latent])
 
 
 
-        network_model = Model([input_flow, input_noise, input_latent], [first_level_block])
+
+
+        network_model = Model([input_flow, input_noise, input_latent], [second_level_block])
         network_model.summary()
         #input_flow = Input(shape=(4, 4, self.num_filters_per_level[0]))
         #input_noise = Input(shape=(4, 4, self.num_filters_per_level[0]))
