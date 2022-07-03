@@ -145,3 +145,4 @@ class Generator:
 
 
 a = Generator()
+a.get_generator(4)
