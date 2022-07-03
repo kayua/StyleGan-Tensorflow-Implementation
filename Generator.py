@@ -140,8 +140,15 @@ class Generator:
         list_input_noise = [self.list_level_noise_input[i] for i in range(number_level)]
         list_input_noise.append(self.initial_flow)
         list_input_noise.append(self.latent_input)
-        x = Model(list_input_noise, self.list_block_synthesis[number_level-1])
-        x.summary()
+        synthesis_model = Model(list_input_noise, self.list_block_synthesis[number_level-1])
+        synthesis_model.summary()
+        print(level_size_feature_dimension[self.num_synthesis_block-2])
+        neural_mapping = self.color_mapping(level_size_feature_dimension[self.num_synthesis_block-2], 3)
+        print(neural_mapping.summary())
+        print("-----------------------------------------")
+        neural_mapping = neural_mapping(synthesis_model)
+        neural_mapping = Model(list_input_noise, neural_mapping)
+        neural_mapping.summary()
 
 
 
