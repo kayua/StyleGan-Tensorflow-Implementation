@@ -77,7 +77,7 @@ class Generator:
         gradient_flow = AddNoise()([gradient_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
         gradient_flow = Model([input_flow, input_noise, input_latent], gradient_flow)
-        gradient_flow.compile(loss=self.loss_function, optimizer='adam', metrics=['accuracy'])
+        gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         return gradient_flow
 
     def non_initial_synthesis_block(self, resolution_block, number_filters):
@@ -94,7 +94,7 @@ class Generator:
         gradient_flow = AddNoise()([gradient_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
         gradient_flow = Model([input_flow, input_noise, input_latent], gradient_flow)
-        gradient_flow.compile(loss=self.loss_function, optimizer='adam', metrics=['accuracy'])
+        gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         return gradient_flow
 
 
@@ -132,7 +132,7 @@ class Generator:
         input_color_mapping = Input(shape=(resolution, resolution, number_channels_flow))
         color_mapping = Conv2D(self.number_output_channels, (1, 1), padding="same")(input_color_mapping)
         color_mapping = Model(input_color_mapping, color_mapping)
-        color_mapping.compile(loss=self.loss_function, optimizer='adam', metrics=['accuracy'])
+        color_mapping.compile(loss=self.loss_function, optimizer=self.optimizer_function)
 
         return color_mapping
 
@@ -142,7 +142,7 @@ class Generator:
         list_input_noise.append(self.initial_flow)
         list_input_noise.append(self.latent_input)
         synthesis_model = Model(list_input_noise, self.list_block_synthesis[number_level-1])
-        synthesis_model.compile(loss=self.loss_function, optimizer='adam', metrics=['accuracy'])
+        synthesis_model.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         synthesis_model.summary()
         last_level_dimension = level_size_feature_dimension[number_level]
         last_level_filters = self.num_filters_per_level[number_level]
