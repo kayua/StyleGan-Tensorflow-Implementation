@@ -12,9 +12,7 @@ class AddNoise(Layer):
     def build(self, input_shape):
         n, h, w, c = input_shape[0]
         initializer = keras.initializers.RandomNormal(mean=0.0, stddev=1.0)
-        self.b = self.add_weight(
-            shape=[1, 1, 1, c], initializer=initializer, trainable=True, name="kernel"
-        )
+        self.b = self.add_weight(shape=[1, 1, 1, c], initializer=initializer, trainable=True, name="kernel")
 
     def call(self, inputs, **kwargs):
         x, noise = inputs
