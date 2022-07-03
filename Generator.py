@@ -115,7 +115,10 @@ class Generator:
 
             resolution_feature = level_size_feature_dimension[i+1]
             input_noise = Input(shape=(resolution_feature*2, resolution_feature*2, self.initial_num_channels), name="Input Noise {}".format(i+2))
+            print("NOISE")
+            print(input_noise)
             self.list_level_noise_input.append(input_noise)
+            print(level_size_feature_dimension[i])
             level_block = self.non_initial_synthesis_block(level_size_feature_dimension[i], self.initial_num_channels)
             level_block = level_block([self.list_block_synthesis[-1], self.list_level_noise_input[-1], input_latent])
 
@@ -148,4 +151,3 @@ class Generator:
 
 
 a = Generator()
-a.get_generator(2)
