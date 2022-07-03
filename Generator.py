@@ -61,23 +61,30 @@ class Generator:
         gradient_flow.compile(loss=self.function_loss, optimizer='adam', metrics=['accuracy'])
         self.constant_mapping_neural_network = gradient_flow
 
-    def block_synthesis(self, resolution_block, number_filters, initial_block):
+    def initial_block_synthesis(self, resolution_block, number_filters):
 
-        if not initial_block:
-            input_flow = Input(shape=(int(resolution_block / 2), int(resolution_block / 2), number_filters))
-            input_noise = Input(shape=(resolution_block, resolution_block, number_filters))
-            input_latent = Input(shape=(self.latent_dimension, 1))
-            gradient_flow = UpSampling2D((2, 2))(input_flow)
-            gradient_flow = AddNoise()([gradient_flow, input_noise])
-            print("Não INICIAL ================================")
+        input_flow = Input(shape=(resolution_block, resolution_block, number_filters))
+        input_noise = Input(shape=(resolution_block, resolution_block, number_filters))
+        input_latent = Input(shape=(self.latent_dimension, 1))
+        gradient_flow = AddNoise()([input_flow, input_noise])
+        gradient_flow = AdaIN()([gradient_flow, input_latent])
+        gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
+        gradient_flow = LeakyReLU(0.2)(gradient_flow)
+        gradient_flow = AddNoise()([gradient_flow, input_noise])
+        gradient_flow = AdaIN()([gradient_flow, input_latent])
+        gradient_flow = Model([input_flow, input_noise, input_latent], gradient_flow, name=self.l)
+        self.l = self.l+"a"
+        gradient_flow.compile(loss=self.function_loss, optimizer='adam', metrics=['accuracy'])
+        gradient_flow.summary()
+        return gradient_flow
 
+    def non_initial_synthesis_block(self, resolution_block, number_filters):
 
-        else:
-            print("INICIAL ================================")
-            input_flow = Input(shape=(resolution_block, resolution_block, number_filters))
-            input_noise = Input(shape=(resolution_block, resolution_block, number_filters))
-            input_latent = Input(shape=(self.latent_dimension, 1))
-            gradient_flow = AddNoise()([input_flow, input_noise])
+        input_flow = Input(shape=(int(resolution_block), int(resolution_block), number_filters))
+        input_noise = Input(shape=(resolution_block*2, resolution_block*2, number_filters))
+        input_latent = Input(shape=(self.latent_dimension, 1))
+        gradient_flow = UpSampling2D((2, 2))(input_flow)
+        gradient_flow = AddNoise()([gradient_flow, input_noise])
 
         gradient_flow = AdaIN()([gradient_flow, input_latent])
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
@@ -90,6 +97,7 @@ class Generator:
         gradient_flow.summary()
         return gradient_flow
 
+
     def build_synthesis_block(self):
 
         input_flow = Input(shape=(self.initial_dimension, self.initial_dimension, self.initial_num_channels), name="Input Mapping")
@@ -97,22 +105,20 @@ class Generator:
         self.latent_input = input_latent
         self.initial_flow = input_flow
 
-        if self.num_synthesis_block <= 1: return -1
-
         input_noise = Input(shape=(self.initial_dimension, self.initial_dimension, self.initial_num_channels), name="Input Noise 1")
-        first_level_block = self.block_synthesis(self.initial_dimension, self.initial_num_channels, True)
+        first_level_block = self.initial_block_synthesis(self.initial_dimension, self.initial_num_channels)
         first_level_block = first_level_block([input_flow, input_noise, input_latent])
         self.list_block_synthesis.append(first_level_block)
         self.list_level_noise_input.append(input_noise)
 
         for i in range(self.num_synthesis_block - 1):
 
-            resolution_feature = level_size_feature_dimension[i]
-            print("RESOLUTION {}".format(resolution_feature))
-            input_noise = Input(shape=(resolution_feature, resolution_feature, self.initial_num_channels), name="Input Noise {}".format(i+2))
+            resolution_feature = level_size_feature_dimension[i+1]
+            input_noise = Input(shape=(resolution_feature*2, resolution_feature*2, self.initial_num_channels), name="Input Noise {}".format(i+2))
             self.list_level_noise_input.append(input_noise)
-            level_block = self.block_synthesis(level_size_feature_dimension[i], self.initial_num_channels, False)
+            level_block = self.non_initial_synthesis_block(level_size_feature_dimension[i], self.initial_num_channels)
             level_block = level_block([self.list_block_synthesis[-1], self.list_level_noise_input[-1], input_latent])
+
             self.list_block_synthesis.append(level_block)
 
     def build_blocks(self):
