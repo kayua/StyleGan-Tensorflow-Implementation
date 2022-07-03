@@ -8,6 +8,10 @@ class EqualizedDense(Layer):
         super(EqualizedDense, self).__init__(**kwargs)
         self.units = units
         self.gain = gain
+        self.in_channels = None
+        self.w = None
+        self.b = None
+        self.scale = None
         self.learning_rate_multiplier = learning_rate_multiplier
 
     def build(self, input_shape):
@@ -27,6 +31,6 @@ class EqualizedDense(Layer):
         fan_in = self.in_channels
         self.scale = tensorflow.sqrt(self.gain / fan_in)
 
-    def call(self, inputs):
+    def call(self, inputs, **kwargs):
         output = tensorflow.add(tensorflow.matmul(inputs, self.scale * self.w), self.b)
         return output * self.learning_rate_multiplier
