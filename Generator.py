@@ -35,7 +35,7 @@ class Generator:
         self.list_level_noise_input = []
         self.loss_function = "binary_crossentropy"
         self.optimizer_function = "adam"
-        self.num_filters_per_level = [64, 64, 64, 64, 64, 64, 64]
+        self.num_filters_per_level = [128, 128, 128, 128, 128, 128, 128, 128, 128]
         self.latent_input = None
         self.initial_flow = None
         self.build_blocks()
@@ -141,6 +141,7 @@ class Generator:
         list_input_noise = [self.list_level_noise_input[i] for i in range(number_level)]
         list_input_noise.append(self.initial_flow)
         list_input_noise.append(self.latent_input)
+
         synthesis_model = Model(list_input_noise, self.list_block_synthesis[number_level-1])
         synthesis_model.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         synthesis_model.summary()
@@ -148,14 +149,12 @@ class Generator:
         last_level_filters = self.num_filters_per_level[number_level]
         neural_mapping = self.color_mapping(last_level_dimension, last_level_filters)
         neural_mapping.summary()
-
-
         neural_mapping = neural_mapping([synthesis_model.output])
-
         neural_mapping = Model(synthesis_model.inputs, neural_mapping)
+
         neural_mapping.summary()
 
 
 
 a = Generator()
-a.get_generator(6)
+a.get_generator(7)
