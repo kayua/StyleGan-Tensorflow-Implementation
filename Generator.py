@@ -9,7 +9,7 @@ from keras.layers import UpSampling2D
 from Layers.AdaIN import AdaIN
 from Layers.AddNoise import AddNoise
 
-level_size_feature_dimension = [4, 8, 16, 32, 64]
+level_size_feature_dimension = [4, 4, 8, 16, 32, 64]
 
 
 class Generator:
@@ -24,7 +24,7 @@ class Generator:
         self.number_output_channels = 3
         self.mapping_neural_network = None
         self.size_kernel_filters = (3, 3)
-        self.num_synthesis_block = 3
+        self.num_synthesis_block = 4
         self.constant_mapping_neural_network = None
         self.input_block = None
         self.list_block_synthesis = []
@@ -115,11 +115,8 @@ class Generator:
 
             resolution_feature = level_size_feature_dimension[i+1]
             input_noise = Input(shape=(resolution_feature*2, resolution_feature*2, self.initial_num_channels), name="Input Noise {}".format(i+2))
-            print("NOISE")
-            print(input_noise)
             self.list_level_noise_input.append(input_noise)
-            print(level_size_feature_dimension[i])
-            level_block = self.non_initial_synthesis_block(level_size_feature_dimension[i], self.initial_num_channels)
+            level_block = self.non_initial_synthesis_block(resolution_feature, self.initial_num_channels)
             level_block = level_block([self.list_block_synthesis[-1], self.list_level_noise_input[-1], input_latent])
 
             self.list_block_synthesis.append(level_block)
@@ -144,7 +141,6 @@ class Generator:
         list_input_noise = [self.list_level_noise_input[i] for i in range(number_level)]
         list_input_noise.append(self.initial_flow)
         list_input_noise.append(self.latent_input)
-        print(list_input_noise)
         x = Model(list_input_noise, self.list_block_synthesis[number_level-1])
         x.summary()
 
