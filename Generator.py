@@ -15,7 +15,7 @@ level_size_feature_dimension = [4, 4, 8, 16, 32, 64]
 class Generator:
 
     def __init__(self):
-        self.l = "a"
+
         self.latent_dimension = 128
         self.num_neurons_mapping = 512
         self.num_mapping_blocks = 4
@@ -72,8 +72,7 @@ class Generator:
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
         gradient_flow = AddNoise()([gradient_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
-        gradient_flow = Model([input_flow, input_noise, input_latent], gradient_flow, name=self.l)
-        self.l = self.l+"a"
+        gradient_flow = Model([input_flow, input_noise, input_latent], gradient_flow)
         gradient_flow.compile(loss=self.function_loss, optimizer='adam', metrics=['accuracy'])
         gradient_flow.summary()
         return gradient_flow
@@ -91,8 +90,7 @@ class Generator:
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
         gradient_flow = AddNoise()([gradient_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
-        gradient_flow = Model([input_flow, input_noise, input_latent], gradient_flow, name=self.l)
-        self.l = self.l+"a"
+        gradient_flow = Model([input_flow, input_noise, input_latent], gradient_flow)
         gradient_flow.compile(loss=self.function_loss, optimizer='adam', metrics=['accuracy'])
         gradient_flow.summary()
         return gradient_flow
