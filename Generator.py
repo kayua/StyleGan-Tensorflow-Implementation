@@ -65,7 +65,6 @@ class Generator:
 
         input_flow = Input(shape=(resolution_block, resolution_block, number_filters))
         input_noise = Input(shape=(resolution_block, resolution_block, number_filters))
-        input_noise = Reshape((resolution_block, resolution_block, number_filters))(input_noise)
         input_latent = Input(shape=(self.latent_dimension, 1))
         gradient_flow = AddNoise()([input_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
@@ -82,7 +81,6 @@ class Generator:
 
         input_flow = Input(shape=(int(resolution_block), int(resolution_block), number_filters))
         input_noise = Input(shape=(resolution_block*2, resolution_block*2, number_filters))
-        input_noise = Reshape((resolution_block*2, resolution_block*2, number_filters))(input_noise)
         input_latent = Input(shape=(self.latent_dimension, 1))
         gradient_flow = UpSampling2D((2, 2))(input_flow)
         gradient_flow = AddNoise()([gradient_flow, input_noise])
