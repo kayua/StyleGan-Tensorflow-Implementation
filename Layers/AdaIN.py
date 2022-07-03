@@ -23,7 +23,7 @@ class AdaIN(Layer):
         self.dense_1 = EqualizedDense(self.x_channels, gain=1)
         self.dense_2 = EqualizedDense(self.x_channels, gain=1)
 
-    def call(self, inputs):
+    def call(self, inputs, **kwargs):
         x, w = inputs
         ys = tensorflow.reshape(self.dense_1(w), (-1, 1, 1, self.x_channels))
         yb = tensorflow.reshape(self.dense_2(w), (-1, 1, 1, self.x_channels))
