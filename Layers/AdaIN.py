@@ -8,6 +8,10 @@ class AdaIN(Layer):
     def __init__(self, gain=1, **kwargs):
         super(AdaIN, self).__init__(**kwargs)
         self.gain = gain
+        self.w_channels = None
+        self.x_channels = None
+        self.dense_1 = None
+        self.dense_2 = None
 
     def build(self, input_shapes):
         x_shape = input_shapes[0]
