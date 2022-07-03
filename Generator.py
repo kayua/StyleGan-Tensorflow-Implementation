@@ -1,15 +1,19 @@
-from keras import Model
+import logging
+
+import tensorflow
 from keras import Input
+from keras import Model
+from keras.layers import Conv2D
 from keras.layers import Dense
 from keras.layers import LeakyReLU
 from keras.layers import Reshape
-from keras.layers import Conv2D
 from keras.layers import UpSampling2D
 
 from Layers.AdaIN import AdaIN
 from Layers.AddNoise import AddNoise
 
-level_size_feature_dimension = [4, 4, 8, 16, 32, 64]
+tensorflow.get_logger().setLevel(logging.ERROR)
+level_size_feature_dimension = [4, 4, 8, 16, 32, 64, 128, 256, 512]
 
 
 class Generator:
@@ -24,13 +28,13 @@ class Generator:
         self.number_output_channels = 3
         self.mapping_neural_network = None
         self.size_kernel_filters = (3, 3)
-        self.num_synthesis_block = 4
+        self.num_synthesis_block = 8
         self.constant_mapping_neural_network = None
         self.input_block = None
         self.list_block_synthesis = []
         self.list_level_noise_input = []
         self.function_loss = "binary_crossentropy"
-        self.num_filters_per_level = [32, 32, 32, 32]
+        self.num_filters_per_level = [64, 64, 64, 64, 64, 64, 64]
         self.latent_input = None
         self.initial_flow = None
         self.build_blocks()
@@ -142,4 +146,4 @@ class Generator:
 
 
 a = Generator()
-a.get_generator(4)
+a.get_generator(6)
