@@ -48,7 +48,6 @@ class Generator:
 
             gradient_flow = Dense(self.latent_dimension)(gradient_flow)
             network_model = Model(latent_dimension_input, gradient_flow, name="Mapping_Network")
-            #network_model.summary()
             self.mapping_neural_network = network_model
 
     def constant_mapping_block(self):
@@ -74,7 +73,6 @@ class Generator:
         gradient_flow = AdaIN()([gradient_flow, input_latent])
         gradient_flow = Model([input_flow, input_noise, input_latent], gradient_flow)
         gradient_flow.compile(loss=self.function_loss, optimizer='adam', metrics=['accuracy'])
-        gradient_flow.summary()
         return gradient_flow
 
     def non_initial_synthesis_block(self, resolution_block, number_filters):
@@ -92,7 +90,6 @@ class Generator:
         gradient_flow = AdaIN()([gradient_flow, input_latent])
         gradient_flow = Model([input_flow, input_noise, input_latent], gradient_flow)
         gradient_flow.compile(loss=self.function_loss, optimizer='adam', metrics=['accuracy'])
-        gradient_flow.summary()
         return gradient_flow
 
 
