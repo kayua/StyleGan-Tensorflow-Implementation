@@ -130,7 +130,7 @@ class Generator:
 
         input_color_mapping = Input(shape=(resolution, resolution, number_channels_flow))
         color_mapping = Conv2D(self.number_output_channels, (1, 1), padding="same")(input_color_mapping)
-        color_mapping = Model([input_color_mapping], color_mapping)
+        color_mapping = Model(input_color_mapping, color_mapping)
         color_mapping.compile(loss=self.function_loss, optimizer='adam', metrics=['accuracy'])
 
         return color_mapping
@@ -141,12 +141,17 @@ class Generator:
         list_input_noise.append(self.initial_flow)
         list_input_noise.append(self.latent_input)
         synthesis_model = Model(list_input_noise, self.list_block_synthesis[number_level-1])
-        last_level_dimension = level_size_feature_dimension[self.num_synthesis_block-2]
-        last_level_filters = self.num_filters_per_level[self.num_synthesis_block-2]
+        synthesis_model.compile(loss=self.function_loss, optimizer='adam', metrics=['accuracy'])
+        synthesis_model.summary()
+        last_level_dimension = level_size_feature_dimension[number_level]
+        last_level_filters = self.num_filters_per_level[number_level]
         neural_mapping = self.color_mapping(last_level_dimension, last_level_filters)
-        print(neural_mapping.summary())
-        neural_mapping = neural_mapping(synthesis_model)
-        neural_mapping = Model(list_input_noise, neural_mapping)
+        neural_mapping.summary()
+
+
+        neural_mapping = neural_mapping([synthesis_model.output])
+
+        neural_mapping = Model(synthesis_model.inputs, neural_mapping)
         neural_mapping.summary()
 
 
