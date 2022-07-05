@@ -134,10 +134,11 @@ def generate_random_noise():
 
     random_noise_vector = []
 
-    for i in range(level_network):
+    for i in range(1, level_network):
         size_feature = level_size_feature_dimension[-i]**2
-
+        resolution_feature = level_size_feature_dimension[-i]
         random_noise = numpy.random.uniform(0, 1, num_filters_per_level[-i]*size_feature)
-        shape_feature = (num_filters_per_level[-i], num_filters_per_level[-i], )
-        random_noise = numpy.reshape(random_noise, ())
+        shape_feature = (resolution_feature, resolution_feature, num_filters_per_level[-i])
+        random_noise = numpy.reshape(random_noise, shape_feature)
+        print(random_noise.shape)
 generate_random_noise()
