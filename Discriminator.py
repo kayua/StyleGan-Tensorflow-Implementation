@@ -50,7 +50,8 @@ class Discriminator:
         self.first_level_discriminator = Conv2D(number_layer, (3, 3), padding="same")(self.first_level_discriminator)
         self.first_level_discriminator = self.fully_connected_block(self.first_level_discriminator)
         self.first_level_discriminator = Model(input_layer, self.first_level_discriminator)
-        # self.first_level_discriminator.summary()
+        if DEFAULT_VERBOSE_CONSTRUCTION:
+            self.first_level_discriminator.summary()
 
         for i in range(len(level_size_feature_dimension)):
             self.convolutional_block(level_size_feature_dimension[i], number_filters_per_layer[i])
