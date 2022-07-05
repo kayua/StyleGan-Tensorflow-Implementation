@@ -24,7 +24,7 @@ class Generator:
         self.num_neurons_mapping = 512
         self.num_mapping_blocks = 4
         self.initial_dimension = 4
-        self.initial_num_channels = 64
+        self.initial_num_channels = 128
         self.number_output_channels = 3
         self.mapping_neural_network = None
         self.size_kernel_filters = (3, 3)
@@ -144,9 +144,9 @@ class Generator:
 
         synthesis_model = Model(list_input_noise, self.list_block_synthesis[number_level-1])
         synthesis_model.compile(loss=self.loss_function, optimizer=self.optimizer_function)
-        synthesis_model.summary()
         last_level_dimension = level_size_feature_dimension[number_level]
         last_level_filters = self.num_filters_per_level[number_level]
+
         neural_mapping = self.color_mapping(last_level_dimension, last_level_filters)
         neural_mapping.summary()
         neural_mapping = neural_mapping([synthesis_model.output])
@@ -157,4 +157,4 @@ class Generator:
 
 
 a = Generator()
-a.get_generator(7)
+a.get_generator(6)
