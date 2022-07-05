@@ -148,7 +148,6 @@ class Generator:
         last_level_filters = self.num_filters_per_level[number_level]
 
         neural_mapping = self.color_mapping(last_level_dimension, last_level_filters)
-        neural_mapping.summary()
         neural_mapping = neural_mapping([synthesis_model.output])
         neural_mapping = Model(synthesis_model.inputs, neural_mapping)
 
