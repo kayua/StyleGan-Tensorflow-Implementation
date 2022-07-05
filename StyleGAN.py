@@ -1,11 +1,15 @@
 import cv2
+import numpy
 import tensorflow
 from keras import Model
+
+level_size_feature_dimension = [512, 256, 128, 64, 32, 16, 8]
 
 
 class StyleGAN(Model):
 
-    def __init__(self, discriminator, generator, latent_dim, discriminator_extra_steps=3, gp_weight=10.0, level_network=2):
+    def __init__(self, discriminator, generator, latent_dim, discriminator_extra_steps=3, gp_weight=10.0,
+                 level_network=2):
         super(StyleGAN, self).__init__()
         self.discriminator = discriminator
         self.level_network = level_network
@@ -13,6 +17,8 @@ class StyleGAN(Model):
         self.latent_dim = latent_dim
         self.d_steps = discriminator_extra_steps
         self.gp_weight = gp_weight
+        self.initial_dimension = 4
+        self.num_filters_per_level = [256, 256, 256, 256, 256, 256, 256, 256, 256]
 
     def compile(self, d_optimizer, g_optimizer, d_loss_fn, g_loss_fn):
         super(StyleGAN, self).compile()
@@ -57,7 +63,6 @@ class StyleGAN(Model):
         # one step of the generator. Here we will train it for 3 extra steps
         # as compared to 5 to reduce the training time.
         for i in range(self.d_steps):
-
             random_latent_vectors = tensorflow.random.normal(shape=(batch_size, self.latent_dim))
 
             with tensorflow.GradientTape() as tape:
@@ -101,8 +106,28 @@ class StyleGAN(Model):
         )
         return {"d_loss": d_loss, "g_loss": g_loss}
 
+    def generate_constant_mapping(self):
+
+        constant_mapping = [[0.5 for col in range(5)] for row in range(10)]
+
     def change_resolution_image(self, batch_image):
+
         batch_image_new_resolution = []
+        size_image = level_size_feature_dimension[-self.level_network]
+        tuple_shape_image = (size_image, size_image)
+
         for i in batch_image:
-            new_image = cv2.resize(i, dsize=(54, 140), interpolation=cv2.INTER_CUBIC)
+            new_image = cv2.resize(i, dsize=tuple_shape_image, interpolation=cv2.INTER_CUBIC)
             batch_image_new_resolution.append(new_image)
+
+        return numpy.array(batch_image_new_resolution, dtype=numpy.float32)
+
+initial_dimension = 4
+num_filters_per_level = [256, 256, 256, 256, 256, 256, 256, 256, 256]
+def generate_constant_mapping():
+
+    number_filters = num_filters_per_level[-1]
+    constant_mapping = numpy.array([[0.5 for col in range(initial_dimension**2)] for row in range(number_filters)])
+    constant_mapping = numpy.reshape(constant_mapping, (initial_dimension, initial_dimension, number_filters))
+    print(constant_mapping.shape)
+generate_constant_mapping()
