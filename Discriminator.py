@@ -36,7 +36,7 @@ class Discriminator:
 
         for i in range(len(level_size_feature_dimension)):
 
-            self.convolutional_block(level_size_feature_dimension[-i], number_filters_per_layer[-i])
+            self.convolutional_block(level_size_feature_dimension[i], number_filters_per_layer[i])
 
 
 
