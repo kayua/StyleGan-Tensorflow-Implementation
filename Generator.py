@@ -3,7 +3,7 @@ import logging
 import tensorflow
 from keras import Input
 from keras import Model
-from keras.layers import Conv2D
+from keras.layers import Conv2D, Flatten
 from keras.layers import Dense
 from keras.layers import LeakyReLU
 from keras.layers import Reshape
@@ -43,17 +43,17 @@ class Generator:
     def block_mapping_network(self):
 
         latent_dimension_input = Input(shape=(self.latent_dimension, 1))
-        if self.num_mapping_blocks > 1:
+        gradient_flow = Flatten()(latent_dimension_input)
+        gradient_flow = Dense(self.num_neurons_mapping)(gradient_flow)
+        gradient_flow = LeakyReLU(0.2)(gradient_flow)
 
-            gradient_flow = Dense(self.num_neurons_mapping)(latent_dimension_input)
+        for i in range(self.num_mapping_blocks - 2):
+            gradient_flow = Dense(self.num_neurons_mapping)(gradient_flow)
+            gradient_flow = LeakyReLU(0.2)(gradient_flow)
 
-            for i in range(self.num_mapping_blocks - 2):
-                gradient_flow = Dense(self.num_neurons_mapping)(gradient_flow)
-                gradient_flow = LeakyReLU(0.2)(gradient_flow)
-
-            gradient_flow = Dense(self.latent_dimension)(gradient_flow)
-            network_model = Model(latent_dimension_input, gradient_flow, name="Mapping_Network")
-            self.mapping_neural_network = network_model
+        gradient_flow = Dense(self.latent_dimension)(gradient_flow)
+        network_model = Model(latent_dimension_input, gradient_flow, name="Mapping_Network")
+        self.mapping_neural_network = network_model
 
     def constant_mapping_block(self):
 
@@ -69,7 +69,8 @@ class Generator:
 
         input_flow = Input(shape=(resolution_block, resolution_block, number_filters))
         input_noise = Input(shape=(resolution_block, resolution_block, number_filters))
-        input_latent = Input(shape=(self.latent_dimension, 1))
+        input_latent = Input(shape=self.latent_dimension)
+        input_latent = Reshape((self.latent_dimension, 1))(input_latent)
         gradient_flow = AddNoise()([input_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
@@ -84,7 +85,8 @@ class Generator:
 
         input_flow = Input(shape=(int(resolution_block), int(resolution_block), number_filters))
         input_noise = Input(shape=(resolution_block*2, resolution_block*2, number_filters))
-        input_latent = Input(shape=(self.latent_dimension, 1))
+        input_latent = Input(shape=self.latent_dimension)
+        input_latent = Reshape((self.latent_dimension, 1))(input_latent)
         gradient_flow = UpSampling2D((2, 2))(input_flow)
         gradient_flow = AddNoise()([gradient_flow, input_noise])
 
@@ -101,7 +103,7 @@ class Generator:
     def build_synthesis_block(self):
 
         input_flow = Input(shape=(self.initial_dimension, self.initial_dimension, self.initial_num_channels), name="Input Mapping")
-        input_latent = Input(shape=(self.latent_dimension, 1), name="Input Latent")
+        input_latent = Input(shape=self.latent_dimension, name="Input Latent")
         self.latent_input = input_latent
         self.initial_flow = input_flow
 
@@ -147,11 +149,21 @@ class Generator:
         last_level_dimension = level_size_feature_dimension[number_level]
         last_level_filters = self.num_filters_per_level[number_level]
 
-        neural_mapping = self.color_mapping(last_level_dimension, last_level_filters)
-        neural_mapping = neural_mapping([synthesis_model.output])
-        neural_mapping = Model(synthesis_model.inputs, neural_mapping)
+        neural_synthesis = self.color_mapping(last_level_dimension, last_level_filters)
+        neural_synthesis = neural_synthesis([synthesis_model.output])
+        neural_synthesis = Model(synthesis_model.inputs, neural_synthesis)
+        neural_synthesis.summary()
+        list_input_noise = [self.list_level_noise_input[i] for i in range(number_level)]
+        list_input_noise.append(self.initial_flow)
+        list_input_noise.append(self.mapping_neural_network.input)
+        generator = neural_synthesis(list_input_noise)
+        generator = Model(list_input_noise, generator)
+        generator.summary()
 
-        neural_mapping.summary()
+
+
+
+        #self.mapping_neural_network.summary()
 
 
 
