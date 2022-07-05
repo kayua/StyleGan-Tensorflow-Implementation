@@ -61,13 +61,13 @@ class Discriminator:
 
     def get_discriminator(self, number_level):
 
-        discriminator_input = self.input_discriminator[number_level]
-        discriminator_network = self.discriminator_blocks[number_level]
+        discriminator_input = self.input_discriminator[-number_level]
+        discriminator_network = self.discriminator_blocks[-number_level]
         discriminator_network = Model(discriminator_input, discriminator_network.output)
         discriminator_network.summary()
-        exit()
-        for i in range(number_level-1):
 
+        for i in range(number_level-1):
+            discriminator_network = discriminator_network(self.input_discriminator[-number_level])
             discriminator_network = Model(discriminator_input, discriminator_network.output)
             discriminator_network.summary()
 
@@ -76,4 +76,4 @@ class Discriminator:
 
 
 discriminator = Discriminator()
-discriminator.get_discriminator(1)
+discriminator.get_discriminator(2)
