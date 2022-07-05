@@ -30,7 +30,7 @@ class Discriminator:
         self.input_discriminator.append(input_layer)
         gradient_flow = Conv2D(number_filters, (3, 3), padding="same")(input_layer)
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
-        gradient_flow = Conv2D(number_filters, (3, 3), padding="same")(gradient_flow)
+        gradient_flow = Conv2D(3, (3, 3), padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
         gradient_flow = MaxPooling2D((2, 2))(gradient_flow)
         gradient_flow = Model(input_layer, gradient_flow)
@@ -64,16 +64,17 @@ class Discriminator:
         discriminator_input = self.input_discriminator[-number_level]
         discriminator_network = self.discriminator_blocks[-number_level]
         discriminator_network = Model(discriminator_input, discriminator_network.output)
+        discriminator_network.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         discriminator_network.summary()
-
         for i in range(number_level-1):
-            discriminator_network = discriminator_network(self.input_discriminator[-number_level])
-            discriminator_network = Model(discriminator_input, discriminator_network.output)
-            discriminator_network.summary()
+            print(-(number_level-(i+1)))
+            discriminator_network = self.discriminator_blocks[-(number_level-(i+1))](discriminator_network.output)
+            discriminator_network = Model(discriminator_input, discriminator_network)
+        discriminator_network.summary()
 
 
 
 
 
 discriminator = Discriminator()
-discriminator.get_discriminator(2)
+discriminator.get_discriminator(3)
