@@ -72,11 +72,11 @@ class Discriminator:
 
         discriminator_network.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         discriminator_network.summary()
-        self.first_level_discriminator.summary()
+        #self.first_level_discriminator.summary()
         discriminator = self.first_level_discriminator(discriminator_network.output)
-        #discriminator = Model(discriminator, self.first_level_discriminator.input)
+        discriminator = Model(discriminator_input, discriminator)
 
-        #discriminator.summary()
+        discriminator.summary()
 
 
 
