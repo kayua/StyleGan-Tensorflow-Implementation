@@ -16,6 +16,7 @@ class Discriminator:
         self.input_discriminator = []
         self.discriminator_blocks = []
         self.first_level_discriminator = None
+        self.build_discriminator()
 
     def convolutional_block(self, resolution_feature, number_filters):
 
@@ -46,7 +47,6 @@ class Discriminator:
 
             self.convolutional_block(level_size_feature_dimension[i], number_filters_per_layer[i])
 
-
     @staticmethod
     def fully_connected_block(input_layer):
         gradient_flow = Flatten()(input_layer)
@@ -58,4 +58,3 @@ class Discriminator:
 
 
 discriminator = Discriminator()
-discriminator.build_discriminator()
