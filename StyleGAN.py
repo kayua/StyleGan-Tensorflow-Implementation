@@ -49,8 +49,10 @@ class StyleGAN(Model):
 
         batch_size = tensorflow.shape(real_images)[0]
 
+        random_noise_vector = []
         for i in range(self.d_steps):
             random_latent_vectors = numpy.array([self.generate_latent_noise()] for _ in range(batch_size))
+            random_noise_vector.append(numpy.array([self.generate_random_noise()] for _ in range(batch_size)))
 
             with tensorflow.GradientTape() as tape:
                 # Generate fake images from the latent vector
