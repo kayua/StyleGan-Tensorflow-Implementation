@@ -63,21 +63,20 @@ class Discriminator:
     def get_discriminator(self, number_level):
 
         discriminator_input = self.input_discriminator[-number_level]
-        discriminator_network = self.discriminator_blocks[-number_level]
-        discriminator_network = Model(discriminator_input, discriminator_network.output)
-        discriminator_network.compile(loss=self.loss_function, optimizer=self.optimizer_function)
+        convolutional_blocks = self.discriminator_blocks[-number_level]
+        convolutional_blocks = Model(discriminator_input, convolutional_blocks.output)
+        convolutional_blocks.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         for i in range(number_level-1):
-            discriminator_network = self.discriminator_blocks[-(number_level-(i+1))](discriminator_network.output)
-            discriminator_network = Model(discriminator_input, discriminator_network)
+            convolutional_blocks = self.discriminator_blocks[-(number_level-(i+1))](convolutional_blocks.output)
+            convolutional_blocks = Model(discriminator_input, convolutional_blocks)
 
-        discriminator_network.compile(loss=self.loss_function, optimizer=self.optimizer_function)
+        convolutional_blocks.compile(loss=self.loss_function, optimizer=self.optimizer_function)
+        convolutional_blocks.summary()
+        discriminator_network = self.first_level_discriminator(convolutional_blocks.output)
+        discriminator_network = Model(discriminator_input, discriminator_network, name="Discriminator")
         discriminator_network.summary()
-        #self.first_level_discriminator.summary()
-        discriminator = self.first_level_discriminator(discriminator_network.output)
-        discriminator = Model(discriminator_input, discriminator)
 
-        discriminator.summary()
-
+        return discriminator_network
 
 
 
