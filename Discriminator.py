@@ -67,9 +67,13 @@ class Discriminator:
         discriminator_network.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         discriminator_network.summary()
         for i in range(number_level-1):
-            print(-(number_level-(i+1)))
             discriminator_network = self.discriminator_blocks[-(number_level-(i+1))](discriminator_network.output)
             discriminator_network = Model(discriminator_input, discriminator_network)
+
+
+
+
+
         discriminator_network.summary()
 
 
