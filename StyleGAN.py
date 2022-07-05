@@ -127,7 +127,7 @@ num_filters_per_level = [256, 256, 256, 256, 256, 256, 256, 256, 256]
 def generate_constant_mapping():
 
     number_filters = num_filters_per_level[-1]
-    constant_mapping = numpy.array([[0.5 for col in range(initial_dimension**2)] for row in range(number_filters)])
+    constant_mapping = numpy.array([0.5 for _ in range(number_filters*initial_dimension**2)])
     constant_mapping = numpy.reshape(constant_mapping, (initial_dimension, initial_dimension, number_filters))
     print(constant_mapping.shape)
 generate_constant_mapping()
