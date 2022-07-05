@@ -108,7 +108,11 @@ class StyleGAN(Model):
 
     def generate_constant_mapping(self):
 
-        constant_mapping = [[0.5 for col in range(5)] for row in range(10)]
+        number_filters = self.num_filters_per_level[-1]
+        constant_mapping = numpy.array([0.5 for _ in range(number_filters * self.initial_dimension ** 2)])
+        mapping_shape = (self.initial_dimension, self.initial_dimension, number_filters)
+        constant_mapping = numpy.reshape(constant_mapping, mapping_shape)
+        return constant_mapping
 
     def change_resolution_image(self, batch_image):
 
@@ -121,13 +125,3 @@ class StyleGAN(Model):
             batch_image_new_resolution.append(new_image)
 
         return numpy.array(batch_image_new_resolution, dtype=numpy.float32)
-
-initial_dimension = 4
-num_filters_per_level = [256, 256, 256, 256, 256, 256, 256, 256, 256]
-def generate_constant_mapping():
-
-    number_filters = num_filters_per_level[-1]
-    constant_mapping = numpy.array([0.5 for _ in range(number_filters*initial_dimension**2)])
-    constant_mapping = numpy.reshape(constant_mapping, (initial_dimension, initial_dimension, number_filters))
-    print(constant_mapping.shape)
-generate_constant_mapping()
