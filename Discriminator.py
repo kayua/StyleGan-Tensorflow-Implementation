@@ -40,7 +40,7 @@ class Discriminator:
         #gradient_flow.summary()
 
     def build_discriminator(self):
-        resolution_feature = level_size_feature_dimension[-1]
+
         input_layer = Input(shape=(self.initial_resolution, self.initial_resolution, number_channels))
         number_layer = number_filters_per_layer[-1]
         self.first_level_discriminator = LayerNormalization()(input_layer)
