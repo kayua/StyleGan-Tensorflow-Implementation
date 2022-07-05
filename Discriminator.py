@@ -11,6 +11,7 @@ level_size_feature_dimension = [512, 256, 128, 64, 32, 16, 8]
 number_filters_per_layer = [16, 32, 64, 96, 128, 256, 512]
 
 number_channels = 3
+DEFAULT_VERBOSE_CONSTRUCTION = False
 
 
 class Discriminator:
@@ -37,7 +38,8 @@ class Discriminator:
         gradient_flow = Model(input_layer, gradient_flow)
         gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         self.discriminator_blocks.append(gradient_flow)
-        #gradient_flow.summary()
+        if DEFAULT_VERBOSE_CONSTRUCTION:
+            gradient_flow.summary()
 
     def build_discriminator(self):
 
@@ -48,10 +50,9 @@ class Discriminator:
         self.first_level_discriminator = Conv2D(number_layer, (3, 3), padding="same")(self.first_level_discriminator)
         self.first_level_discriminator = self.fully_connected_block(self.first_level_discriminator)
         self.first_level_discriminator = Model(input_layer, self.first_level_discriminator)
-        #self.first_level_discriminator.summary()
+        # self.first_level_discriminator.summary()
 
         for i in range(len(level_size_feature_dimension)):
-
             self.convolutional_block(level_size_feature_dimension[i], number_filters_per_layer[i])
 
     @staticmethod
@@ -66,8 +67,8 @@ class Discriminator:
         convolutional_blocks = self.discriminator_blocks[-number_level]
         convolutional_blocks = Model(discriminator_input, convolutional_blocks.output)
         convolutional_blocks.compile(loss=self.loss_function, optimizer=self.optimizer_function)
-        for i in range(number_level-1):
-            convolutional_blocks = self.discriminator_blocks[-(number_level-(i+1))](convolutional_blocks.output)
+        for i in range(number_level - 1):
+            convolutional_blocks = self.discriminator_blocks[-(number_level - (i + 1))](convolutional_blocks.output)
             convolutional_blocks = Model(discriminator_input, convolutional_blocks)
 
         convolutional_blocks.compile(loss=self.loss_function, optimizer=self.optimizer_function)
@@ -77,8 +78,6 @@ class Discriminator:
         discriminator_network.summary()
 
         return discriminator_network
-
-
 
 
 discriminator = Discriminator()
