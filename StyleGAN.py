@@ -114,6 +114,7 @@ class StyleGAN(Model):
         constant_mapping = numpy.reshape(constant_mapping, mapping_shape)
         return constant_mapping
 
+
     def change_resolution_image(self, batch_image):
 
         batch_image_new_resolution = []
@@ -125,3 +126,15 @@ class StyleGAN(Model):
             batch_image_new_resolution.append(new_image)
 
         return numpy.array(batch_image_new_resolution, dtype=numpy.float32)
+
+
+level_network = 4
+num_filters_per_level = [256, 256, 256, 256, 256, 256, 256, 256, 256]
+def generate_random_noise():
+
+    random_noise_vector = []
+
+    for i in range(level_network):
+        print(numpy.random.uniform(0.5, 1, 1000))
+
+generate_random_noise()
