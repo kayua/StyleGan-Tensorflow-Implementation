@@ -1,5 +1,11 @@
-from keras import Input, Model
-from keras.layers import Conv2D, LeakyReLU, MaxPooling2D, Dense, LayerNormalization, Flatten
+from keras import Input
+from keras import Model
+from keras.layers import Conv2D
+from keras.layers import LeakyReLU
+from keras.layers import MaxPooling2D
+from keras.layers import Dense
+from keras.layers import LayerNormalization
+from keras.layers import Flatten
 
 level_size_feature_dimension = [512, 256, 128, 64, 32, 16, 8]
 number_filters_per_layer = [8, 16, 32, 64, 128, 256, 512]
@@ -55,6 +61,7 @@ class Discriminator:
 
     def get_discriminator(self, number_level):
 
+        for i in range()
         discriminator_input = self.input_discriminator[-1]
         discriminator_network = self.discriminator_blocks[-1]
         discriminator_network = Model(discriminator_input, discriminator_network.output)
