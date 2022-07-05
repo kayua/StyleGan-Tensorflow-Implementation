@@ -8,7 +8,7 @@ from keras.layers import LayerNormalization
 from keras.layers import Flatten
 
 level_size_feature_dimension = [512, 256, 128, 64, 32, 16, 8]
-number_filters_per_layer = [8, 16, 32, 64, 128, 256, 512]
+number_filters_per_layer = [16, 32, 64, 96, 128, 256, 512]
 
 number_channels = 3
 
@@ -82,4 +82,4 @@ class Discriminator:
 
 
 discriminator = Discriminator()
-discriminator.get_discriminator(3)
+discriminator.get_discriminator(7)
