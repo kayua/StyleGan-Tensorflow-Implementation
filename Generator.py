@@ -140,32 +140,28 @@ class Generator:
 
     def get_generator(self, number_level):
 
-        list_input_noise = [self.list_level_noise_input[i] for i in range(number_level)]
-        list_input_noise.append(self.initial_flow)
-        list_input_noise.append(self.latent_input)
+        neural_input_layer = [self.list_level_noise_input[i] for i in range(number_level)]
+        neural_input_layer.append(self.initial_flow)
+        neural_input_layer.append(self.latent_input)
 
-        synthesis_model = Model(list_input_noise, self.list_block_synthesis[number_level-1])
+        synthesis_model = Model(neural_input_layer, self.list_block_synthesis[number_level-1])
         synthesis_model.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         last_level_dimension = level_size_feature_dimension[number_level]
         last_level_filters = self.num_filters_per_level[number_level]
-
         neural_synthesis = self.color_mapping(last_level_dimension, last_level_filters)
         neural_synthesis = neural_synthesis([synthesis_model.output])
         neural_synthesis = Model(synthesis_model.inputs, neural_synthesis)
-        neural_synthesis.summary()
-        list_input_noise = [self.list_level_noise_input[i] for i in range(number_level)]
-        list_input_noise.append(self.initial_flow)
-        list_input_noise.append(self.mapping_neural_network.input)
-        generator = neural_synthesis(list_input_noise)
-        generator = Model(list_input_noise, generator)
-        generator.summary()
 
-
-
-
-        #self.mapping_neural_network.summary()
-
+        neural_input_layer = [self.list_level_noise_input[i] for i in range(number_level)]
+        neural_input_layer.append(self.initial_flow)
+        neural_input_layer.append(self.mapping_neural_network.input)
+        style_generator = neural_synthesis(neural_input_layer)
+        style_generator = Model(neural_input_layer, style_generator)
+        style_generator.summary()
+        return style_generator
 
 
 a = Generator()
+a.get_generator(3)
+a.get_generator(5)
 a.get_generator(6)
