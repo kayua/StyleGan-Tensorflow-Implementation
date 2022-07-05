@@ -16,8 +16,6 @@ class Discriminator:
         self.input_discriminator = []
         self.discriminator_blocks = []
         self.first_level_discriminator = None
-        pass
-
 
     def convolutional_block(self, resolution_feature, number_filters):
 
@@ -37,7 +35,8 @@ class Discriminator:
         resolution_feature = level_size_feature_dimension[-1]
         input_layer = Input(shape=(resolution_feature, resolution_feature, number_channels))
         number_layer = number_filters_per_layer[-1]
-        self.first_level_discriminator = Conv2D(number_layer, (3, 3), padding="same")(input_layer)
+        self.first_level_discriminator = LayerNormalization()(input_layer)
+        self.first_level_discriminator = Conv2D(number_layer, (3, 3), padding="same")(self.first_level_discriminator)
         self.first_level_discriminator = Conv2D(number_layer, (3, 3), padding="same")(self.first_level_discriminator)
         self.first_level_discriminator = self.fully_connected_block(self.first_level_discriminator)
         self.first_level_discriminator = Model(input_layer, self.first_level_discriminator)
@@ -51,9 +50,7 @@ class Discriminator:
     @staticmethod
     def fully_connected_block(input_layer):
         gradient_flow = Flatten()(input_layer)
-        gradient_flow = LayerNormalization(gradient_flow)
         gradient_flow = Dense(1)(gradient_flow)
-        gradient_flow = LeakyReLU(0.2)(gradient_flow)
         return gradient_flow
 
 
