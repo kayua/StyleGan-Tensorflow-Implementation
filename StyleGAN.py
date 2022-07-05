@@ -17,6 +17,7 @@ class StyleGAN(Model):
         self.latent_dim = latent_dim
         self.d_steps = discriminator_extra_steps
         self.gp_weight = gp_weight
+        self.latent_dimension = 128
         self.initial_dimension = 4
         self.num_filters_per_level = [256, 256, 256, 256, 256, 256, 256, 256, 256]
 
@@ -46,24 +47,10 @@ class StyleGAN(Model):
         if isinstance(real_images, tuple):
             real_images = real_images[0]
 
-        # Get the batch size
         batch_size = tensorflow.shape(real_images)[0]
 
-        # For each batch, we are going to perform the
-        # following steps as laid out in the original paper:
-        # 1. Train the generator and get the generator loss
-        # 2. Train the discriminator and get the discriminator loss
-        # 3. Calculate the gradient penalty
-        # 4. Multiply this gradient penalty with a constant weight factor
-        # 5. Add the gradient penalty to the discriminator loss
-        # 6. Return the generator and discriminator losses as a loss dictionary
-
-        # Train the discriminator first. The original paper recommends training
-        # the discriminator for `x` more steps (typically 5) as compared to
-        # one step of the generator. Here we will train it for 3 extra steps
-        # as compared to 5 to reduce the training time.
         for i in range(self.d_steps):
-            random_latent_vectors = tensorflow.random.normal(shape=(batch_size, self.latent_dim))
+            random_latent_vectors = numpy.array([self.generate_latent_noise()] for _ in range(batch_size))
 
             with tensorflow.GradientTape() as tape:
                 # Generate fake images from the latent vector
@@ -114,6 +101,24 @@ class StyleGAN(Model):
         constant_mapping = numpy.reshape(constant_mapping, mapping_shape)
         return constant_mapping
 
+    def generate_random_noise(self):
+
+        random_noise_vector = []
+
+        for i in range(1, level_network):
+            size_feature = level_size_feature_dimension[-i] ** 2
+            resolution_feature = level_size_feature_dimension[-i]
+            random_noise = numpy.random.uniform(0, 1, self.num_filters_per_level[-i] * size_feature)
+            shape_feature = (resolution_feature, resolution_feature, num_filters_per_level[-i])
+            random_noise_vector.append(numpy.reshape(random_noise, shape_feature))
+
+        return random_noise_vector
+
+    def generate_latent_noise(self):
+
+        latent_input = numpy.random.uniform(0, 1, self.latent_dimension)
+        latent_input = numpy.reshape(latent_input, (self.latent_dimension, 1))
+        return latent_input
 
     def change_resolution_image(self, batch_image):
 
@@ -130,19 +135,3 @@ class StyleGAN(Model):
 
 level_network = 4
 num_filters_per_level = [256, 256, 256, 256, 256, 256, 256, 256, 256]
-
-def generate_random_noise():
-
-    random_noise_vector = []
-
-    for i in range(1, level_network):
-        size_feature = level_size_feature_dimension[-i]**2
-        resolution_feature = level_size_feature_dimension[-i]
-        random_noise = numpy.random.uniform(0, 1, num_filters_per_level[-i]*size_feature)
-        shape_feature = (resolution_feature, resolution_feature, num_filters_per_level[-i])
-        random_noise_vector.append(numpy.reshape(random_noise, shape_feature))
-
-    return random_noise_vector
-
-
-generate_random_noise()
