@@ -22,6 +22,7 @@ class Discriminator:
         self.input_discriminator = []
         self.discriminator_blocks = []
         self.first_level_discriminator = None
+        self.initial_resolution = 4
         self.build_discriminator()
 
     def convolutional_block(self, resolution_feature, number_filters):
@@ -40,7 +41,7 @@ class Discriminator:
 
     def build_discriminator(self):
         resolution_feature = level_size_feature_dimension[-1]
-        input_layer = Input(shape=(resolution_feature, resolution_feature, number_channels))
+        input_layer = Input(shape=(self.initial_resolution, self.initial_resolution, number_channels))
         number_layer = number_filters_per_layer[-1]
         self.first_level_discriminator = LayerNormalization()(input_layer)
         self.first_level_discriminator = Conv2D(number_layer, (3, 3), padding="same")(self.first_level_discriminator)
@@ -65,16 +66,17 @@ class Discriminator:
         discriminator_network = self.discriminator_blocks[-number_level]
         discriminator_network = Model(discriminator_input, discriminator_network.output)
         discriminator_network.compile(loss=self.loss_function, optimizer=self.optimizer_function)
-        discriminator_network.summary()
         for i in range(number_level-1):
             discriminator_network = self.discriminator_blocks[-(number_level-(i+1))](discriminator_network.output)
             discriminator_network = Model(discriminator_input, discriminator_network)
 
-
-
-
-
+        discriminator_network.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         discriminator_network.summary()
+        self.first_level_discriminator.summary()
+        discriminator = self.first_level_discriminator(discriminator_network.output)
+        #discriminator = Model(discriminator, self.first_level_discriminator.input)
+
+        #discriminator.summary()
 
 
 
