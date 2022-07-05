@@ -1,5 +1,5 @@
 from keras import Input, Model
-from keras.layers import Conv2D, LeakyReLU, MaxPooling2D, Dense, Normalization
+from keras.layers import Conv2D, LeakyReLU, MaxPooling2D, Dense, LayerNormalization, Flatten
 
 level_size_feature_dimension = [512, 256, 128, 64, 32, 16, 8, 4, 4]
 number_filters_per_layer = [4, 8, 16, 32, 64, 128, 256, 512, 512]
@@ -50,7 +50,8 @@ class Discriminator:
 
     @staticmethod
     def fully_connected_block(input_layer):
-        gradient_flow = Normalization(input_layer)
+        gradient_flow = Flatten()(input_layer)
+        gradient_flow = LayerNormalization(gradient_flow)
         gradient_flow = Dense(1)(gradient_flow)
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
         return gradient_flow
