@@ -15,7 +15,7 @@ from Layers.AddNoise import AddNoise
 tensorflow.get_logger().setLevel(logging.ERROR)
 level_size_feature_dimension = [4, 4, 8, 16, 32, 64, 128, 256, 512]
 
-DEFAULT_VERBOSE_CONSTRUCTION = True
+DEFAULT_VERBOSE_CONSTRUCTION = False
 
 
 class Generator:
@@ -175,4 +175,4 @@ class Generator:
 
 
 a = Generator()
-a.get_generator(3)
+a.get_generator(5)
