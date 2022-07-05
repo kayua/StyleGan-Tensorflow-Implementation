@@ -53,6 +53,10 @@ class Discriminator:
         gradient_flow = Dense(1)(gradient_flow)
         return gradient_flow
 
+    def get_discriminator(self, number_level):
+
+
+
 
 
 
