@@ -30,7 +30,7 @@ class Discriminator:
         gradient_flow = Model(input_layer, gradient_flow)
         gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         self.discriminator_blocks.append(gradient_flow)
-        gradient_flow.summary()
+        #gradient_flow.summary()
 
     def build_discriminator(self):
         resolution_feature = level_size_feature_dimension[-1]
@@ -41,7 +41,7 @@ class Discriminator:
         self.first_level_discriminator = Conv2D(number_layer, (3, 3), padding="same")(self.first_level_discriminator)
         self.first_level_discriminator = self.fully_connected_block(self.first_level_discriminator)
         self.first_level_discriminator = Model(input_layer, self.first_level_discriminator)
-        self.first_level_discriminator.summary()
+        #self.first_level_discriminator.summary()
 
         for i in range(len(level_size_feature_dimension)):
 
@@ -55,10 +55,14 @@ class Discriminator:
 
     def get_discriminator(self, number_level):
 
-
+        discriminator_input = self.input_discriminator[-1]
+        discriminator_network = self.discriminator_blocks[-1]
+        discriminator_network = Model(discriminator_input, discriminator_network.output)
+        discriminator_network.summary()
 
 
 
 
 
 discriminator = Discriminator()
+discriminator.get_discriminator(1)
