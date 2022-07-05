@@ -1,12 +1,14 @@
+import cv2
 import tensorflow
 from keras import Model
 
 
 class StyleGAN(Model):
 
-    def __init__(self, discriminator, generator, latent_dim, discriminator_extra_steps=3, gp_weight=10.0):
+    def __init__(self, discriminator, generator, latent_dim, discriminator_extra_steps=3, gp_weight=10.0, level_network=2):
         super(StyleGAN, self).__init__()
         self.discriminator = discriminator
+        self.level_network = level_network
         self.generator = generator
         self.latent_dim = latent_dim
         self.d_steps = discriminator_extra_steps
@@ -82,8 +84,8 @@ class StyleGAN(Model):
 
         # Train the generator
         # Get the latent vector
-        random_latent_vectors = tf.random.normal(shape=(batch_size, self.latent_dim))
-        with tf.GradientTape() as tape:
+        random_latent_vectors = tensorflow.random.normal(shape=(batch_size, self.latent_dim))
+        with tensorflow.GradientTape() as tape:
             # Generate fake images using the generator
             generated_images = self.generator(random_latent_vectors, training=True)
             # Get the discriminator logits for fake images
@@ -98,3 +100,9 @@ class StyleGAN(Model):
             zip(gen_gradient, self.generator.trainable_variables)
         )
         return {"d_loss": d_loss, "g_loss": g_loss}
+
+    def change_resolution_image(self, batch_image):
+        batch_image_new_resolution = []
+        for i in batch_image:
+            new_image = cv2.resize(i, dsize=(54, 140), interpolation=cv2.INTER_CUBIC)
+            batch_image_new_resolution.append(new_image)
