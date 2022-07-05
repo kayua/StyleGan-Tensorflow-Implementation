@@ -1,8 +1,8 @@
 from keras import Input, Model
 from keras.layers import Conv2D, LeakyReLU, MaxPooling2D, Dense, LayerNormalization, Flatten
 
-level_size_feature_dimension = [512, 256, 128, 64, 32, 16, 8, 4, 4]
-number_filters_per_layer = [4, 8, 16, 32, 64, 128, 256, 512, 512]
+level_size_feature_dimension = [512, 256, 128, 64, 32, 16, 8]
+number_filters_per_layer = [8, 16, 32, 64, 128, 256, 512]
 
 number_channels = 3
 
