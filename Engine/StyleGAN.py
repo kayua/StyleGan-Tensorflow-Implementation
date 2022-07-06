@@ -1,3 +1,5 @@
+import cv2
+import numpy
 import tensorflow
 from keras import Model
 
@@ -20,7 +22,7 @@ class StyleGAN(Model):
         self.initial_dimension = 4
         self.num_filters_per_level = [256, 256, 256, 256, 256, 256, 256, 256, 256]
 
-    def compile(self, d_optimizer, g_optimizer, d_loss_fn, g_loss_fn, **kwargs):
+    def compile(self, d_optimizer, g_optimizer, d_loss_fn, g_loss_fn):
         super(StyleGAN, self).compile()
         self.d_optimizer = d_optimizer
         self.g_optimizer = g_optimizer
@@ -35,6 +37,7 @@ class StyleGAN(Model):
 
         with tensorflow.GradientTape() as gp_tape:
             gp_tape.watch(interpolated)
+
             pred = self.discriminator(interpolated, training=True)
 
         grads = gp_tape.gradient(pred, [interpolated])[0]
@@ -74,13 +77,14 @@ class StyleGAN(Model):
                 real_image_resize = self.resize_image(8, real_images)
                 real_discriminator_loss = self.discriminator(real_image_resize, training=True)
 
-                discriminator_loss = self.d_loss_fn(real_discriminator_loss, synthetic_discriminator_loss)
+                discriminator_loss = self.d_loss_fn(real_img=real_discriminator_loss, fake_img=synthetic_discriminator_loss)
 
                 gradient_update = self.gradient_penalty(batch_size, real_image_resize, synthetic_images_generated)
                 discriminator_loss = discriminator_loss + gradient_update * self.gp_weight
-                discriminator_update = tape.gradient(discriminator_loss, self.discriminator.trainable_variables)
-                gradient_update_values = zip(discriminator_update, self.discriminator.trainable_variables)
-                self.d_optimizer.apply_gradients(gradient_update_values)
+
+            discriminator_update = tape.gradient(discriminator_loss, self.discriminator.trainable_variables)
+
+            self.d_optimizer.apply_gradients(zip(discriminator_update, self.discriminator.trainable_variables))
 
         random_latent_space = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
         dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
@@ -92,15 +96,22 @@ class StyleGAN(Model):
 
             synthetic_images_generated = self.generator(input_mapping, training=True)
             discriminator_loss = self.discriminator(synthetic_images_generated, training=True)
-            generator_loss = self.g_loss_fn(discriminator_loss)
-            gradient_update_loss_generator = tape.gradient(generator_loss, self.generator.trainable_variables)
-            gradient_update_values = zip(gradient_update_loss_generator, self.generator.trainable_variables)
-            self.g_optimizer.apply_gradients(gradient_update_values)
+            g_loss = self.g_loss_fn(discriminator_loss)
+        gen_gradient = tape.gradient(g_loss, self.generator.trainable_variables)
+        self.g_optimizer.apply_gradients(zip(gen_gradient, self.generator.trainable_variables))
 
-        return {"discriminator_loss": discriminator_loss, "generator_loss": generator_loss}
 
-    @staticmethod
-    def resize_image(res, image):
+
+
+
+
+
+
+
+
+        return {"discriminator_loss": discriminator_loss, "g_loss": g_loss}
+
+    def resize_image(self, res, image):
         image = tensorflow.image.resize(image, (res, res), method=tensorflow.image.ResizeMethod.NEAREST_NEIGHBOR)
         image = tensorflow.cast(image, tensorflow.float32)
         return image
@@ -122,4 +133,21 @@ class StyleGAN(Model):
 
         return random_noise_vector
 
+    def generate_latent_noise(self, batch_size):
 
+        latent_input = numpy.random.uniform(0, 1, self.latent_dimension * batch_size)
+        latent_input = numpy.reshape(latent_input, (batch_size, self.latent_dimension, 1))
+        latent_input = numpy.array(latent_input, dtype=numpy.float32)
+        return latent_input
+
+    def change_resolution_image(self, batch_image):
+
+        batch_image_new_resolution = []
+        size_image = level_size_feature_dimension[-self.level_network]
+        tuple_shape_image = (size_image, size_image)
+
+        for i in batch_image:
+            new_image = cv2.resize(i, dsize=tuple_shape_image, interpolation=cv2.INTER_CUBIC)
+            batch_image_new_resolution.append(new_image)
+
+        return numpy.array(batch_image_new_resolution, dtype=numpy.float32)
