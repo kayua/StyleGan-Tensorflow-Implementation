@@ -93,8 +93,6 @@ class StyleGAN(Model):
             gen_gradient = tape.gradient(g_loss, self.generator.trainable_variables)
             self.g_optimizer.apply_gradients(zip(gen_gradient, self.generator.trainable_variables))
 
-        print({"d_loss": d_loss, "g_loss": g_loss})
-
         return {"d_loss": d_loss, "g_loss": g_loss}
 
     def resize_image(self, res, image):
