@@ -25,7 +25,6 @@ generator_instance = Generator()
 image_instance = LoadImage()
 image_training = image_instance.get_dataset_image()
 print(image_training.shape)
-
 generator_model = generator_instance.get_generator(level)
 discriminator_model = discriminator_instance.get_discriminator(level)
 

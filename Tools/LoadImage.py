@@ -41,6 +41,6 @@ class LoadImage:
     def get_dataset_image(self):
         self.load_images()
 
-        return numpy.array([self.image_loaded])
+        return numpy.array(self.image_loaded)
 
 
