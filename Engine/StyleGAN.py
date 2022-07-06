@@ -48,9 +48,13 @@ class StyleGAN(Model):
 
     def get_random_batch_image(self, images, number_images):
 
+        list_image_batch = []
         image_index = [random.randint(0, number_images) for _ in range(self.batch_size)]
-        list_image_batch = numpy.array(images[image_index])
-        return list_image_batch
+
+        for i in image_index:
+            list_image_batch.append(numpy.array(images[i]))
+
+        return numpy.array(list_image_batch)
 
 
 
@@ -65,6 +69,7 @@ class StyleGAN(Model):
         for i in range(self.d_steps):
             random_latent_vectors = self.generate_latent_noise(number_images)
             real_image_batch = self.get_random_batch_image(real_images, number_images)
+            print(real_image_batch.shape)
             exit()
             #random_noise_vector.append(numpy.array([self.generate_random_noise() for _ in range(batch_size)]))
             #constant_feature_mapping = numpy.array([self.generate_constant_mapping() for _ in range(batch_size)])
