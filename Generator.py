@@ -18,26 +18,38 @@ level_size_feature_dimension = [4, 4, 8, 16, 32, 64, 128, 256, 512]
 
 DEFAULT_VERBOSE_CONSTRUCTION = False
 
+DEFAULT_LATENT_DIMENSION = 128
+DEFAULT_NUMBER_NEURONS_MAPPING = 512
+DEFAULT_NUMBER_MAPPING_BLOCKS = 4
+DEFAULT_INITIAL_FEATURE_DIMENSION = 4
+DEFAULT_INITIAL_NUMBER_CHANNELS = 256
+DEFAULT_NUMBER_OUTPUT_CHANNELS = 3
+DEFAULT_DIMENSION_CONVOLUTION_KERNELS = (3, 3)
+DEFAULT_NUMBER_SYNTHESIS_BLOCKS = 8
+DEFAULT_LOSS_FUNCTION = "binary_crossentropy"
+DEFAULT_OPTIMIZER_FUNCTION = "adam"
+
 
 class Generator:
 
     def __init__(self):
 
-        self.latent_dimension = 128
-        self.num_neurons_mapping = 512
-        self.num_mapping_blocks = 4
-        self.initial_dimension = 4
-        self.initial_num_channels = 256
-        self.number_output_channels = 3
+        self.latent_dimension = DEFAULT_LATENT_DIMENSION
+        self.num_neurons_mapping = DEFAULT_NUMBER_NEURONS_MAPPING
+        self.num_mapping_blocks = DEFAULT_NUMBER_MAPPING_BLOCKS
+        self.initial_dimension = DEFAULT_INITIAL_FEATURE_DIMENSION
+        self.initial_num_channels = DEFAULT_INITIAL_NUMBER_CHANNELS
+        self.number_output_channels = DEFAULT_NUMBER_OUTPUT_CHANNELS
+        self.size_kernel_filters = DEFAULT_DIMENSION_CONVOLUTION_KERNELS
+        self.num_synthesis_block = DEFAULT_NUMBER_SYNTHESIS_BLOCKS
+        self.loss_function = DEFAULT_LOSS_FUNCTION
+        self.optimizer_function = DEFAULT_OPTIMIZER_FUNCTION
         self.mapping_neural_network = None
-        self.size_kernel_filters = (3, 3)
-        self.num_synthesis_block = 8
         self.constant_mapping_neural_network = None
         self.input_block = None
         self.list_block_synthesis = []
         self.list_level_noise_input = []
-        self.loss_function = "binary_crossentropy"
-        self.optimizer_function = "adam"
+
         self.num_filters_per_level = [256, 256, 256, 256, 256, 256, 256, 256, 256]
         self.latent_input = None
         self.initial_flow = None
@@ -58,7 +70,6 @@ class Generator:
         network_model = Model(latent_dimension_input, gradient_flow, name="Mapping_Network")
         self.mapping_neural_network = network_model
         if DEFAULT_VERBOSE_CONSTRUCTION: self.mapping_neural_network.summary()
-
 
     def constant_mapping_block(self):
 
