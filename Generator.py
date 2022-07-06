@@ -200,21 +200,22 @@ class Generator:
         self.initial_dimension = initial_dimension
 
     def set_initial_number_channels(self, initial_number_channels):
-
         self.initial_num_channels = initial_number_channels
 
     def set_number_output_channels(self, number_output_channels):
-
         self.number_output_channels = number_output_channels
 
     def set_dimension_kernel_filters(self, dimension_filter_kernels):
         self.size_kernel_filters = dimension_filter_kernels
 
     def set_number_synthesis_block(self, number_synthesis_block):
-
-            self.num_synthesis_block = number_synthesis_block
+        self.num_synthesis_block = number_synthesis_block
 
     def set_loss_function(self, loss_function):
         self.loss_function = loss_function
+
+    def set_optimizer_function(self, optimizer_function):
         self.optimizer_function = optimizer_function
-        self.num_filters_per_level = num_filters_per_level
+
+    def set_number_filters_per_level(self, number_filter_per_level):
+        self.num_filters_per_level = number_filter_per_level
