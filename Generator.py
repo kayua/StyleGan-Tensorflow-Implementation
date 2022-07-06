@@ -203,8 +203,14 @@ class Generator:
 
         self.initial_num_channels = initial_number_channels
 
-    self.number_output_channels = number_output_channels
-        self.size_kernel_filters = size_kernel_filters
+    def set_number_output_channels(self, number_output_channels):
+
+        self.number_output_channels = number_output_channels
+
+    def set_dimension_kernel_filters(self, dimension_filter_kernels):
+        self.size_kernel_filters = dimension_filter_kernels
+
+
         self.num_synthesis_block = num_synthesis_block
         self.loss_function = loss_function
         self.optimizer_function = optimizer_function
