@@ -16,7 +16,7 @@ from Engine.Layers.AddNoise import AddNoise
 tensorflow.get_logger().setLevel(logging.ERROR)
 level_size_feature_dimension = [4, 4, 8, 16, 32, 64, 128, 256, 512]
 
-DEFAULT_VERBOSE_CONSTRUCTION = False
+DEFAULT_VERBOSE_CONSTRUCTION = True
 
 DEFAULT_LATENT_DIMENSION = 128
 DEFAULT_NUMBER_NEURONS_MAPPING = 512
@@ -97,7 +97,7 @@ class Generator:
         resolution_features_block = (resolution_block, resolution_block, number_filters)
 
         input_flow = Input(shape=resolution_features_block)
-        input_noise = Input(shape=resolution_features_block)
+        input_noise = Input(shape=(resolution_block, resolution_block, 1))
         input_latent = Input(shape=self.latent_dimension)
         input_latent = Reshape((self.latent_dimension, 1))(input_latent)
 
@@ -119,7 +119,7 @@ class Generator:
         feature_output_resolution = (resolution_block * 2, resolution_block * 2, number_filters)
 
         input_flow = Input(shape=feature_input_resolution)
-        input_noise = Input(shape=feature_output_resolution)
+        input_noise = Input(shape=(resolution_block*2, resolution_block*2, 1))
         input_latent = Input(shape=self.latent_dimension)
         input_latent = Reshape((self.latent_dimension, 1))(input_latent)
 
@@ -139,9 +139,10 @@ class Generator:
     def build_synthesis_block(self):
 
         dimension_input_flow = (self.initial_dimension, self.initial_dimension, self.initial_num_channels)
+        dimension_input_flow_noise = (self.initial_dimension, self.initial_dimension, 1)
         input_flow = Input(shape=dimension_input_flow, name="Input Constant")
         input_latent = Input(shape=self.latent_dimension, name="Input Latent")
-        input_noise = Input(shape=dimension_input_flow, name="Input Noise 1")
+        input_noise = Input(shape=dimension_input_flow_noise, name="Input Noise 1")
 
         self.latent_input = input_latent
         self.initial_gradient_flow = input_flow
@@ -154,7 +155,7 @@ class Generator:
         for i in range(self.num_synthesis_block - 1):
 
             resolution_feature = level_size_feature_dimension[i + 1]
-            output_resolution_feature = (resolution_feature * 2, resolution_feature * 2, self.initial_num_channels)
+            output_resolution_feature = (resolution_feature * 2, resolution_feature * 2, 1)
             input_noise = Input(shape=output_resolution_feature, name="Input Noise {}".format(i + 2))
             self.list_level_noise_input.append(input_noise)
             level_block = self.non_initial_synthesis_block(resolution_feature, self.initial_num_channels)

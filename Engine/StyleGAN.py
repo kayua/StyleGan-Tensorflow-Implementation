@@ -58,9 +58,6 @@ class StyleGAN(Model):
 
     def train_step(self, real_images):
 
-        if isinstance(real_images, tuple):
-            real_images = real_images[0]
-
         batch_size = tensorflow.shape(real_images)[0]
 
         for i in range(self.d_steps):
@@ -90,7 +87,7 @@ class StyleGAN(Model):
         print("STEP TRAINING")
         print("---------------------------------")
         print(input_mapping)
-        print("---------------------------------")
+        print("---------------------------------\n\n")
         with tensorflow.GradientTape() as tape:
 
             generated_images = self.generator(input_mapping, training=True)
