@@ -19,6 +19,7 @@ class LoadImage:
         self.number_color_channels = DEFAULT_NUMBER_COLOR_CHANNELS
         self.dataset_path = DEFAULT_DATASET_IMAGE_PATH
         self.image_list = []
+        self.image_loaded = None
         pass
 
     def parse_image(self, filename):
@@ -34,4 +35,11 @@ class LoadImage:
 
         for i in tqdm(directory_images):
             self.image_list.append(self.parse_image(i))
+
+        self.image_loaded = numpy.array(self.image_list)
+
+    def get_dataset_image(self):
+
+        return self.image_list
+
 
