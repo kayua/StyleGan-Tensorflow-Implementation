@@ -17,7 +17,7 @@ class StyleGAN(Model):
         self.latent_dim = latent_dim
         self.d_steps = discriminator_extra_steps
         self.gp_weight = gp_weight
-        self.latent_dimension = 128
+        self.latent_dimension = 256
         self.initial_dimension = 4
         self.num_filters_per_level = [256, 256, 256, 256, 256, 256, 256, 256, 256]
 

@@ -1,4 +1,4 @@
-
+from keras.layers import Reshape
 from keras.utils import conv_utils
 import tensorflow
 from tensorflow.python.layers.base import Layer
@@ -16,18 +16,27 @@ class AdaIN(Layer):
         return input_shape[0]
 
     def call(self, inputs):
-        image = inputs[0]
-        if len(inputs) == 2:
-            style = inputs[1]
-            style_mean, style_var = tensorflow.nn.moments(style, self.spatial_axis, keepdims=True)
-        else:
-            style_mean = tensorflow.expand_dims(tensorflow.expand_dims(inputs[1], self.spatial_axis[0]), self.spatial_axis[1])
-            style_var = tensorflow.expand_dims(tensorflow.expand_dims(inputs[2], self.spatial_axis[0]), self.spatial_axis[1])
-        image_mean, image_var = tensorflow.nn.moments(image, self.spatial_axis, keepdims=True)
-        out = tensorflow.nn.batch_normalization(image, image_mean,
-                                         image_var, style_mean,
-                                         tensorflow.sqrt(style_var), self.eps)
+        content = inputs[0]
+        style = inputs[1]
+        content_mean, content_std = self.get_mean_std(content)
+        style_mean, style_std = self.get_mean_std(style)
+
+        dimension_expanded = (content.shape[1], content.shape[1])
+        style_std = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(Reshape((1, 1, 1))(style_std))
+        content_mean = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(Reshape((1, 1, 256))(content_mean))
+        content_std = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(Reshape((1, 1, 256))(content_std))
+        style_mean = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(Reshape((1, 1, 1))(style_mean))
+
+        out = style_std * (content - content_mean) / content_std + style_mean
+
         return out
+
+    @staticmethod
+    def get_mean_std(x, epsilon=1e-5):
+        axes = [1, 2]
+        mean, variance = tensorflow.nn.moments(x, axes=axes, keepdims=True)
+        standard_deviation = tensorflow.sqrt(variance + epsilon)
+        return mean, standard_deviation
 
     def get_config(self):
         config = {'eps': self.eps}
