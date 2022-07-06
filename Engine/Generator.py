@@ -116,7 +116,7 @@ class Generator:
     def non_initial_synthesis_block(self, resolution_block, number_filters):
 
         feature_input_resolution = (resolution_block, resolution_block, number_filters)
-        feature_output_resolution = (resolution_block * 2, resolution_block * 2, number_filters)
+        (resolution_block * 2, resolution_block * 2, number_filters)
 
         input_flow = Input(shape=feature_input_resolution)
         input_noise = Input(shape=(resolution_block*2, resolution_block*2, 1))
