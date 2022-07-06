@@ -27,7 +27,7 @@ class LoadImage:
         image = tensorflow.image.decode_png(image, channels=self.number_color_channels)
         image = tensorflow.image.convert_image_dtype(image, tensorflow.float32)
         image = tensorflow.image.resize(image, [self.image_width, self.image_height])
-        return numpy.asarray(image, dtype="float32") * DEFAULT_IMAGE_NORMALIZATION
+        return numpy.array(numpy.asarray(image, dtype="float32") * DEFAULT_IMAGE_NORMALIZATION)
 
 
     def load_images(self):
@@ -40,6 +40,7 @@ class LoadImage:
 
     def get_dataset_image(self):
         self.load_images()
-        return self.image_loaded
+
+        return numpy.array([self.image_loaded])
 
 

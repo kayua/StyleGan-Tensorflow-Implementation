@@ -44,15 +44,14 @@ class StyleGAN(Model):
         return gp
 
     def train_step(self, real_images):
-        if isinstance(real_images, tuple):
-            real_images = real_images[0]
 
         batch_size = tensorflow.shape(real_images)[0]
-
+        print(real_images.shape[0])
+        exit()
         random_noise_vector = []
         for i in range(self.d_steps):
-            random_latent_vectors = numpy.array([self.generate_latent_noise()] for _ in range(batch_size))
-            random_noise_vector.append(numpy.array([self.generate_random_noise()] for _ in range(batch_size)))
+            random_latent_vectors = self.generate_latent_noise(batch_size)
+            random_noise_vector.append(numpy.array([self.generate_random_noise() for _ in range(batch_size)]))
             constant_feature_mapping = numpy.array([self.generate_constant_mapping() for _ in range(batch_size)])
 
             with tensorflow.GradientTape() as tape:
@@ -117,10 +116,11 @@ class StyleGAN(Model):
 
         return random_noise_vector
 
-    def generate_latent_noise(self):
+    def generate_latent_noise(self, batch_size):
 
-        latent_input = numpy.random.uniform(0, 1, self.latent_dimension)
-        latent_input = numpy.reshape(latent_input, (self.latent_dimension, 1))
+        latent_input = numpy.random.uniform(0, 1, self.latent_dimension*batch_size)
+        latent_input = numpy.reshape(latent_input, (batch_size, self.latent_dimension, 1))
+        latent_input = numpy.array(latent_input, dtype=numpy.float32)
         return latent_input
 
     def change_resolution_image(self, batch_image):
