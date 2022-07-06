@@ -80,6 +80,3 @@ class Discriminator:
 
         return discriminator_network
 
-
-discriminator = Discriminator()
-discriminator.get_discriminator(7)
