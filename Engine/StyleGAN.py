@@ -40,10 +40,9 @@ class StyleGAN(Model):
 
             discriminator_result = self.discriminator(update_score, training=True)
 
-        grads = gradient_penalty_reduce.gradient(discriminator_result, [update_score])[0]
-        norm = tensorflow.sqrt(tensorflow.reduce_sum(tensorflow.square(grads), axis=[1, 2, 3]))
-        gp = tensorflow.reduce_mean((norm - 1.0) ** 2)
-        return gp
+        gradient_result = gradient_penalty_reduce.gradient(discriminator_result, [update_score])[0]
+        stander_reduction = tensorflow.sqrt(tensorflow.reduce_sum(tensorflow.square(gradient_result), axis=[1, 2, 3]))
+        return tensorflow.reduce_mean((stander_reduction - 1.0) ** 2)
 
     @staticmethod
     def tensor_mapping(random_noise, constant_mapping, latent_input):
