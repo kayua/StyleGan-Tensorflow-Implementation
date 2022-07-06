@@ -84,11 +84,15 @@ class StyleGAN(Model):
                 d_gradient = tape.gradient(d_loss, self.discriminator.trainable_variables)
                 self.d_optimizer.apply_gradients(zip(d_gradient, self.discriminator.trainable_variables))
 
-        exit()
-        random_latent_vectors = tensorflow.random.normal(shape=(batch_size, self.latent_dim))
+        random_latent_vectors = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
+        dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
+        constant_mapping = tensorflow.fill(dimension, 0.5)
+        random_noise_synthesis = self.generate_random_noise(batch_size)
+        input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping, random_latent_vectors)
         with tensorflow.GradientTape() as tape:
-            # Generate fake images using the generator
-            generated_images = self.generator(random_latent_vectors, training=True)
+
+            generated_images = self.generator(input_mapping, training=True)
+            exit()
             # Get the discriminator logits for fake images
             gen_img_logits = self.discriminator(generated_images, training=True)
             # Calculate the generator loss
