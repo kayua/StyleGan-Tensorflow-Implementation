@@ -64,7 +64,8 @@ class Generator:
 
     def block_mapping_network(self):
 
-        latent_dimension_input = Input(shape=(self.latent_dimension, 1), name="Latent Input")
+        shape_latent_mapping = (self.latent_dimension, 1)
+        latent_dimension_input = Input(shape=shape_latent_mapping, name="Latent Input")
         gradient_flow = Flatten()(latent_dimension_input)
         gradient_flow = Dense(self.num_neurons_mapping)(gradient_flow)
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
@@ -81,7 +82,8 @@ class Generator:
     def constant_mapping_block(self):
 
         dimension_latent_vector = 2 ** self.initial_dimension * self.initial_num_channels
-        latent_input = Input(shape=(dimension_latent_vector, 1))
+        latent_shape = (dimension_latent_vector, 1)
+        latent_input = Input(shape=latent_shape)
         mapping_format = (self.initial_dimension, self.initial_dimension, self.initial_num_channels)
         gradient_flow = Reshape(mapping_format)(latent_input)
         gradient_flow = Model(latent_input, gradient_flow, name="Constant_Block")
@@ -91,20 +93,24 @@ class Generator:
 
     def initial_block_synthesis(self, resolution_block, number_filters):
 
-        input_flow = Input(shape=(resolution_block, resolution_block, number_filters))
-        input_noise = Input(shape=(resolution_block, resolution_block, number_filters))
+        resolution_features_block = (resolution_block, resolution_block, number_filters)
+
+        input_flow = Input(shape=resolution_features_block)
+        input_noise = Input(shape=resolution_features_block)
         input_latent = Input(shape=self.latent_dimension)
         input_latent = Reshape((self.latent_dimension, 1))(input_latent)
+
         gradient_flow = AddNoise()([input_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
         gradient_flow = AddNoise()([gradient_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
-        gradient_flow = Model([input_flow, input_noise, input_latent], gradient_flow)
-        gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
-        if DEFAULT_VERBOSE_CONSTRUCTION: gradient_flow.summary()
-        return gradient_flow
+
+        initial_block_model = Model([input_flow, input_noise, input_latent], gradient_flow)
+        initial_block_model.compile(loss=self.loss_function, optimizer=self.optimizer_function)
+        if DEFAULT_VERBOSE_CONSTRUCTION: initial_block_model.summary()
+        return initial_block_model
 
     def non_initial_synthesis_block(self, resolution_block, number_filters):
 
