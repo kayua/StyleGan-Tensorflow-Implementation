@@ -7,7 +7,6 @@ from keras.layers import Dense
 from keras.layers import LayerNormalization
 from keras.layers import Flatten
 
-level_size_feature_dimension = [512, 256, 128, 64, 32, 16, 8]
 number_filters_per_layer = [16, 32, 64, 96, 128, 256, 512]
 
 DEFAULT_VERBOSE_CONSTRUCTION = False
@@ -24,6 +23,7 @@ class Discriminator:
         self.first_level_discriminator = None
         self.initial_resolution = 4
         self.number_channels = 3
+        self.level_feature_dimension = [512, 256, 128, 64, 32, 16, 8]
         self.build_discriminator()
 
     def convolutional_block(self, resolution_feature, number_filters):
@@ -53,8 +53,8 @@ class Discriminator:
         if DEFAULT_VERBOSE_CONSTRUCTION:
             self.first_level_discriminator.summary()
 
-        for i in range(len(level_size_feature_dimension)):
-            self.convolutional_block(level_size_feature_dimension[i], number_filters_per_layer[i])
+        for i in range(len(self.level_feature_dimension)):
+            self.convolutional_block(self.level_feature_dimension[i], number_filters_per_layer[i])
 
     @staticmethod
     def fully_connected_block(input_layer):
