@@ -16,7 +16,7 @@ from Engine.Layers.AdaIN import AdaIN
 tensorflow.get_logger().setLevel(logging.ERROR)
 level_size_feature_dimension = [4, 4, 8, 16, 32, 64, 128, 256, 512]
 
-DEFAULT_VERBOSE_CONSTRUCTION = True
+DEFAULT_VERBOSE_CONSTRUCTION = False
 
 DEFAULT_LATENT_DIMENSION = 256
 DEFAULT_NUMBER_NEURONS_MAPPING = 512
