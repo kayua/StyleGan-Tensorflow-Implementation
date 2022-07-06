@@ -12,6 +12,7 @@ DEFAULT_OPTIMIZER_FUNCTION = "adam"
 DEFAULT_VERBOSE_CONSTRUCTION = False
 DEFAULT_NUMBER_CHANNELS = 3
 DEFAULT_INITIAL_RESOLUTION = 4
+DEFAULT_DIMENSION_CONVOLUTION_KERNELS = (3, 3)
 DEFAULT_FILTER_PER_LAYER = [16, 32, 64, 96, 128, 256, 512]
 DEFAULT_LEVEL_FEATURE_DIMENSION = [512, 256, 128, 64, 32, 16, 8]
 
@@ -32,6 +33,7 @@ class Discriminator:
         self.number_channels = number_channels
         self.number_filters_per_layer = number_filters_per_layer
         self.level_feature_dimension = level_feature_dimension
+        self.size_kernel_filters = DEFAULT_DIMENSION_CONVOLUTION_KERNELS
         self.input_discriminator = []
         self.discriminator_blocks = []
         self.first_level_discriminator = None
@@ -41,9 +43,9 @@ class Discriminator:
 
         input_layer = Input(shape=(resolution_feature, resolution_feature, self.number_channels))
         self.input_discriminator.append(input_layer)
-        gradient_flow = Conv2D(number_filters, (3, 3), padding="same")(input_layer)
+        gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(input_layer)
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
-        gradient_flow = Conv2D(self.number_channels, (3, 3), padding="same")(gradient_flow)
+        gradient_flow = Conv2D(self.number_channels, self.size_kernel_filters, padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
         gradient_flow = MaxPooling2D((2, 2))(gradient_flow)
         gradient_flow = Model(input_layer, gradient_flow)
@@ -56,12 +58,12 @@ class Discriminator:
         input_layer = Input(shape=(self.initial_resolution, self.initial_resolution, self.number_channels))
         number_layer = self.number_filters_per_layer[-1]
         self.first_level_discriminator = LayerNormalization()(input_layer)
-        self.first_level_discriminator = Conv2D(number_layer, (3, 3), padding="same")(self.first_level_discriminator)
-        self.first_level_discriminator = Conv2D(number_layer, (3, 3), padding="same")(self.first_level_discriminator)
+        self.first_level_discriminator = Conv2D(number_layer, self.size_kernel_filters, padding="same")(self.first_level_discriminator)
+        self.first_level_discriminator = Conv2D(number_layer, self.size_kernel_filters, padding="same")(self.first_level_discriminator)
         self.first_level_discriminator = self.fully_connected_block(self.first_level_discriminator)
         self.first_level_discriminator = Model(input_layer, self.first_level_discriminator)
-        if DEFAULT_VERBOSE_CONSTRUCTION:
-            self.first_level_discriminator.summary()
+
+        if DEFAULT_VERBOSE_CONSTRUCTION: self.first_level_discriminator.summary()
 
         for i in range(len(self.level_feature_dimension)):
             self.convolutional_block(self.level_feature_dimension[i], self.number_filters_per_layer[i])
