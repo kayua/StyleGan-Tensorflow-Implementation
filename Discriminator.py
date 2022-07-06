@@ -67,7 +67,6 @@ class Discriminator:
         number_level -= 1
 
         if number_level == 0:
-
             self.first_level_discriminator.summary()
             return self.first_level_discriminator
 
@@ -77,7 +76,6 @@ class Discriminator:
         convolutional_blocks.compile(loss=self.loss_function, optimizer=self.optimizer_function)
 
         for i in range(number_level - 1):
-
             convolutional_blocks = self.discriminator_blocks[-(number_level - (i + 1))](convolutional_blocks.output)
             convolutional_blocks = Model(discriminator_input, convolutional_blocks)
 
@@ -87,3 +85,6 @@ class Discriminator:
         discriminator_network.summary()
 
         return discriminator_network
+
+    def set_loss_function(self, loss_function):
+        self.loss_function = loss_function
