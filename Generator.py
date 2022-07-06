@@ -164,12 +164,12 @@ class Generator:
         last_level_filters = self.num_filters_per_level[number_level]
         neural_synthesis = self.color_mapping(last_level_dimension, last_level_filters)
         neural_synthesis = neural_synthesis([synthesis_model.output])
-        neural_synthesis = Model(synthesis_model.inputs, neural_synthesis)
+        neural_synthesis = Model(synthesis_model.inputs, neural_synthesis, name="Synthesis_Block")
 
         neural_input_layer = [self.list_level_noise_input[i] for i in range(number_level)]
         neural_input_layer.append(self.initial_flow)
         neural_input_layer.append(self.mapping_neural_network.input)
         style_generator = neural_synthesis(neural_input_layer)
-        style_generator = Model(neural_input_layer, style_generator)
+        style_generator = Model(neural_input_layer, style_generator, name="Generator")
         style_generator.summary()
         return style_generator
