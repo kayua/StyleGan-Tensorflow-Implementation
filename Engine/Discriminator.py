@@ -43,7 +43,7 @@ class Discriminator:
         self.input_discriminator.append(input_layer)
         gradient_flow = Conv2D(number_filters, (3, 3), padding="same")(input_layer)
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
-        gradient_flow = Conv2D(3, (3, 3), padding="same")(gradient_flow)
+        gradient_flow = Conv2D(number_filters, (3, 3), padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
         gradient_flow = MaxPooling2D((2, 2))(gradient_flow)
         gradient_flow = Model(input_layer, gradient_flow)
