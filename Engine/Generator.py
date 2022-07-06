@@ -102,11 +102,11 @@ class Generator:
         input_latent = Reshape((self.latent_dimension, 1))(input_latent)
 
         gradient_flow = Add()([input_flow, input_noise])
-        gradient_flow = AdaIN()([input_latent, gradient_flow])
+        gradient_flow = AdaIN()([gradient_flow, input_latent])
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(DEFAULT_THRESHOLD_RELU)(gradient_flow)
         gradient_flow = Add()([gradient_flow, input_noise])
-        gradient_flow = AdaIN()([input_latent, gradient_flow])
+        gradient_flow = AdaIN()([gradient_flow, input_latent])
 
         initial_block_model = Model([input_flow, input_noise, input_latent], gradient_flow)
         initial_block_model.compile(loss=self.loss_function, optimizer=self.optimizer_function)
@@ -125,7 +125,7 @@ class Generator:
 
         gradient_flow = UpSampling2D((2, 2))(input_flow)
         gradient_flow = Add()([gradient_flow, input_noise])
-        gradient_flow = self.ada_in(input_latent, gradient_flow) #AdaIN()([gradient_flow, input_latent])
+        gradient_flow = AdaIN()([gradient_flow, input_latent])
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(DEFAULT_THRESHOLD_RELU)(gradient_flow)
         gradient_flow = Add()([gradient_flow, input_noise])

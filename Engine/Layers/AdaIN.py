@@ -1,7 +1,8 @@
 
-from keras.type.types import Layer
 from keras.utils import conv_utils
 import tensorflow
+from tensorflow.python.layers.base import Layer
+
 
 class AdaIN(Layer):
 
@@ -18,11 +19,11 @@ class AdaIN(Layer):
         image = inputs[0]
         if len(inputs) == 2:
             style = inputs[1]
-            style_mean, style_var = tensorflow.nn.moments(style, self.spatial_axis, keep_dims=True)
+            style_mean, style_var = tensorflow.nn.moments(style, self.spatial_axis, keepdims=True)
         else:
             style_mean = tensorflow.expand_dims(tensorflow.expand_dims(inputs[1], self.spatial_axis[0]), self.spatial_axis[1])
             style_var = tensorflow.expand_dims(tensorflow.expand_dims(inputs[2], self.spatial_axis[0]), self.spatial_axis[1])
-        image_mean, image_var = tensorflow.nn.moments(image, self.spatial_axis, keep_dims=True)
+        image_mean, image_var = tensorflow.nn.moments(image, self.spatial_axis, keepdims=True)
         out = tensorflow.nn.batch_normalization(image, image_mean,
                                          image_var, style_mean,
                                          tensorflow.sqrt(style_var), self.eps)
