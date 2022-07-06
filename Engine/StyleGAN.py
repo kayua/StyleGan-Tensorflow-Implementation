@@ -8,18 +8,18 @@ level_size_feature_dimension = [512, 256, 128, 64, 32, 16, 8]
 DEFAULT_DISCRIMINATOR = None
 DEFAULT_GENERATOR = None
 DEFAULT_LATENT_DIMENSION = 256
-
+DEFAULT_DISCRIMINATOR_STEPS = 4
 
 class StyleGAN(Model, ABC):
 
     def __init__(self, discriminator=DEFAULT_DISCRIMINATOR, generator=DEFAULT_GENERATOR,
-                 latent_dimension=DEFAULT_LATENT_DIMENSION, discriminator_extra_steps=3, gp_weight=10.0,
+                 latent_dimension=DEFAULT_LATENT_DIMENSION, discriminator_steps=DEFAULT_DISCRIMINATOR_STEPS, gp_weight=10.0,
                  level_network=2):
         super(StyleGAN, self).__init__()
         self.discriminator = discriminator
         self.level_network = level_network
         self.generator = generator
-        self.d_steps = discriminator_extra_steps
+        self.d_steps = discriminator_steps
         self.gp_weight = gp_weight
         self.latent_dimension = latent_dimension
         self.constant_mapping_value = 0.5
