@@ -51,8 +51,10 @@ class StyleGAN(Model):
         list_image_batch = []
         image_index = [random.randint(0, number_images) for _ in range(self.batch_size)]
 
+        print(numpy.array(images)[0])
+        exit()
         for i in image_index:
-            list_image_batch.append(numpy.array(images[i]))
+            list_image_batch.append(numpy.array(numpy.array(images)))
 
         return numpy.array(list_image_batch)
 
@@ -63,38 +65,39 @@ class StyleGAN(Model):
 
     def train_step(self, real_images):
 
-        batch_size = int(real_images.shape[1])
-        number_images = int(real_images.shape[1])
+        if isinstance(real_images, tuple):
+            real_images = real_images[0]
+
+        batch_size = tensorflow.shape(real_images)[0]
 
         for i in range(self.d_steps):
-            random_latent_vectors = self.generate_latent_noise(number_images)
-            real_image_batch = self.get_random_batch_image(real_images, number_images)
-            print(real_image_batch.shape)
-            exit()
-            #random_noise_vector.append(numpy.array([self.generate_random_noise() for _ in range(batch_size)]))
-            #constant_feature_mapping = numpy.array([self.generate_constant_mapping() for _ in range(batch_size)])
+            random_latent_vectors = tensorflow.random.normal(shape=(batch_size, self.latent_dim, 1))
 
+            random_noise_synthesis = tensorflow.convert_to_tensor(self.generate_random_noise())
+            constant_mapping = tensorflow.convert_to_tensor(self.generate_constant_mapping())
+            self.generator.summary()
+            input_tensor = random_noise_synthesis + constant_mapping + random_latent_vectors
             with tensorflow.GradientTape() as tape:
-                # Generate fake images from the latent vector
-                fake_images = self.generator(random_latent_vectors, training=True)
+                tensor_mapping = {"title": title_data, "body": body_data, "tags": tags_data}
+                fake_images = self.generator(tensor_mapping , training=True)
                 # Get the logits for the fake images
-                fake_logits = self.discriminator(fake_images, training=True)
+                #fake_logits = self.discriminator(fake_images, training=True)
                 # Get the logits for the real images
                 real_logits = self.discriminator(real_images, training=True)
 
                 # Calculate the discriminator loss using the fake and real image logits
-                d_cost = self.d_loss_fn(real_img=real_logits, fake_img=fake_logits)
+                #d_cost = self.d_loss_fn(real_img=real_logits, fake_img=fake_logits)
                 # Calculate the gradient penalty
-                gp = self.gradient_penalty(batch_size, real_images, fake_images)
+                #gp = self.gradient_penalty(batch_size, real_images, fake_images)
                 # Add the gradient penalty to the original discriminator loss
-                d_loss = d_cost + gp * self.gp_weight
+                #d_loss = d_cost + gp * self.gp_weight
 
             # Get the gradients w.r.t the discriminator loss
-            d_gradient = tape.gradient(d_loss, self.discriminator.trainable_variables)
+            #d_gradient = tape.gradient(d_loss, self.discriminator.trainable_variables)
             # Update the weights of the discriminator using the discriminator optimizer
-            self.d_optimizer.apply_gradients(
-                zip(d_gradient, self.discriminator.trainable_variables)
-            )
+            #self.d_optimizer.apply_gradients(
+            #    zip(d_gradient, self.discriminator.trainable_variables)
+           # )
 
         # Train the generator
         # Get the latent vector
@@ -113,7 +116,7 @@ class StyleGAN(Model):
         self.g_optimizer.apply_gradients(
             zip(gen_gradient, self.generator.trainable_variables)
         )
-        return {"d_loss": d_loss, "g_loss": g_loss}
+        #return {"d_loss": d_loss, "g_loss": g_loss}
 
     def generate_constant_mapping(self):
 
@@ -134,7 +137,7 @@ class StyleGAN(Model):
             shape_feature = (resolution_feature, resolution_feature, self.num_filters_per_level[-i])
             random_noise_vector.append(numpy.reshape(random_noise, shape_feature))
 
-        return random_noise_vector
+        return numpy.array(random_noise_vector)
 
     def generate_latent_noise(self, batch_size):
 
