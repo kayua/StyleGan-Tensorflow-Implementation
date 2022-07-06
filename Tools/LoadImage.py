@@ -1,0 +1,33 @@
+import glob
+
+import numpy
+import tensorflow
+
+DEFAULT_IMAGE_WIDTH = 256
+DEFAULT_IMAGE_HEIGHT = 256
+DEFAULT_NUMBER_COLOR_CHANNELS = 3
+DEFAULT_IMAGE_NORMALIZATION = 10
+DEFAULT_DATASET_IMAGE_PATH = "images"
+
+
+class LoadImage:
+
+    def __init__(self):
+        self.image_width = DEFAULT_IMAGE_WIDTH
+        self.image_height = DEFAULT_IMAGE_HEIGHT
+        self.number_color_channels = DEFAULT_NUMBER_COLOR_CHANNELS
+        self.image_list = []
+        pass
+
+    def parse_image(self, filename):
+        image = tensorflow.io.read_file(filename)
+        image = tensorflow.image.decode_png(image, channels=self.number_color_channels)
+        image = tensorflow.image.convert_image_dtype(image, tensorflow.float32)
+        image = tensorflow.image.resize(image, [self.image_width, self.image_height])
+        return numpy.asarray(image, dtype="float32") * DEFAULT_IMAGE_NORMALIZATION
+
+
+    def load_images(self):
+        directory_images = glob.glob("{}".format(self.))
+        for i in tqdm()
+
