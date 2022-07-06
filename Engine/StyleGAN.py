@@ -66,7 +66,7 @@ class StyleGAN(Model):
         for i in range(1, len(random_noise) + 1):
             input_mapping["Input Noise {}".format(i)] = random_noise[i - 1]
 
-        input_mapping["Input Mapping"] = constant_mapping
+        input_mapping["Input Constant"] = constant_mapping
         input_mapping["Latent Input"] = latent_input
 
         return input_mapping
@@ -80,13 +80,15 @@ class StyleGAN(Model):
 
         for i in range(self.d_steps):
 
-            random_latent_vectors = tensorflow.random.normal(shape=(batch_size, self.latent_dim, 1))
+            random_latent_vectors = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
             dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0], 1]
             constant_mapping = tensorflow.fill(dimension, 0.5)
+            random_noise_synthesis =
+
             print("Latent Dimension {}".format(random_latent_vectors.shape))
             print("Constant Mapping {}".format(constant_mapping.shape))
             exit()
-            random_noise_synthesis = self.generate_random_noise()
+
             input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping, random_latent_vectors)
 
             with tensorflow.GradientTape() as tape:
@@ -152,7 +154,6 @@ class StyleGAN(Model):
 
         for i in range(1, self.level_network):
             size_feature = level_size_feature_dimension[-i] ** 2
-            print(size_feature)
             resolution_feature = level_size_feature_dimension[-i]
             random_noise = numpy.random.uniform(0, 1, self.num_filters_per_level[-i] * size_feature)
             shape_feature = (resolution_feature, resolution_feature, self.num_filters_per_level[-i])

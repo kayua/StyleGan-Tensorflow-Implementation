@@ -139,7 +139,7 @@ class Generator:
     def build_synthesis_block(self):
 
         dimension_input_flow = (self.initial_dimension, self.initial_dimension, self.initial_num_channels)
-        input_flow = Input(shape=dimension_input_flow, name="Input Mapping")
+        input_flow = Input(shape=dimension_input_flow, name="Input Constant")
         input_latent = Input(shape=self.latent_dimension, name="Input Latent")
         input_noise = Input(shape=dimension_input_flow, name="Input Noise 1")
 
