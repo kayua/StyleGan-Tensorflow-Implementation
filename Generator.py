@@ -70,7 +70,7 @@ class Generator:
         gradient_flow = Dense(self.num_neurons_mapping)(gradient_flow)
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
 
-        for i in range(self.num_mapping_blocks - 2):
+        for _ in range(self.num_mapping_blocks - 2):
             gradient_flow = Dense(self.num_neurons_mapping)(gradient_flow)
             gradient_flow = LeakyReLU(0.2)(gradient_flow)
 
@@ -114,22 +114,26 @@ class Generator:
 
     def non_initial_synthesis_block(self, resolution_block, number_filters):
 
-        input_flow = Input(shape=(int(resolution_block), int(resolution_block), number_filters))
-        input_noise = Input(shape=(resolution_block * 2, resolution_block * 2, number_filters))
+        feature_input_resolution = (resolution_block, resolution_block, number_filters)
+        feature_output_resolution = (resolution_block * 2, resolution_block * 2, number_filters)
+
+        input_flow = Input(shape=feature_input_resolution)
+        input_noise = Input(shape=feature_output_resolution)
         input_latent = Input(shape=self.latent_dimension)
         input_latent = Reshape((self.latent_dimension, 1))(input_latent)
+
         gradient_flow = UpSampling2D((2, 2))(input_flow)
         gradient_flow = AddNoise()([gradient_flow, input_noise])
-
         gradient_flow = AdaIN()([gradient_flow, input_latent])
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
         gradient_flow = AddNoise()([gradient_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
-        gradient_flow = Model([input_flow, input_noise, input_latent], gradient_flow)
-        gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
-        if DEFAULT_VERBOSE_CONSTRUCTION: gradient_flow.summary()
-        return gradient_flow
+
+        non_initial_block_model = Model([input_flow, input_noise, input_latent], gradient_flow)
+        non_initial_block_model.compile(loss=self.loss_function, optimizer=self.optimizer_function)
+        if DEFAULT_VERBOSE_CONSTRUCTION: non_initial_block_model.summary()
+        return non_initial_block_model
 
     def build_synthesis_block(self):
 
