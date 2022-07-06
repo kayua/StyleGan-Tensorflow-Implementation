@@ -57,8 +57,7 @@ class Generator:
         gradient_flow = Dense(self.latent_dimension)(gradient_flow)
         network_model = Model(latent_dimension_input, gradient_flow, name="Mapping_Network")
         self.mapping_neural_network = network_model
-        if DEFAULT_VERBOSE_CONSTRUCTION:
-            self.mapping_neural_network.summary()
+        if DEFAULT_VERBOSE_CONSTRUCTION: self.mapping_neural_network.summary()
 
 
     def constant_mapping_block(self):
@@ -70,8 +69,7 @@ class Generator:
         gradient_flow = Model(latent_input, gradient_flow, name="Constant_Block")
         gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         self.constant_mapping_neural_network = gradient_flow
-        if DEFAULT_VERBOSE_CONSTRUCTION:
-            self.constant_mapping_neural_network.summary()
+        if DEFAULT_VERBOSE_CONSTRUCTION: self.constant_mapping_neural_network.summary()
 
     def initial_block_synthesis(self, resolution_block, number_filters):
 
@@ -87,8 +85,7 @@ class Generator:
         gradient_flow = AdaIN()([gradient_flow, input_latent])
         gradient_flow = Model([input_flow, input_noise, input_latent], gradient_flow)
         gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
-        if DEFAULT_VERBOSE_CONSTRUCTION:
-            gradient_flow.summary()
+        if DEFAULT_VERBOSE_CONSTRUCTION: gradient_flow.summary()
         return gradient_flow
 
     def non_initial_synthesis_block(self, resolution_block, number_filters):
@@ -107,8 +104,7 @@ class Generator:
         gradient_flow = AdaIN()([gradient_flow, input_latent])
         gradient_flow = Model([input_flow, input_noise, input_latent], gradient_flow)
         gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
-        if DEFAULT_VERBOSE_CONSTRUCTION:
-            gradient_flow.summary()
+        if DEFAULT_VERBOSE_CONSTRUCTION: gradient_flow.summary()
         return gradient_flow
 
     def build_synthesis_block(self):
@@ -148,8 +144,7 @@ class Generator:
         color_mapping = Conv2D(self.number_output_channels, (1, 1), padding="same")(input_color_mapping)
         color_mapping = Model(input_color_mapping, color_mapping)
         color_mapping.compile(loss=self.loss_function, optimizer=self.optimizer_function)
-        if DEFAULT_VERBOSE_CONSTRUCTION:
-            color_mapping.summary()
+        if DEFAULT_VERBOSE_CONSTRUCTION: color_mapping.summary()
         return color_mapping
 
     def get_generator(self, number_level):
