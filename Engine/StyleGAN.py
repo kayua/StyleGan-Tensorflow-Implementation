@@ -83,7 +83,7 @@ class StyleGAN(Model):
             random_latent_vectors = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
             dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0], 1]
             constant_mapping = tensorflow.fill(dimension, 0.5)
-            random_noise_synthesis =
+            random_noise_synthesis = self.generate_random_noise(batch_size)
 
             print("Latent Dimension {}".format(random_latent_vectors.shape))
             print("Constant Mapping {}".format(constant_mapping.shape))
@@ -132,34 +132,23 @@ class StyleGAN(Model):
         )
         # return {"d_loss": d_loss, "g_loss": g_loss}
 
-    def generate_constant_mapping(self):
 
-        number_filters = self.num_filters_per_level[-1]
-        constant_mapping = numpy.array([0.5 for _ in range(number_filters * self.initial_dimension ** 2)])
-        mapping_shape = (self.initial_dimension, self.initial_dimension, number_filters)
-        constant_mapping = numpy.reshape(constant_mapping, mapping_shape)
-
-
-        exit()
-        return constant_mapping
-
-    def generate_random_noise(self):
+    def generate_random_noise(self, batch_size):
 
         random_noise_vector = []
 
         resolution_feature = self.initial_dimension
-        random_noise = numpy.random.uniform(0, 1, self.num_filters_per_level[0] * self.initial_dimension**2)
-        shape_feature = (resolution_feature, resolution_feature, self.num_filters_per_level[0])
-        random_noise_vector.append(numpy.reshape(random_noise, shape_feature))
+        shape_feature = (batch_size, resolution_feature, resolution_feature, self.num_filters_per_level[0])
+        random_noise = tensorflow.random.normal(shape=shape_feature)
+        random_noise_vector.append(random_noise)
 
         for i in range(1, self.level_network):
-            size_feature = level_size_feature_dimension[-i] ** 2
             resolution_feature = level_size_feature_dimension[-i]
-            random_noise = numpy.random.uniform(0, 1, self.num_filters_per_level[-i] * size_feature)
-            shape_feature = (resolution_feature, resolution_feature, self.num_filters_per_level[-i])
-            random_noise_vector.append(numpy.reshape(random_noise, shape_feature))
-
-        return numpy.array(random_noise_vector)
+            shape_feature = (batch_size, resolution_feature, resolution_feature, self.num_filters_per_level[0])
+            random_noise = tensorflow.random.normal(shape=shape_feature)
+            random_noise_vector.append(random_noise)
+            print(random_noise.shape)
+        return random_noise_vector
 
     def generate_latent_noise(self, batch_size):
 
