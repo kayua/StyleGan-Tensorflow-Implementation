@@ -82,7 +82,9 @@ class StyleGAN(Model):
 
             random_latent_vectors = tensorflow.random.normal(shape=(batch_size, self.latent_dim, 1))
             dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0], 1]
-            constant_mapping = tensorflow.fill(dimension, 9)
+            constant_mapping = tensorflow.fill(dimension, 0.5)
+            print("Latent Dimension {}".format(random_latent_vectors.shape))
+            print("Constant Mapping {}".format(constant_mapping.shape))
             exit()
             random_noise_synthesis = self.generate_random_noise()
             input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping, random_latent_vectors)
