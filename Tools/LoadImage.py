@@ -4,8 +4,8 @@ import numpy
 import tensorflow
 from tqdm import tqdm
 
-DEFAULT_IMAGE_WIDTH = 256
-DEFAULT_IMAGE_HEIGHT = 256
+DEFAULT_IMAGE_WIDTH = 128
+DEFAULT_IMAGE_HEIGHT = 128
 DEFAULT_NUMBER_COLOR_CHANNELS = 3
 DEFAULT_IMAGE_NORMALIZATION = 10
 DEFAULT_DATASET_IMAGE_PATH = "Dataset"
@@ -39,7 +39,7 @@ class LoadImage:
         self.image_loaded = numpy.array(self.image_list)
 
     def get_dataset_image(self):
-
-        return self.image_list
+        self.load_images()
+        return self.image_loaded
 
 

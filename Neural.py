@@ -5,6 +5,8 @@ from Discriminator import Discriminator
 from Generator import Generator
 from StyleGAN import StyleGAN
 
+from Tools.LoadImage import LoadImage
+
 generator_optimizer = keras.optimizers.Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
 discriminator_optimizer = keras.optimizers.Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
 
@@ -18,11 +20,13 @@ def discriminator_loss(real_img, fake_img):
 def generator_loss(fake_img):
     return -tensorflow.reduce_mean(fake_img)
 
-
+level = 3
 discriminator_instance = Discriminator()
 generator_instance = Generator()
+image_instance = LoadImage()
+image_training = image_instance.get_dataset_image()
 
-level = 3
+
 generator_model = generator_instance.get_generator(level)
 discriminator_model = discriminator_instance.get_discriminator(level)
 
