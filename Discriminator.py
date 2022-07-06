@@ -10,7 +10,6 @@ from keras.layers import Flatten
 level_size_feature_dimension = [512, 256, 128, 64, 32, 16, 8]
 number_filters_per_layer = [16, 32, 64, 96, 128, 256, 512]
 
-number_channels = 3
 DEFAULT_VERBOSE_CONSTRUCTION = False
 
 
@@ -24,11 +23,12 @@ class Discriminator:
         self.discriminator_blocks = []
         self.first_level_discriminator = None
         self.initial_resolution = 4
+        self.number_channels = 3
         self.build_discriminator()
 
     def convolutional_block(self, resolution_feature, number_filters):
 
-        input_layer = Input(shape=(resolution_feature, resolution_feature, number_channels))
+        input_layer = Input(shape=(resolution_feature, resolution_feature, self.number_channels))
         self.input_discriminator.append(input_layer)
         gradient_flow = Conv2D(number_filters, (3, 3), padding="same")(input_layer)
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
@@ -43,7 +43,7 @@ class Discriminator:
 
     def build_discriminator(self):
 
-        input_layer = Input(shape=(self.initial_resolution, self.initial_resolution, number_channels))
+        input_layer = Input(shape=(self.initial_resolution, self.initial_resolution, self.number_channels))
         number_layer = number_filters_per_layer[-1]
         self.first_level_discriminator = LayerNormalization()(input_layer)
         self.first_level_discriminator = Conv2D(number_layer, (3, 3), padding="same")(self.first_level_discriminator)
@@ -94,3 +94,6 @@ class Discriminator:
 
     def set_initial_resolution(self, initial_resolution):
         self.initial_resolution = initial_resolution
+
+    def set_number_channels(self, number_channels):
+        self.number_channels = number_channels
