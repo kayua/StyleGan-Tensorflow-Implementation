@@ -71,14 +71,18 @@ class StyleGAN(Model):
             with tensorflow.GradientTape() as tape:
 
                 synthetic_images_generated = self.generator(input_mapping, training=True)
-                fake_logits = self.discriminator(synthetic_images_generated, training=True)
-                real_image_reshape = self.resize_image(8, real_images)
-                real_logits = self.discriminator(real_image_reshape, training=True)
-                d_cost = self.d_loss_fn(real_img=real_logits, fake_img=fake_logits)
-                gp = self.gradient_penalty(batch_size, real_image_reshape, synthetic_images_generated)
-                d_loss = d_cost + gp * self.gp_weight
-                d_gradient = tape.gradient(d_loss, self.discriminator.trainable_variables)
-                self.d_optimizer.apply_gradients(zip(d_gradient, self.discriminator.trainable_variables))
+                synthetic_discriminator_loss = self.discriminator(synthetic_images_generated, training=True)
+
+                real_image_resize = self.resize_image(8, real_images)
+                real_discriminator_loss = self.discriminator(real_image_resize, training=True)
+
+                discriminator_loss = self.d_loss_fn(real_discriminator_loss, synthetic_discriminator_loss)
+
+                gradient_update = self.gradient_penalty(batch_size, real_image_resize, synthetic_images_generated)
+                discriminator_loss = discriminator_loss + gradient_update * self.gp_weight
+                discriminator_update = tape.gradient(discriminator_loss, self.discriminator.trainable_variables)
+
+                self.d_optimizer.apply_gradients(zip(discriminator_update, self.discriminator.trainable_variables))
 
         random_latent_space = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
         dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
@@ -94,7 +98,7 @@ class StyleGAN(Model):
             gen_gradient = tape.gradient(g_loss, self.generator.trainable_variables)
             self.g_optimizer.apply_gradients(zip(gen_gradient, self.generator.trainable_variables))
 
-        return {"d_loss": d_loss, "g_loss": g_loss}
+        return {"discriminator_loss": discriminator_loss, "g_loss": g_loss}
 
     def resize_image(self, res, image):
         image = tensorflow.image.resize(image, (res, res), method=tensorflow.image.ResizeMethod.NEAREST_NEIGHBOR)
