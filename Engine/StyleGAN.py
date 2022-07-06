@@ -101,7 +101,7 @@ class StyleGAN(Model):
         gradient_apply = zip(gen_gradient, self.generator.trainable_variables)
         self.g_optimizer.apply_gradients(gradient_apply)
 
-        return {"d_loss": discriminator_loss, "g_loss": g_loss}
+        return {"discriminator_loss": discriminator_loss, "generator_loss": g_loss}
 
     def resize_image(self, res, image):
         image = tensorflow.image.resize(image, (res, res), method=tensorflow.image.ResizeMethod.NEAREST_NEIGHBOR)
