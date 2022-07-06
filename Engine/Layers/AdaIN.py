@@ -23,26 +23,26 @@ class AdaIN(Layer):
         style_mean, style_std = self.get_mean_std(style)
 
         dimension_expanded = (content.shape[1], content.shape[1])
+
         style_std = Reshape((1, 1, 1))(style_std)
         style_std = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(style_std)
 
         content_mean = Reshape((1, 1, 256))(content_mean)
         content_mean = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(content_mean)
-        content_std = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(Reshape((1, 1, 256))(content_std))
-        style_mean = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(Reshape((1, 1, 1))(style_mean))
 
-        out = style_std * (content - content_mean) / content_std + style_mean
+        content_std = Reshape((1, 1, 256))(content_std)
+        content_std = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(content_std)
 
-        return out
+        style_mean = Reshape((1, 1, 1))(style_mean)
+        style_mean = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(style_mean)
+
+        return style_std * (content - content_mean) / content_std + style_mean
 
     @staticmethod
     def get_mean_std(x, epsilon=1e-5):
+
         axes = [1, 2]
         mean, variance = tensorflow.nn.moments(x, axes=axes, keepdims=True)
         standard_deviation = tensorflow.sqrt(variance + epsilon)
         return mean, standard_deviation
 
-    def get_config(self):
-        config = {'eps': self.eps}
-        base_config = super(AdaIN, self).get_config()
-        return dict(list(base_config.items()) + list(config.items()))
