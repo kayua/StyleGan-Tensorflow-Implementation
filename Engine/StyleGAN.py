@@ -1,4 +1,3 @@
-import cv2
 import numpy
 import tensorflow
 from keras import Model
@@ -22,7 +21,7 @@ class StyleGAN(Model):
         self.initial_dimension = 4
         self.num_filters_per_level = [256, 256, 256, 256, 256, 256, 256, 256, 256]
 
-    def compile(self, d_optimizer, g_optimizer, d_loss_fn, g_loss_fn):
+    def compile(self, d_optimizer, g_optimizer, d_loss_fn, g_loss_fn, **kwargs):
         super(StyleGAN, self).compile()
         self.d_optimizer = d_optimizer
         self.g_optimizer = g_optimizer
@@ -81,8 +80,8 @@ class StyleGAN(Model):
                 gradient_update = self.gradient_penalty(batch_size, real_image_resize, synthetic_images_generated)
                 discriminator_loss = discriminator_loss + gradient_update * self.gp_weight
                 discriminator_update = tape.gradient(discriminator_loss, self.discriminator.trainable_variables)
-
-                self.d_optimizer.apply_gradients(zip(discriminator_update, self.discriminator.trainable_variables))
+                gradient_update_values = zip(discriminator_update, self.discriminator.trainable_variables)
+                self.d_optimizer.apply_gradients(gradient_update_values)
 
         random_latent_space = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
         dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
@@ -124,21 +123,4 @@ class StyleGAN(Model):
 
         return random_noise_vector
 
-    def generate_latent_noise(self, batch_size):
 
-        latent_input = numpy.random.uniform(0, 1, self.latent_dimension * batch_size)
-        latent_input = numpy.reshape(latent_input, (batch_size, self.latent_dimension, 1))
-        latent_input = numpy.array(latent_input, dtype=numpy.float32)
-        return latent_input
-
-    def change_resolution_image(self, batch_image):
-
-        batch_image_new_resolution = []
-        size_image = level_size_feature_dimension[-self.level_network]
-        tuple_shape_image = (size_image, size_image)
-
-        for i in batch_image:
-            new_image = cv2.resize(i, dsize=tuple_shape_image, interpolation=cv2.INTER_CUBIC)
-            batch_image_new_resolution.append(new_image)
-
-        return numpy.array(batch_image_new_resolution, dtype=numpy.float32)
