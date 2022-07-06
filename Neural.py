@@ -22,7 +22,10 @@ def generator_loss(fake_img):
 discriminator_instance = Discriminator()
 generator_instance = Generator()
 
-discriminator_model = discriminator_instance.get_discriminator(1)
-generator_model = generator_instance.get_generator(1)
+level = 3
+generator_model = generator_instance.get_generator(level)
+discriminator_model = discriminator_instance.get_discriminator(level)
 
-#wgan = StyleGAN(discriminator=d_model, generator=g_model, latent_dim=noise_dim, discriminator_extra_steps=3)
+
+styleGan = StyleGAN(discriminator=discriminator_model, generator=generator_model, latent_dim=0, discriminator_extra_steps=3, level_network=level)
+styleGan.compile(d_optimizer=discriminator_optimizer, g_optimizer=generator_optimizer, g_loss_fn=generator_loss, d_loss_fn=discriminator_loss)

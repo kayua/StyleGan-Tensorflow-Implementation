@@ -63,8 +63,11 @@ class Discriminator:
         return gradient_flow
 
     def get_discriminator(self, number_level):
+
         number_level -= 1
+
         if number_level == 0:
+
             self.first_level_discriminator.summary()
             return self.first_level_discriminator
 
@@ -79,7 +82,6 @@ class Discriminator:
             convolutional_blocks = Model(discriminator_input, convolutional_blocks)
 
         convolutional_blocks.compile(loss=self.loss_function, optimizer=self.optimizer_function)
-        convolutional_blocks.summary()
         discriminator_network = self.first_level_discriminator(convolutional_blocks.output)
         discriminator_network = Model(discriminator_input, discriminator_network, name="Discriminator")
         discriminator_network.summary()
