@@ -3,7 +3,8 @@ import logging
 import tensorflow
 from keras import Input
 from keras import Model
-from keras.layers import Conv2D, Add
+from keras.layers import Conv2D
+from keras.layers import Add
 from keras.layers import Flatten
 from keras.layers import Dense
 from keras.layers import LeakyReLU
