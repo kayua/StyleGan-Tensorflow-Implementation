@@ -104,7 +104,8 @@ class StyleGAN(Model):
         return {"discriminator_loss": discriminator_loss, "generator_loss": g_loss}
 
     def resize_image(self, res, image):
-        image = tensorflow.image.resize(image, (res, res), method=tensorflow.image.ResizeMethod.NEAREST_NEIGHBOR)
+        interpolation_operator = tensorflow.image.ResizeMethod.NEAREST_NEIGHBOR
+        image = tensorflow.image.resize(image, (res, res), method=interpolation_operator)
         image = tensorflow.cast(image, tensorflow.float32)
         return image
 
@@ -124,13 +125,6 @@ class StyleGAN(Model):
             random_noise_vector.append(random_noise)
 
         return random_noise_vector
-
-    def generate_latent_noise(self, batch_size):
-
-        latent_input = numpy.random.uniform(0, 1, self.latent_dimension * batch_size)
-        latent_input = numpy.reshape(latent_input, (batch_size, self.latent_dimension, 1))
-        latent_input = numpy.array(latent_input, dtype=numpy.float32)
-        return latent_input
 
     def change_resolution_image(self, batch_image):
 
