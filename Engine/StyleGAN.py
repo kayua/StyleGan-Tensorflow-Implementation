@@ -18,6 +18,7 @@ class StyleGAN(Model):
         self.d_steps = discriminator_extra_steps
         self.gp_weight = gp_weight
         self.latent_dimension = 256
+        self.constant_mapping_value = 0.5
         self.initial_dimension = 4
         self.num_filters_per_level = [256, 256, 256, 256, 256, 256, 256, 256, 256]
 
@@ -48,8 +49,7 @@ class StyleGAN(Model):
 
         input_mapping = {}
 
-        for i in range(1, len(random_noise) + 1):
-            input_mapping["Input Noise {}".format(i)] = random_noise[i - 1]
+        for i in range(1, len(random_noise) + 1): input_mapping["Input Noise {}".format(i)] = random_noise[i - 1]
 
         input_mapping["Input Constant"] = constant_mapping
         input_mapping["Latent Input"] = latent_input
@@ -64,7 +64,7 @@ class StyleGAN(Model):
 
             random_latent_space = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
             dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
-            constant_mapping_tensor = tensorflow.fill(dimension, 0.5)
+            constant_mapping_tensor = tensorflow.fill(dimension, self.constant_mapping_value)
             random_noise_synthesis = self.generate_random_noise(batch_size)
             input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
 
@@ -86,7 +86,7 @@ class StyleGAN(Model):
 
         random_latent_space = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
         dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
-        constant_mapping_tensor = tensorflow.fill(dimension, 0.5)
+        constant_mapping_tensor = tensorflow.fill(dimension, self.constant_mapping_value)
         random_noise_synthesis = self.generate_random_noise(batch_size)
         input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
 
