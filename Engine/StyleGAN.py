@@ -1,5 +1,4 @@
 from abc import ABC
-
 import tensorflow
 from keras import Model
 
@@ -9,18 +8,22 @@ DEFAULT_DISCRIMINATOR = None
 DEFAULT_GENERATOR = None
 DEFAULT_LATENT_DIMENSION = 256
 DEFAULT_DISCRIMINATOR_STEPS = 4
+DEFAULT_GRADIENT_PENALTY_ALPHA = 10.0
+DEFAULT_NETWORK_LEVEL = 2
+
 
 class StyleGAN(Model, ABC):
 
     def __init__(self, discriminator=DEFAULT_DISCRIMINATOR, generator=DEFAULT_GENERATOR,
-                 latent_dimension=DEFAULT_LATENT_DIMENSION, discriminator_steps=DEFAULT_DISCRIMINATOR_STEPS, gp_weight=10.0,
-                 level_network=2):
+                 latent_dimension=DEFAULT_LATENT_DIMENSION, number_discriminator_steps=DEFAULT_DISCRIMINATOR_STEPS,
+                 gradient_penalty_alpha=DEFAULT_GRADIENT_PENALTY_ALPHA, network_level=DEFAULT_NETWORK_LEVEL):
+
         super(StyleGAN, self).__init__()
         self.discriminator = discriminator
-        self.level_network = level_network
+        self.network_level = network_level
         self.generator = generator
-        self.d_steps = discriminator_steps
-        self.gp_weight = gp_weight
+        self.number_discriminator_steps = number_discriminator_steps
+        self.gp_weight = gradient_penalty_alpha
         self.latent_dimension = latent_dimension
         self.constant_mapping_value = 0.5
         self.initial_dimension = 4
@@ -40,7 +43,6 @@ class StyleGAN(Model, ABC):
         update_score = real_images + random_noise * divergence
 
         with tensorflow.GradientTape() as gradient_penalty_reduce:
-
             gradient_penalty_reduce.watch(update_score)
             discriminator_result = self.discriminator(update_score, training=True)
 
@@ -64,8 +66,7 @@ class StyleGAN(Model, ABC):
 
         batch_size = tensorflow.shape(real_images)[0]
 
-        for _ in range(self.d_steps):
-
+        for _ in range(self.number_discriminator_steps):
             random_latent_space = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
             dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
             constant_mapping_tensor = tensorflow.fill(dimension, self.constant_mapping_value)
@@ -73,14 +74,14 @@ class StyleGAN(Model, ABC):
             input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
 
             with tensorflow.GradientTape() as tape:
-
                 synthetic_images_generated = self.generator(input_mapping, training=True)
                 synthetic_discriminator_loss = self.discriminator(synthetic_images_generated, training=True)
 
                 real_image_resize = self.resize_image(8, real_images)
                 real_discriminator_loss = self.discriminator(real_image_resize, training=True)
 
-                discriminator_loss = self.d_loss_fn(real_img=real_discriminator_loss, fake_img=synthetic_discriminator_loss)
+                discriminator_loss = self.d_loss_fn(real_img=real_discriminator_loss,
+                                                    fake_img=synthetic_discriminator_loss)
 
                 gradient_update = self.gradient_penalty(batch_size, real_image_resize, synthetic_images_generated)
                 discriminator_loss = discriminator_loss + gradient_update * self.gp_weight
@@ -96,7 +97,6 @@ class StyleGAN(Model, ABC):
         input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
 
         with tensorflow.GradientTape() as tape:
-
             synthetic_images_generated = self.generator(input_mapping, training=True)
             discriminator_loss = self.discriminator(synthetic_images_generated, training=True)
             g_loss = self.g_loss_fn(discriminator_loss)
@@ -124,7 +124,7 @@ class StyleGAN(Model, ABC):
         random_noise = tensorflow.random.normal(shape=shape_feature)
         random_noise_vector.append(random_noise)
 
-        for i in range(1, self.level_network):
+        for i in range(1, self.network_level):
             resolution_feature = level_size_feature_dimension[-i]
             shape_feature = (batch_size, resolution_feature, resolution_feature, 1)
             random_noise = tensorflow.random.normal(shape=shape_feature)
