@@ -110,13 +110,13 @@ class StyleGAN(Model):
         random_noise_vector = []
 
         resolution_feature = self.initial_dimension
-        shape_feature = (batch_size, resolution_feature, resolution_feature, self.num_filters_per_level[0])
+        shape_feature = (batch_size, resolution_feature, resolution_feature, 1)
         random_noise = tensorflow.random.normal(shape=shape_feature)
         random_noise_vector.append(random_noise)
 
         for i in range(1, self.level_network):
             resolution_feature = level_size_feature_dimension[-i]
-            shape_feature = (batch_size, resolution_feature, resolution_feature, self.num_filters_per_level[0])
+            shape_feature = (batch_size, resolution_feature, resolution_feature, 1)
             random_noise = tensorflow.random.normal(shape=shape_feature)
             random_noise_vector.append(random_noise)
 
