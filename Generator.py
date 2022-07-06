@@ -173,7 +173,3 @@ class Generator:
         style_generator = Model(neural_input_layer, style_generator)
         style_generator.summary()
         return style_generator
-
-
-a = Generator()
-a.get_generator(5)
