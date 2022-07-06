@@ -199,10 +199,11 @@ class Generator:
     def set_initial_dimension(self, initial_dimension):
         self.initial_dimension = initial_dimension
 
+    def set_initial_number_channels(self, initial_number_channels):
 
-        self.initial_dimension = initial_dimension
-        self.initial_num_channels = initial_num_channels
-        self.number_output_channels = number_output_channels
+        self.initial_num_channels = initial_number_channels
+
+    self.number_output_channels = number_output_channels
         self.size_kernel_filters = size_kernel_filters
         self.num_synthesis_block = num_synthesis_block
         self.loss_function = loss_function
