@@ -7,22 +7,34 @@ from keras.layers import Dense
 from keras.layers import LayerNormalization
 from keras.layers import Flatten
 
+DEFAULT_LOSS_FUNCTION = "binary_crossentropy"
+DEFAULT_OPTIMIZER_FUNCTION = "adam"
 DEFAULT_VERBOSE_CONSTRUCTION = False
+DEFAULT_NUMBER_CHANNELS = 3
+DEFAULT_INITIAL_RESOLUTION = 4
+DEFAULT_FILTER_PER_LAYER = [16, 32, 64, 96, 128, 256, 512]
+DEFAULT_LEVEL_FEATURE_DIMENSION = [512, 256, 128, 64, 32, 16, 8]
 
 
 class Discriminator:
 
-    def __init__(self):
+    def __init__(self, loss_function=DEFAULT_LOSS_FUNCTION, optimizer_function=DEFAULT_OPTIMIZER_FUNCTION,
+                 number_channels=DEFAULT_NUMBER_CHANNELS, initial_resolution=DEFAULT_INITIAL_RESOLUTION,
+                 number_filters_per_layer=None, level_feature_dimension=None):
 
-        self.loss_function = "binary_crossentropy"
-        self.optimizer_function = "adam"
+        if number_filters_per_layer is None: number_filters_per_layer = DEFAULT_FILTER_PER_LAYER
+
+        if level_feature_dimension is None: level_feature_dimension = DEFAULT_LEVEL_FEATURE_DIMENSION
+
+        self.loss_function = loss_function
+        self.optimizer_function = optimizer_function
+        self.initial_resolution = initial_resolution
+        self.number_channels = number_channels
+        self.number_filters_per_layer = number_filters_per_layer
+        self.level_feature_dimension = level_feature_dimension
         self.input_discriminator = []
         self.discriminator_blocks = []
         self.first_level_discriminator = None
-        self.initial_resolution = 4
-        self.number_channels = 3
-        self.number_filters_per_layer = [16, 32, 64, 96, 128, 256, 512]
-        self.level_feature_dimension = [512, 256, 128, 64, 32, 16, 8]
         self.build_discriminator()
 
     def convolutional_block(self, resolution_feature, number_filters):
