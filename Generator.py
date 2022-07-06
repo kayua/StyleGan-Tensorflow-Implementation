@@ -57,7 +57,7 @@ class Generator:
         self.list_level_noise_input = []
         self.input_block = None
         self.latent_input = None
-        self.initial_flow = None
+        self.initial_gradient_flow = None
         self.mapping_neural_network = None
         self.constant_mapping_neural_network = None
         self.build_blocks()
@@ -143,7 +143,7 @@ class Generator:
         input_noise = Input(shape=dimension_input_flow, name="Input Noise 1")
 
         self.latent_input = input_latent
-        self.initial_flow = input_flow
+        self.initial_gradient_flow = input_flow
 
         first_level_block = self.initial_block_synthesis(self.initial_dimension, self.initial_num_channels)
         first_level_block = first_level_block([input_flow, input_noise, input_latent])
@@ -166,35 +166,39 @@ class Generator:
         self.block_mapping_network()
         self.constant_mapping_block()
 
-    def color_mapping(self, resolution, number_channels_flow):
+    def output_channels_mapping(self, resolution, number_channels_flow):
 
-        input_color_mapping = Input(shape=(resolution, resolution, number_channels_flow))
-        color_mapping = Conv2D(self.number_output_channels, (1, 1), padding="same")(input_color_mapping)
-        color_mapping = Model(input_color_mapping, color_mapping)
-        color_mapping.compile(loss=self.loss_function, optimizer=self.optimizer_function)
-        if DEFAULT_VERBOSE_CONSTRUCTION: color_mapping.summary()
-        return color_mapping
+        input_channels_mapping = Input(shape=(resolution, resolution, number_channels_flow))
+        output_mapping = Conv2D(self.number_output_channels, (1, 1), padding="same")(input_channels_mapping)
+        output_mapping = Model(input_channels_mapping, output_mapping)
+        output_mapping.compile(loss=self.loss_function, optimizer=self.optimizer_function)
+        if DEFAULT_VERBOSE_CONSTRUCTION: output_mapping.summary()
+        return output_mapping
 
     def get_generator(self, number_level):
 
         neural_input_layer = [self.list_level_noise_input[i] for i in range(number_level)]
-        neural_input_layer.append(self.initial_flow)
+        neural_input_layer.append(self.initial_gradient_flow)
         neural_input_layer.append(self.latent_input)
 
         synthesis_model = Model(neural_input_layer, self.list_block_synthesis[number_level - 1])
         synthesis_model.compile(loss=self.loss_function, optimizer=self.optimizer_function)
+
         last_level_dimension = level_size_feature_dimension[number_level]
         last_level_filters = self.num_filters_per_level[number_level]
-        neural_synthesis = self.color_mapping(last_level_dimension, last_level_filters)
+
+        neural_synthesis = self.output_channels_mapping(last_level_dimension, last_level_filters)
         neural_synthesis = neural_synthesis([synthesis_model.output])
         neural_synthesis = Model(synthesis_model.inputs, neural_synthesis, name="Synthesis_Block")
 
         neural_input_layer = [self.list_level_noise_input[i] for i in range(number_level)]
-        neural_input_layer.append(self.initial_flow)
+        neural_input_layer.append(self.initial_gradient_flow)
         neural_input_layer.append(self.mapping_neural_network.input)
+
         style_generator = neural_synthesis(neural_input_layer)
         style_generator = Model(neural_input_layer, style_generator, name="Generator")
         style_generator.summary()
+
         return style_generator
 
     def set_latent_dimension(self, latent_dimension):
