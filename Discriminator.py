@@ -66,7 +66,7 @@ class Discriminator:
 
         discriminator_input = self.input_discriminator[-number_level]
         convolutional_blocks = self.discriminator_blocks[-number_level]
-        convolutional_blocks = Model(discriminator_input, convolutional_blocks.output)
+        convolutional_blocks = Model(discriminator_input, convolutional_blocks.output, name="Image Input")
         convolutional_blocks.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         for i in range(number_level - 1):
             convolutional_blocks = self.discriminator_blocks[-(number_level - (i + 1))](convolutional_blocks.output)
