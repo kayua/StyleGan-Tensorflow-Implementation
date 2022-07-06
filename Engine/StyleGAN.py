@@ -84,10 +84,7 @@ class StyleGAN(Model):
         constant_mapping = tensorflow.fill(dimension, 0.5)
         random_noise_synthesis = self.generate_random_noise(batch_size)
         input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping, random_latent_vectors)
-        print("STEP TRAINING")
-        print("---------------------------------")
-        print(input_mapping)
-        print("---------------------------------\n\n")
+
         with tensorflow.GradientTape() as tape:
 
             generated_images = self.generator(input_mapping, training=True)
