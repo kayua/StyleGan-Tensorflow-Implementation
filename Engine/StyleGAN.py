@@ -32,15 +32,15 @@ class StyleGAN(Model):
     def gradient_penalty(self, batch_size, real_images, fake_images):
 
         alpha = tensorflow.random.normal([batch_size, 1, 1, 1], 0.0, 1.0)
-        diff = fake_images - real_images
-        interpolated = real_images + alpha * diff
+        divergence = fake_images - real_images
+        update_score = real_images + alpha * divergence
 
-        with tensorflow.GradientTape() as gp_tape:
-            gp_tape.watch(interpolated)
+        with tensorflow.GradientTape() as gradient_penalty_reduce:
+            gradient_penalty_reduce.watch(update_score)
 
-            pred = self.discriminator(interpolated, training=True)
+            discriminator_result = self.discriminator(update_score, training=True)
 
-        grads = gp_tape.gradient(pred, [interpolated])[0]
+        grads = gradient_penalty_reduce.gradient(discriminator_result, [update_score])[0]
         norm = tensorflow.sqrt(tensorflow.reduce_sum(tensorflow.square(grads), axis=[1, 2, 3]))
         gp = tensorflow.reduce_mean((norm - 1.0) ** 2)
         return gp
@@ -68,7 +68,7 @@ class StyleGAN(Model):
             constant_mapping_tensor = tensorflow.fill(dimension, self.constant_mapping_value)
             random_noise_synthesis = self.generate_random_noise(batch_size)
             input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
-
+            print(input_mapping)
             with tensorflow.GradientTape() as tape:
 
                 synthetic_images_generated = self.generator(input_mapping, training=True)
@@ -97,19 +97,12 @@ class StyleGAN(Model):
             synthetic_images_generated = self.generator(input_mapping, training=True)
             discriminator_loss = self.discriminator(synthetic_images_generated, training=True)
             g_loss = self.g_loss_fn(discriminator_loss)
+
         gen_gradient = tape.gradient(g_loss, self.generator.trainable_variables)
         self.g_optimizer.apply_gradients(zip(gen_gradient, self.generator.trainable_variables))
 
 
-
-
-
-
-
-
-
-
-        return {"discriminator_loss": discriminator_loss, "g_loss": g_loss}
+        return {"d_loss": discriminator_loss, "g_loss": g_loss}
 
     def resize_image(self, res, image):
         image = tensorflow.image.resize(image, (res, res), method=tensorflow.image.ResizeMethod.NEAREST_NEIGHBOR)

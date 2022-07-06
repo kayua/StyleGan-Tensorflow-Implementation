@@ -18,6 +18,7 @@ class LoadImage:
         self.image_height = DEFAULT_IMAGE_HEIGHT
         self.number_color_channels = DEFAULT_NUMBER_COLOR_CHANNELS
         self.dataset_path = DEFAULT_DATASET_IMAGE_PATH
+        self.size_batch = 32
         self.image_list = []
         self.image_loaded = None
         pass
@@ -36,7 +37,10 @@ class LoadImage:
         for i in tqdm(directory_images):
             self.image_list.append(self.parse_image(i))
 
-        self.image_loaded = numpy.array(self.image_list)
+        residual = len(self.image_list)%self.size_batch
+
+        self.image_loaded = numpy.array(self.image_list[0:len(self.image_list) - residual])
+        print(len(self.image_loaded))
 
     def get_dataset_image(self):
 

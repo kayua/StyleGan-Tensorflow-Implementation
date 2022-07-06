@@ -40,9 +40,12 @@ class AdaIN(Layer):
 
     @staticmethod
     def get_mean_std(x, epsilon=1e-5):
-
         axes = [1, 2]
         mean, variance = tensorflow.nn.moments(x, axes=axes, keepdims=True)
         standard_deviation = tensorflow.sqrt(variance + epsilon)
         return mean, standard_deviation
 
+    def get_config(self):
+        config = {'eps': self.eps}
+        base_config = super(AdaIN, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
