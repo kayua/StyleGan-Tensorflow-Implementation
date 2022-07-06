@@ -1,5 +1,3 @@
-import cv2
-import numpy
 import tensorflow
 from keras import Model
 
