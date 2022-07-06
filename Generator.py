@@ -45,7 +45,7 @@ class Generator:
 
     def block_mapping_network(self):
 
-        latent_dimension_input = Input(shape=(self.latent_dimension, 1))
+        latent_dimension_input = Input(shape=(self.latent_dimension, 1), name="Latent Input")
         gradient_flow = Flatten()(latent_dimension_input)
         gradient_flow = Dense(self.num_neurons_mapping)(gradient_flow)
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
