@@ -10,8 +10,8 @@ from keras.layers import LeakyReLU
 from keras.layers import Reshape
 from keras.layers import UpSampling2D
 
-from Layers.AdaIN import AdaIN
-from Layers.AddNoise import AddNoise
+from Engine.Layers.AdaIN import AdaIN
+from Engine.Layers.AddNoise import AddNoise
 
 tensorflow.get_logger().setLevel(logging.ERROR)
 level_size_feature_dimension = [4, 4, 8, 16, 32, 64, 128, 256, 512]

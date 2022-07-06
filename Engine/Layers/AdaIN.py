@@ -1,7 +1,7 @@
 import tensorflow
 from tensorflow.python.layers.base import Layer
 
-from Layers.EqualizedDense import EqualizedDense
+from Engine.Layers.EqualizedDense import EqualizedDense
 
 
 class AdaIN(Layer):
