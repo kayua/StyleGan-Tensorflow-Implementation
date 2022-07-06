@@ -54,6 +54,7 @@ class StyleGAN(Model):
             random_latent_vectors = numpy.array([self.generate_latent_noise()] for _ in range(batch_size))
             random_noise_vector.append(numpy.array([self.generate_random_noise()] for _ in range(batch_size)))
             constant_feature_mapping = numpy.array([self.generate_constant_mapping() for _ in range(batch_size)])
+
             with tensorflow.GradientTape() as tape:
                 # Generate fake images from the latent vector
                 fake_images = self.generator(random_latent_vectors, training=True)
@@ -107,11 +108,11 @@ class StyleGAN(Model):
 
         random_noise_vector = []
 
-        for i in range(1, level_network):
+        for i in range(1, self.level_network):
             size_feature = level_size_feature_dimension[-i] ** 2
             resolution_feature = level_size_feature_dimension[-i]
             random_noise = numpy.random.uniform(0, 1, self.num_filters_per_level[-i] * size_feature)
-            shape_feature = (resolution_feature, resolution_feature, num_filters_per_level[-i])
+            shape_feature = (resolution_feature, resolution_feature, self.num_filters_per_level[-i])
             random_noise_vector.append(numpy.reshape(random_noise, shape_feature))
 
         return random_noise_vector
@@ -133,7 +134,3 @@ class StyleGAN(Model):
             batch_image_new_resolution.append(new_image)
 
         return numpy.array(batch_image_new_resolution, dtype=numpy.float32)
-
-
-level_network = 4
-num_filters_per_level = [256, 256, 256, 256, 256, 256, 256, 256, 256]
