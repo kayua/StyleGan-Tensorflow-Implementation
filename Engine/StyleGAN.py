@@ -81,18 +81,14 @@ class StyleGAN(Model):
         for i in range(self.d_steps):
 
             random_latent_vectors = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
-            dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0], 1]
+            dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
             constant_mapping = tensorflow.fill(dimension, 0.5)
             random_noise_synthesis = self.generate_random_noise(batch_size)
-
-            print("Latent Dimension {}".format(random_latent_vectors.shape))
-            print("Constant Mapping {}".format(constant_mapping.shape))
-            exit()
-
             input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping, random_latent_vectors)
 
             with tensorflow.GradientTape() as tape:
                 fake_images = self.generator(input_mapping, training=True)
+                print(fake_images.shape)
                 exit()
                 # Get the logits for the fake images
                 # fake_logits = self.discriminator(fake_images, training=True)
@@ -147,7 +143,7 @@ class StyleGAN(Model):
             shape_feature = (batch_size, resolution_feature, resolution_feature, self.num_filters_per_level[0])
             random_noise = tensorflow.random.normal(shape=shape_feature)
             random_noise_vector.append(random_noise)
-            print(random_noise.shape)
+
         return random_noise_vector
 
     def generate_latent_noise(self, batch_size):
