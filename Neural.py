@@ -31,4 +31,4 @@ discriminator_model = discriminator_instance.get_discriminator(level)
 
 styleGan = StyleGAN(discriminator=discriminator_model, generator=generator_model, latent_dim=0, discriminator_extra_steps=1, level_network=level)
 styleGan.compile(d_optimizer=discriminator_optimizer, g_optimizer=generator_optimizer, g_loss_fn=generator_loss, d_loss_fn=discriminator_loss)
-styleGan.fit(image_training, batch_size=16, steps_per_epoch=1, epochs=10)
+styleGan.fit(image_training, batch_size=32, steps_per_epoch=1, epochs=100)

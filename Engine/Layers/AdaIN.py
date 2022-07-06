@@ -15,7 +15,7 @@ class AdaIN(Layer):
     def compute_output_shape(self, input_shape):
         return input_shape[0]
 
-    def call(self, inputs):
+    def call(self, inputs, **kwargs):
         content = inputs[0]
         style = inputs[1]
         content_mean, content_std = self.get_mean_std(content)
