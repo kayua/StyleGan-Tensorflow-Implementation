@@ -64,11 +64,17 @@ class Discriminator:
 
     def get_discriminator(self, number_level):
         number_level -= 1
+        if number_level == 0:
+            self.first_level_discriminator.summary()
+            return self.first_level_discriminator
+
         discriminator_input = self.input_discriminator[-number_level]
         convolutional_blocks = self.discriminator_blocks[-number_level]
         convolutional_blocks = Model(discriminator_input, convolutional_blocks.output)
         convolutional_blocks.compile(loss=self.loss_function, optimizer=self.optimizer_function)
+
         for i in range(number_level - 1):
+
             convolutional_blocks = self.discriminator_blocks[-(number_level - (i + 1))](convolutional_blocks.output)
             convolutional_blocks = Model(discriminator_input, convolutional_blocks)
 
