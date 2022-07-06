@@ -1,21 +1,27 @@
+from abc import ABC
+
 import tensorflow
 from keras import Model
 
 level_size_feature_dimension = [512, 256, 128, 64, 32, 16, 8]
 
+DEFAULT_DISCRIMINATOR = None
+DEFAULT_GENERATOR = None
+DEFAULT_LATENT_DIMENSION = 256
 
-class StyleGAN(Model):
 
-    def __init__(self, discriminator, generator, latent_dim, discriminator_extra_steps=3, gp_weight=10.0,
+class StyleGAN(Model, ABC):
+
+    def __init__(self, discriminator=DEFAULT_DISCRIMINATOR, generator=DEFAULT_GENERATOR,
+                 latent_dimension=DEFAULT_LATENT_DIMENSION, discriminator_extra_steps=3, gp_weight=10.0,
                  level_network=2):
         super(StyleGAN, self).__init__()
         self.discriminator = discriminator
         self.level_network = level_network
         self.generator = generator
-        self.latent_dim = latent_dim
         self.d_steps = discriminator_extra_steps
         self.gp_weight = gp_weight
-        self.latent_dimension = 256
+        self.latent_dimension = latent_dimension
         self.constant_mapping_value = 0.5
         self.initial_dimension = 4
         self.num_filters_per_level = [256, 256, 256, 256, 256, 256, 256, 256, 256]
