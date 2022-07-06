@@ -60,30 +60,31 @@ class StyleGAN(Model):
 
         batch_size = tensorflow.shape(real_images)[0]
 
-        for i in range(self.d_steps):
+        for _ in range(self.d_steps):
 
-            random_latent_vectors = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
+            random_latent_space = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
             dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
-            constant_mapping = tensorflow.fill(dimension, 0.5)
+            constant_mapping_tensor = tensorflow.fill(dimension, 0.5)
             random_noise_synthesis = self.generate_random_noise(batch_size)
-            input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping, random_latent_vectors)
+            input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
+
             with tensorflow.GradientTape() as tape:
 
-                fake_images = self.generator(input_mapping, training=True)
-                fake_logits = self.discriminator(fake_images, training=True)
+                synthetic_images_generated = self.generator(input_mapping, training=True)
+                fake_logits = self.discriminator(synthetic_images_generated, training=True)
                 real_image_reshape = self.resize_image(8, real_images)
                 real_logits = self.discriminator(real_image_reshape, training=True)
                 d_cost = self.d_loss_fn(real_img=real_logits, fake_img=fake_logits)
-                gp = self.gradient_penalty(batch_size, real_image_reshape, fake_images)
+                gp = self.gradient_penalty(batch_size, real_image_reshape, synthetic_images_generated)
                 d_loss = d_cost + gp * self.gp_weight
                 d_gradient = tape.gradient(d_loss, self.discriminator.trainable_variables)
                 self.d_optimizer.apply_gradients(zip(d_gradient, self.discriminator.trainable_variables))
 
-        random_latent_vectors = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
+        random_latent_space = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
         dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
-        constant_mapping = tensorflow.fill(dimension, 0.5)
+        constant_mapping_tensor = tensorflow.fill(dimension, 0.5)
         random_noise_synthesis = self.generate_random_noise(batch_size)
-        input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping, random_latent_vectors)
+        input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
 
         with tensorflow.GradientTape() as tape:
 
