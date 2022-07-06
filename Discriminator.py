@@ -88,3 +88,9 @@ class Discriminator:
 
     def set_loss_function(self, loss_function):
         self.loss_function = loss_function
+
+    def set_optimizer_function(self, optimizer_function):
+        self.optimizer_function = optimizer_function
+
+    def set_initial_resolution(self, initial_resolution):
+        self.initial_resolution = initial_resolution
