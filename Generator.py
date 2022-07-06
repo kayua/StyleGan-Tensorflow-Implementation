@@ -151,13 +151,13 @@ class Generator:
         self.list_level_noise_input.append(input_noise)
 
         for i in range(self.num_synthesis_block - 1):
+
             resolution_feature = level_size_feature_dimension[i + 1]
-            input_noise = Input(shape=(resolution_feature * 2, resolution_feature * 2, self.initial_num_channels),
-                                name="Input Noise {}".format(i + 2))
+            output_resolution_feature = (resolution_feature * 2, resolution_feature * 2, self.initial_num_channels)
+            input_noise = Input(shape=output_resolution_feature, name="Input Noise {}".format(i + 2))
             self.list_level_noise_input.append(input_noise)
             level_block = self.non_initial_synthesis_block(resolution_feature, self.initial_num_channels)
             level_block = level_block([self.list_block_synthesis[-1], self.list_level_noise_input[-1], input_latent])
-
             self.list_block_synthesis.append(level_block)
 
     def build_blocks(self):
