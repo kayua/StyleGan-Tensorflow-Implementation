@@ -1,5 +1,3 @@
-import random
-
 import cv2
 import numpy
 import tensorflow
@@ -46,18 +44,6 @@ class StyleGAN(Model):
         gp = tensorflow.reduce_mean((norm - 1.0) ** 2)
         return gp
 
-    def get_random_batch_image(self, images, number_images):
-
-        list_image_batch = []
-        image_index = [random.randint(0, number_images) for _ in range(self.batch_size)]
-
-        print(numpy.array(images)[0])
-        exit()
-        for i in image_index:
-            list_image_batch.append(numpy.array(numpy.array(images)))
-
-        return numpy.array(list_image_batch)
-
     @staticmethod
     def tensor_mapping(random_noise, constant_mapping, latent_input):
 
@@ -87,6 +73,7 @@ class StyleGAN(Model):
             input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping, random_latent_vectors)
 
             with tensorflow.GradientTape() as tape:
+
                 fake_images = self.generator(input_mapping, training=True)
                 fake_logits = self.discriminator(fake_images, training=True)
                 real_image_reshape = self.resize_image(8, real_images)
@@ -94,17 +81,10 @@ class StyleGAN(Model):
                 d_cost = self.d_loss_fn(real_img=real_logits, fake_img=fake_logits)
                 gp = self.gradient_penalty(batch_size, real_image_reshape, fake_images)
                 d_loss = d_cost + gp * self.gp_weight
-                print(d_loss)
-            exit()
-            # Get the gradients w.r.t the discriminator loss
-            # d_gradient = tape.gradient(d_loss, self.discriminator.trainable_variables)
-            # Update the weights of the discriminator using the discriminator optimizer
-            # self.d_optimizer.apply_gradients(
-            #    zip(d_gradient, self.discriminator.trainable_variables)
-        # )
+                d_gradient = tape.gradient(d_loss, self.discriminator.trainable_variables)
+                self.d_optimizer.apply_gradients(zip(d_gradient, self.discriminator.trainable_variables))
 
-        # Train the generator
-        # Get the latent vector
+        exit()
         random_latent_vectors = tensorflow.random.normal(shape=(batch_size, self.latent_dim))
         with tensorflow.GradientTape() as tape:
             # Generate fake images using the generator
