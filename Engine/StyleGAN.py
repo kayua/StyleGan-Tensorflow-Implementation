@@ -76,7 +76,7 @@ class StyleGAN(Model):
             random_noise_synthesis = tensorflow.convert_to_tensor(self.generate_random_noise())
             constant_mapping = tensorflow.convert_to_tensor(self.generate_constant_mapping())
             self.generator.summary()
-            input_tensor = random_noise_synthesis + constant_mapping + random_latent_vectors
+
             with tensorflow.GradientTape() as tape:
                 tensor_mapping = {"title": title_data, "body": body_data, "tags": tags_data}
                 fake_images = self.generator(tensor_mapping , training=True)
