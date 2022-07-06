@@ -1,3 +1,5 @@
+import random
+
 import cv2
 import numpy
 import tensorflow
@@ -14,6 +16,7 @@ class StyleGAN(Model):
         self.discriminator = discriminator
         self.level_network = level_network
         self.generator = generator
+        self.batch_size = 32
         self.latent_dim = latent_dim
         self.d_steps = discriminator_extra_steps
         self.gp_weight = gp_weight
@@ -43,16 +46,28 @@ class StyleGAN(Model):
         gp = tensorflow.reduce_mean((norm - 1.0) ** 2)
         return gp
 
+    def get_random_batch_image(self, images, number_images):
+
+        image_index = [random.randint(0, number_images) for _ in range(self.batch_size)]
+        list_image_batch = numpy.array(images[image_index])
+        return list_image_batch
+
+
+
+
+
+
     def train_step(self, real_images):
 
-        batch_size = tensorflow.shape(real_images)[0]
-        print(real_images.shape[0])
-        exit()
-        random_noise_vector = []
+        batch_size = int(real_images.shape[1])
+        number_images = int(real_images.shape[1])
+
         for i in range(self.d_steps):
-            random_latent_vectors = self.generate_latent_noise(batch_size)
-            random_noise_vector.append(numpy.array([self.generate_random_noise() for _ in range(batch_size)]))
-            constant_feature_mapping = numpy.array([self.generate_constant_mapping() for _ in range(batch_size)])
+            random_latent_vectors = self.generate_latent_noise(number_images)
+            real_image_batch = self.get_random_batch_image(real_images, number_images)
+            exit()
+            #random_noise_vector.append(numpy.array([self.generate_random_noise() for _ in range(batch_size)]))
+            #constant_feature_mapping = numpy.array([self.generate_constant_mapping() for _ in range(batch_size)])
 
             with tensorflow.GradientTape() as tape:
                 # Generate fake images from the latent vector
