@@ -88,20 +88,14 @@ class StyleGAN(Model):
 
             with tensorflow.GradientTape() as tape:
                 fake_images = self.generator(input_mapping, training=True)
-                print(fake_images.shape)
-                exit()
-                # Get the logits for the fake images
-                # fake_logits = self.discriminator(fake_images, training=True)
-                # Get the logits for the real images
-                real_logits = self.discriminator(real_images, training=True)
-
-                # Calculate the discriminator loss using the fake and real image logits
-                # d_cost = self.d_loss_fn(real_img=real_logits, fake_img=fake_logits)
-                # Calculate the gradient penalty
-                # gp = self.gradient_penalty(batch_size, real_images, fake_images)
-                # Add the gradient penalty to the original discriminator loss
-                # d_loss = d_cost + gp * self.gp_weight
-
+                fake_logits = self.discriminator(fake_images, training=True)
+                real_image_reshape = self.resize_image(8, real_images)
+                real_logits = self.discriminator(real_image_reshape, training=True)
+                d_cost = self.d_loss_fn(real_img=real_logits, fake_img=fake_logits)
+                gp = self.gradient_penalty(batch_size, real_image_reshape, fake_images)
+                d_loss = d_cost + gp * self.gp_weight
+                print(d_loss)
+            exit()
             # Get the gradients w.r.t the discriminator loss
             # d_gradient = tape.gradient(d_loss, self.discriminator.trainable_variables)
             # Update the weights of the discriminator using the discriminator optimizer
@@ -128,6 +122,10 @@ class StyleGAN(Model):
         )
         # return {"d_loss": d_loss, "g_loss": g_loss}
 
+    def resize_image(self, res, image):
+        image = tensorflow.image.resize(image, (res, res), method=tensorflow.image.ResizeMethod.NEAREST_NEIGHBOR)
+        image = tensorflow.cast(image, tensorflow.float32)
+        return image
 
     def generate_random_noise(self, batch_size):
 
