@@ -43,14 +43,13 @@ class Discriminator:
         self.input_discriminator.append(input_layer)
         gradient_flow = Conv2D(number_filters, (3, 3), padding="same")(input_layer)
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
-        gradient_flow = Conv2D(number_filters, (3, 3), padding="same")(gradient_flow)
+        gradient_flow = Conv2D(self.number_channels, (3, 3), padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(0.2)(gradient_flow)
         gradient_flow = MaxPooling2D((2, 2))(gradient_flow)
         gradient_flow = Model(input_layer, gradient_flow)
         gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         self.discriminator_blocks.append(gradient_flow)
-        if DEFAULT_VERBOSE_CONSTRUCTION:
-            gradient_flow.summary()
+        if DEFAULT_VERBOSE_CONSTRUCTION: gradient_flow.summary()
 
     def build_discriminator(self):
 
