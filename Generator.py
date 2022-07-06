@@ -28,6 +28,7 @@ DEFAULT_DIMENSION_CONVOLUTION_KERNELS = (3, 3)
 DEFAULT_NUMBER_SYNTHESIS_BLOCKS = 8
 DEFAULT_LOSS_FUNCTION = "binary_crossentropy"
 DEFAULT_OPTIMIZER_FUNCTION = "adam"
+DEFAULT_NUMBER_FILTERS_PER_LEVEL = [256, 256, 256, 256, 256, 256, 256, 256, 256]
 
 
 class Generator:
@@ -44,15 +45,14 @@ class Generator:
         self.num_synthesis_block = DEFAULT_NUMBER_SYNTHESIS_BLOCKS
         self.loss_function = DEFAULT_LOSS_FUNCTION
         self.optimizer_function = DEFAULT_OPTIMIZER_FUNCTION
-        self.mapping_neural_network = None
-        self.constant_mapping_neural_network = None
-        self.input_block = None
+        self.num_filters_per_level = DEFAULT_NUMBER_FILTERS_PER_LEVEL
         self.list_block_synthesis = []
         self.list_level_noise_input = []
-
-        self.num_filters_per_level = [256, 256, 256, 256, 256, 256, 256, 256, 256]
+        self.input_block = None
         self.latent_input = None
         self.initial_flow = None
+        self.mapping_neural_network = None
+        self.constant_mapping_neural_network = None
         self.build_blocks()
 
     def block_mapping_network(self):
