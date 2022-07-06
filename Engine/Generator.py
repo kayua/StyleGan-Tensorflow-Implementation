@@ -24,6 +24,7 @@ DEFAULT_NUMBER_MAPPING_BLOCKS = 4
 DEFAULT_INITIAL_FEATURE_DIMENSION = 4
 DEFAULT_INITIAL_NUMBER_CHANNELS = 256
 DEFAULT_NUMBER_OUTPUT_CHANNELS = 3
+DEFAULT_THRESHOLD_RELU = 0.2
 DEFAULT_DIMENSION_CONVOLUTION_KERNELS = (3, 3)
 DEFAULT_NUMBER_SYNTHESIS_BLOCKS = 8
 DEFAULT_LOSS_FUNCTION = "binary_crossentropy"
@@ -68,11 +69,11 @@ class Generator:
         latent_dimension_input = Input(shape=shape_latent_mapping, name="Latent Input")
         gradient_flow = Flatten()(latent_dimension_input)
         gradient_flow = Dense(self.num_neurons_mapping)(gradient_flow)
-        gradient_flow = LeakyReLU(0.2)(gradient_flow)
+        gradient_flow = LeakyReLU(DEFAULT_THRESHOLD_RELU)(gradient_flow)
 
         for _ in range(self.num_mapping_blocks - 2):
             gradient_flow = Dense(self.num_neurons_mapping)(gradient_flow)
-            gradient_flow = LeakyReLU(0.2)(gradient_flow)
+            gradient_flow = LeakyReLU(DEFAULT_THRESHOLD_RELU)(gradient_flow)
 
         gradient_flow = Dense(self.latent_dimension)(gradient_flow)
         network_model = Model(latent_dimension_input, gradient_flow, name="Mapping_Network")
@@ -103,7 +104,7 @@ class Generator:
         gradient_flow = AddNoise()([input_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
-        gradient_flow = LeakyReLU(0.2)(gradient_flow)
+        gradient_flow = LeakyReLU(DEFAULT_THRESHOLD_RELU)(gradient_flow)
         gradient_flow = AddNoise()([gradient_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
 
@@ -126,7 +127,7 @@ class Generator:
         gradient_flow = AddNoise()([gradient_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
-        gradient_flow = LeakyReLU(0.2)(gradient_flow)
+        gradient_flow = LeakyReLU(DEFAULT_THRESHOLD_RELU)(gradient_flow)
         gradient_flow = AddNoise()([gradient_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
 
