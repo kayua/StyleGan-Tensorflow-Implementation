@@ -3,7 +3,7 @@ import logging
 import tensorflow
 from keras import Input
 from keras import Model
-from keras.layers import Conv2D
+from keras.layers import Conv2D, Add
 from keras.layers import Flatten
 from keras.layers import Dense
 from keras.layers import LeakyReLU
@@ -11,7 +11,6 @@ from keras.layers import Reshape
 from keras.layers import UpSampling2D
 
 from Engine.Layers.AdaIN import AdaIN
-from Engine.Layers.AddNoise import AddNoise
 
 tensorflow.get_logger().setLevel(logging.ERROR)
 level_size_feature_dimension = [4, 4, 8, 16, 32, 64, 128, 256, 512]
@@ -92,6 +91,7 @@ class Generator:
         self.constant_mapping_neural_network = gradient_flow
         if DEFAULT_VERBOSE_CONSTRUCTION: self.constant_mapping_neural_network.summary()
 
+
     def initial_block_synthesis(self, resolution_block, number_filters):
 
         resolution_features_block = (resolution_block, resolution_block, number_filters)
@@ -101,12 +101,12 @@ class Generator:
         input_latent = Input(shape=self.latent_dimension)
         input_latent = Reshape((self.latent_dimension, 1))(input_latent)
 
-        gradient_flow = AddNoise()([input_flow, input_noise])
-        gradient_flow = AdaIN()([gradient_flow, input_latent])
+        gradient_flow = Add()([input_flow, input_noise])
+        gradient_flow = AdaIN()([input_latent, gradient_flow])
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(DEFAULT_THRESHOLD_RELU)(gradient_flow)
-        gradient_flow = AddNoise()([gradient_flow, input_noise])
-        gradient_flow = AdaIN()([gradient_flow, input_latent])
+        gradient_flow = Add()([gradient_flow, input_noise])
+        gradient_flow = AdaIN()([input_latent, gradient_flow])
 
         initial_block_model = Model([input_flow, input_noise, input_latent], gradient_flow)
         initial_block_model.compile(loss=self.loss_function, optimizer=self.optimizer_function)
@@ -124,11 +124,11 @@ class Generator:
         input_latent = Reshape((self.latent_dimension, 1))(input_latent)
 
         gradient_flow = UpSampling2D((2, 2))(input_flow)
-        gradient_flow = AddNoise()([gradient_flow, input_noise])
-        gradient_flow = AdaIN()([gradient_flow, input_latent])
+        gradient_flow = Add()([gradient_flow, input_noise])
+        gradient_flow = self.ada_in(input_latent, gradient_flow) #AdaIN()([gradient_flow, input_latent])
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(DEFAULT_THRESHOLD_RELU)(gradient_flow)
-        gradient_flow = AddNoise()([gradient_flow, input_noise])
+        gradient_flow = Add()([gradient_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
 
         non_initial_block_model = Model([input_flow, input_noise, input_latent], gradient_flow)

@@ -1,30 +1,34 @@
+
+from keras.type.types import Layer
+from keras.utils import conv_utils
 import tensorflow
-from tensorflow.python.layers.base import Layer
-
-from Engine.Layers.EqualizedDense import EqualizedDense
-
 
 class AdaIN(Layer):
-    def __init__(self, gain=1, **kwargs):
+
+    def __init__(self, data_format=None, eps=1e-7, **kwargs):
         super(AdaIN, self).__init__(**kwargs)
-        self.gain = gain
-        self.w_channels = None
-        self.x_channels = None
-        self.dense_1 = None
-        self.dense_2 = None
+        self.data_format = conv_utils.normalize_data_format(data_format)
+        self.spatial_axis = [1, 2] if self.data_format == 'channels_last' else [2, 3]
+        self.eps = eps
 
-    def build(self, input_shapes):
-        x_shape = input_shapes[0]
-        w_shape = input_shapes[1]
+    def compute_output_shape(self, input_shape):
+        return input_shape[0]
 
-        self.w_channels = w_shape[-1]
-        self.x_channels = x_shape[-1]
+    def call(self, inputs):
+        image = inputs[0]
+        if len(inputs) == 2:
+            style = inputs[1]
+            style_mean, style_var = tensorflow.nn.moments(style, self.spatial_axis, keep_dims=True)
+        else:
+            style_mean = tensorflow.expand_dims(tensorflow.expand_dims(inputs[1], self.spatial_axis[0]), self.spatial_axis[1])
+            style_var = tensorflow.expand_dims(tensorflow.expand_dims(inputs[2], self.spatial_axis[0]), self.spatial_axis[1])
+        image_mean, image_var = tensorflow.nn.moments(image, self.spatial_axis, keep_dims=True)
+        out = tensorflow.nn.batch_normalization(image, image_mean,
+                                         image_var, style_mean,
+                                         tensorflow.sqrt(style_var), self.eps)
+        return out
 
-        self.dense_1 = EqualizedDense(self.x_channels, gain=1)
-        self.dense_2 = EqualizedDense(self.x_channels, gain=1)
-
-    def call(self, inputs, **kwargs):
-        x, w = inputs
-        ys = tensorflow.reshape(self.dense_1(w), (-1, 1, 1, self.x_channels))
-        yb = tensorflow.reshape(self.dense_2(w), (-1, 1, 1, self.x_channels))
-        return ys * x + yb
+    def get_config(self):
+        config = {'eps': self.eps}
+        base_config = super(AdaIN, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
