@@ -2,6 +2,7 @@ import glob
 
 import numpy
 import tensorflow
+from tqdm import tqdm
 
 DEFAULT_IMAGE_WIDTH = 256
 DEFAULT_IMAGE_HEIGHT = 256
@@ -16,6 +17,7 @@ class LoadImage:
         self.image_width = DEFAULT_IMAGE_WIDTH
         self.image_height = DEFAULT_IMAGE_HEIGHT
         self.number_color_channels = DEFAULT_NUMBER_COLOR_CHANNELS
+        self.dataset_path = DEFAULT_DATASET_IMAGE_PATH
         self.image_list = []
         pass
 
@@ -28,6 +30,8 @@ class LoadImage:
 
 
     def load_images(self):
-        directory_images = glob.glob("{}".format(self.))
-        for i in tqdm()
+        directory_images = glob.glob("{}/*".format(self.dataset_path))
+
+        for i in tqdm(directory_images):
+            self.image_list.append(self.parse_image(i))
 
