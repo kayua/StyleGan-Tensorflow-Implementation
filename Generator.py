@@ -186,3 +186,25 @@ class Generator:
         style_generator = Model(neural_input_layer, style_generator, name="Generator")
         style_generator.summary()
         return style_generator
+
+    def set_latent_dimension(self, latent_dimension):
+        self.latent_dimension = latent_dimension
+
+    def set_number_neurons_mapping(self, number_neurons_mapping):
+        self.num_neurons_mapping = number_neurons_mapping
+
+    def set_number_mapping_block(self, number_mapping_blocks):
+        self.num_mapping_blocks = number_mapping_blocks
+
+    def set_initial_dimension(self, initial_dimension):
+        self.initial_dimension = initial_dimension
+
+
+        self.initial_dimension = initial_dimension
+        self.initial_num_channels = initial_num_channels
+        self.number_output_channels = number_output_channels
+        self.size_kernel_filters = size_kernel_filters
+        self.num_synthesis_block = num_synthesis_block
+        self.loss_function = loss_function
+        self.optimizer_function = optimizer_function
+        self.num_filters_per_level = num_filters_per_level
