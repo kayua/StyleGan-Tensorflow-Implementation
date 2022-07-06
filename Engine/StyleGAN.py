@@ -14,7 +14,6 @@ class StyleGAN(Model):
         self.discriminator = discriminator
         self.level_network = level_network
         self.generator = generator
-        self.batch_size = 32
         self.latent_dim = latent_dim
         self.d_steps = discriminator_extra_steps
         self.gp_weight = gp_weight
@@ -71,7 +70,7 @@ class StyleGAN(Model):
             constant_mapping = tensorflow.fill(dimension, 0.5)
             random_noise_synthesis = self.generate_random_noise(batch_size)
             input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping, random_latent_vectors)
-
+            print(input_mapping)
             with tensorflow.GradientTape() as tape:
 
                 fake_images = self.generator(input_mapping, training=True)
@@ -89,22 +88,18 @@ class StyleGAN(Model):
         constant_mapping = tensorflow.fill(dimension, 0.5)
         random_noise_synthesis = self.generate_random_noise(batch_size)
         input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping, random_latent_vectors)
+
         with tensorflow.GradientTape() as tape:
 
             generated_images = self.generator(input_mapping, training=True)
-            exit()
-            # Get the discriminator logits for fake images
             gen_img_logits = self.discriminator(generated_images, training=True)
-            # Calculate the generator loss
             g_loss = self.g_loss_fn(gen_img_logits)
+            gen_gradient = tape.gradient(g_loss, self.generator.trainable_variables)
+            self.g_optimizer.apply_gradients(zip(gen_gradient, self.generator.trainable_variables))
 
-        # Get the gradients w.r.t the generator loss
-        gen_gradient = tape.gradient(g_loss, self.generator.trainable_variables)
-        # Update the weights of the generator using the generator optimizer
-        self.g_optimizer.apply_gradients(
-            zip(gen_gradient, self.generator.trainable_variables)
-        )
-        # return {"d_loss": d_loss, "g_loss": g_loss}
+        print({"d_loss": d_loss, "g_loss": g_loss})
+
+        return {"d_loss": d_loss, "g_loss": g_loss}
 
     def resize_image(self, res, image):
         image = tensorflow.image.resize(image, (res, res), method=tensorflow.image.ResizeMethod.NEAREST_NEIGHBOR)
