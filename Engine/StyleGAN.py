@@ -10,24 +10,32 @@ DEFAULT_LATENT_DIMENSION = 256
 DEFAULT_DISCRIMINATOR_STEPS = 4
 DEFAULT_GRADIENT_PENALTY_ALPHA = 10.0
 DEFAULT_NETWORK_LEVEL = 2
+DEFAULT_CONSTANT_VALUE_MAPPING = 0.5
+DEFAULT_INITIAL_DIMENSION = 4
+DEFAULT_NUMBER_FILTERS_PER_LAYER = [256, 256, 256, 256, 256, 256, 256, 256, 256]
 
 
 class StyleGAN(Model, ABC):
 
     def __init__(self, discriminator=DEFAULT_DISCRIMINATOR, generator=DEFAULT_GENERATOR,
                  latent_dimension=DEFAULT_LATENT_DIMENSION, number_discriminator_steps=DEFAULT_DISCRIMINATOR_STEPS,
-                 gradient_penalty_alpha=DEFAULT_GRADIENT_PENALTY_ALPHA, network_level=DEFAULT_NETWORK_LEVEL):
+                 gradient_penalty_alpha=DEFAULT_GRADIENT_PENALTY_ALPHA, network_level=DEFAULT_NETWORK_LEVEL,
+                 constant_mapping_value=DEFAULT_CONSTANT_VALUE_MAPPING, initial_dimension=DEFAULT_INITIAL_DIMENSION,
+                 number_filter_per_layer=None):
 
         super(StyleGAN, self).__init__()
+
+        if number_filter_per_layer is None: number_filter_per_layer = DEFAULT_NUMBER_FILTERS_PER_LAYER
+
         self.discriminator = discriminator
         self.network_level = network_level
         self.generator = generator
         self.number_discriminator_steps = number_discriminator_steps
         self.gp_weight = gradient_penalty_alpha
         self.latent_dimension = latent_dimension
-        self.constant_mapping_value = 0.5
-        self.initial_dimension = 4
-        self.num_filters_per_level = [256, 256, 256, 256, 256, 256, 256, 256, 256]
+        self.constant_mapping_value = constant_mapping_value
+        self.initial_dimension = initial_dimension
+        self.num_filters_per_level = number_filter_per_layer
 
     def compile(self, d_optimizer, g_optimizer, d_loss_fn, g_loss_fn):
         super(StyleGAN, self).compile()
