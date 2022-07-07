@@ -19,16 +19,17 @@ def discriminator_loss(real_img, fake_img):
 def generator_loss(fake_img):
     return -tensorflow.reduce_mean(fake_img)
 
-level = 2
+min_level = 2
+max_level = 5
 discriminator_instance = Discriminator()
 generator_instance = Generator()
 image_instance = LoadImage()
 image_training = image_instance.get_dataset_image()
-print(image_training.shape)
-generator_model = generator_instance.get_generator(level)
-discriminator_model = discriminator_instance.get_discriminator(level)
 
 
-styleGan = StyleGAN(discriminator=discriminator_model, generator=generator_model, number_discriminator_steps=2, network_level=level)
-styleGan.compile(discriminator_optimizer=discriminator_optimizer, generator_optimizer=generator_optimizer, generator_loss=generator_loss, discriminator_loss=discriminator_loss)
-styleGan.fit(image_training, batch_size=32, steps_per_epoch=4, epochs=10)
+for level in range(min_level, max_level):
+    generator_model = generator_instance.get_generator(level)
+    discriminator_model = discriminator_instance.get_discriminator(level)
+    styleGan = StyleGAN(discriminator=discriminator_model, generator=generator_model, number_discriminator_steps=2, network_level=level)
+    styleGan.compile(discriminator_optimizer=discriminator_optimizer, generator_optimizer=generator_optimizer, generator_loss=generator_loss, discriminator_loss=discriminator_loss)
+    styleGan.fit(image_training, batch_size=32, steps_per_epoch=4, epochs=10)
