@@ -9,12 +9,12 @@ from keras.layers import Flatten
 
 DEFAULT_LOSS_FUNCTION = "binary_crossentropy"
 DEFAULT_OPTIMIZER_FUNCTION = "adam"
-DEFAULT_VERBOSE_CONSTRUCTION = False
+DEFAULT_VERBOSE_CONSTRUCTION = True
 DEFAULT_NUMBER_CHANNELS = 3
 DEFAULT_INITIAL_RESOLUTION = 4
 DEFAULT_DIMENSION_CONVOLUTION_KERNELS = (3, 3)
-DEFAULT_FILTER_PER_LAYER = [16, 32, 64, 96, 128, 256, 512]
-DEFAULT_LEVEL_FEATURE_DIMENSION = [512, 256, 128, 64, 32, 16, 8]
+DEFAULT_FILTER_PER_LAYER = [64, 64, 128, 128, 256, 256, 512, 512]
+DEFAULT_LEVEL_FEATURE_DIMENSION = [1024, 512, 256, 128, 64, 32, 16, 8]
 DEFAULT_THRESHOLD_ACTIVATION = 0.2
 
 
@@ -50,7 +50,7 @@ class Discriminator:
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(input_layer)
         gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
 
-        gradient_flow = Conv2D(self.number_channels, self.size_kernel_filters, padding="same")(gradient_flow)
+        gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
 
         gradient_flow = MaxPooling2D((2, 2))(gradient_flow)
@@ -107,7 +107,7 @@ class Discriminator:
         convolutional_blocks.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         discriminator_network = self.first_level_discriminator(convolutional_blocks.output)
         discriminator_network = Model(discriminator_input, discriminator_network, name="Discriminator")
-        discriminator_network.summary()
+        #discriminator_network.summary()
 
         return discriminator_network
 
