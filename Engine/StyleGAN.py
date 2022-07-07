@@ -1,7 +1,10 @@
 from abc import ABC
-import tensorflow
-from keras import Model
 
+import numpy
+import tensorflow
+from cv2 import cv2
+from keras import Model
+from PIL import Image
 from Engine.Loss import discriminator_loss_function
 from Engine.Loss import generator_loss_function
 
@@ -158,10 +161,10 @@ class StyleGAN(Model, ABC):
 
         images = self.generator(input_mapping)
 
-        for i, images in enumerate(images):
-
-            print(i)
-            print(images.shape)
+        for i, img in enumerate(images):
+            new_image = 1+img.numpy()
+            new_image = numpy.array(new_image*127.5)
+            cv2.imwrite('{}/image_level_{}_id_{}.jpg'.format(path_output, self.network_level, i), new_image)
 
 
 

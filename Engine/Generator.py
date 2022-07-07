@@ -1,15 +1,16 @@
 import logging
 
 import tensorflow
-from keras import Input
+from keras import Input, activations
 from keras import Model
-from keras.layers import Conv2D
+from keras.layers import Conv2D, Activation
 from keras.layers import Add
 from keras.layers import Flatten
 from keras.layers import Dense
 from keras.layers import LeakyReLU
 from keras.layers import Reshape
 from keras.layers import UpSampling2D
+from tensorflow.python.ops.gen_math_ops import Tanh
 
 from Engine.Layers.AdaIN import AdaIN
 
@@ -173,6 +174,7 @@ class Generator:
 
         input_channels_mapping = Input(shape=(resolution, resolution, number_channels_flow))
         output_mapping = Conv2D(self.number_output_channels, (1, 1), padding="same")(input_channels_mapping)
+        output_mapping = Activation(activations.tanh)(output_mapping)
         output_mapping = Model(input_channels_mapping, output_mapping)
         output_mapping.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         if DEFAULT_VERBOSE_CONSTRUCTION: output_mapping.summary()
