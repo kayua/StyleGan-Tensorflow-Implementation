@@ -125,3 +125,8 @@ class Discriminator:
 
     def set_level_feature_dimension(self, level_feature_dimension):
         self.level_feature_dimension = level_feature_dimension
+
+
+discriminator_instance = Discriminator()
+
+discriminator_instance.get_discriminator(2)
