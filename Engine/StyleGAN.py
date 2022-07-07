@@ -141,11 +141,15 @@ class StyleGAN(Model, ABC):
 
         if latent_noise is None:
             random_latent_space = tensorflow.random.normal(shape=(number_images, self.latent_dimension, 1))
+
         else:
             random_latent_space = latent_noise
 
         if noise_level is None:
             random_noise_synthesis = self.generate_random_noise(number_images)
+
+        else:
+            random_noise_synthesis = noise_level
 
         dimension = [number_images, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
         constant_mapping_tensor = tensorflow.fill(dimension, self.constant_mapping_value)
