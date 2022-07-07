@@ -2,7 +2,8 @@ from abc import ABC
 import tensorflow
 from keras import Model
 
-from Engine.Loss import discriminator_loss_function, generator_loss_function
+from Engine.Loss import discriminator_loss_function
+from Engine.Loss import generator_loss_function
 
 DEFAULT_DISCRIMINATOR = None
 DEFAULT_GENERATOR = None
@@ -18,6 +19,7 @@ DEFAULT_GENERATOR_OPTIMIZER = tensorflow.keras.optimizers.Adam(learning_rate=0.0
 DEFAULT_DISCRIMINATOR_OPTIMIZER = tensorflow.keras.optimizers.Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
 DEFAULT_DISCRIMINATOR_LOSS = discriminator_loss_function
 DEFAULT_GENERATOR_LOSS = generator_loss_function
+
 
 class StyleGAN(Model, ABC):
 
