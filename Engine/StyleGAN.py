@@ -19,6 +19,7 @@ DEFAULT_GENERATOR_OPTIMIZER = tensorflow.keras.optimizers.Adam(learning_rate=0.0
 DEFAULT_DISCRIMINATOR_OPTIMIZER = tensorflow.keras.optimizers.Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
 DEFAULT_DISCRIMINATOR_LOSS = discriminator_loss_function
 DEFAULT_GENERATOR_LOSS = generator_loss_function
+DEFAULT_DIMENSION_IMAGE_ALGORITHM = tensorflow.image.ResizeMethod.NEAREST_NEIGHBOR
 
 
 class StyleGAN(Model, ABC):
@@ -27,7 +28,8 @@ class StyleGAN(Model, ABC):
                  latent_dimension=DEFAULT_LATENT_DIMENSION, number_discriminator_steps=DEFAULT_DISCRIMINATOR_STEPS,
                  gradient_penalty_alpha=DEFAULT_GRADIENT_PENALTY_ALPHA, network_level=DEFAULT_NETWORK_LEVEL,
                  constant_mapping_value=DEFAULT_CONSTANT_VALUE_MAPPING, initial_dimension=DEFAULT_INITIAL_DIMENSION,
-                 number_filter_per_layer=None, size_feature_dimension=None):
+                 reduce_dimension_image_algorithm=DEFAULT_DIMENSION_IMAGE_ALGORITHM, number_filter_per_layer=None,
+                 size_feature_dimension=None):
 
         super(StyleGAN, self).__init__()
 
@@ -44,6 +46,7 @@ class StyleGAN(Model, ABC):
         self.initial_dimension = initial_dimension
         self.num_filters_per_level = number_filter_per_layer
         self.size_feature_dimension = size_feature_dimension
+        self.reduce_dimension_image_method = reduce_dimension_image_algorithm
         self.discriminator_optimizer = None
         self.generator_optimizer = None
         self.discriminator_loss = None
@@ -97,7 +100,6 @@ class StyleGAN(Model, ABC):
             input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
 
             with tensorflow.GradientTape() as tape:
-
                 synthetic_images_generated = self.generator(input_mapping, training=True)
                 synthetic_discriminator_loss = self.discriminator(synthetic_images_generated, training=True)
                 image_new_dimension = self.size_feature_dimension[-(self.network_level - 1)]
@@ -128,14 +130,12 @@ class StyleGAN(Model, ABC):
 
         return {"discriminator_loss_function": discriminator_loss, "generator_loss_function": generator_loss}
 
-    @staticmethod
-    def resize_image(resolution_image, image_propagated):
-        interpolation_operator = tensorflow.image.ResizeMethod.NEAREST_NEIGHBOR
+    def resize_image(self, resolution_image, image_propagated):
+        interpolation_operator = self.reduce_dimension_image_method
         shape_image = (resolution_image, resolution_image)
         image_propagated = tensorflow.image.resize(image_propagated, shape_image, method=interpolation_operator)
         image_propagated = tensorflow.cast(image_propagated, tensorflow.float32)
         return image_propagated
-
 
     def generate_random_noise(self, batch_size):
 
@@ -153,7 +153,6 @@ class StyleGAN(Model, ABC):
             random_noise_vector.append(random_noise)
 
         return random_noise_vector
-
 
     def set_discriminator(self, discriminator):
         self.discriminator = discriminator
