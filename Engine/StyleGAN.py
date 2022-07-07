@@ -2,8 +2,6 @@ from abc import ABC
 import tensorflow
 from keras import Model
 
-level_size_feature_dimension = [512, 256, 128, 64, 32, 16, 8]
-
 DEFAULT_DISCRIMINATOR = None
 DEFAULT_GENERATOR = None
 DEFAULT_LATENT_DIMENSION = 256
@@ -22,10 +20,11 @@ class StyleGAN(Model, ABC):
                  latent_dimension=DEFAULT_LATENT_DIMENSION, number_discriminator_steps=DEFAULT_DISCRIMINATOR_STEPS,
                  gradient_penalty_alpha=DEFAULT_GRADIENT_PENALTY_ALPHA, network_level=DEFAULT_NETWORK_LEVEL,
                  constant_mapping_value=DEFAULT_CONSTANT_VALUE_MAPPING, initial_dimension=DEFAULT_INITIAL_DIMENSION,
-                 number_filter_per_layer=None):
+                 number_filter_per_layer=None, size_feature_dimension=None):
 
         super(StyleGAN, self).__init__()
 
+        if size_feature_dimension is None: size_feature_dimension = DEFAULT_SIZE_FEATURE_DIMENSION
         if number_filter_per_layer is None: number_filter_per_layer = DEFAULT_NUMBER_FILTERS_PER_LAYER
 
         self.discriminator = discriminator
@@ -37,6 +36,7 @@ class StyleGAN(Model, ABC):
         self.constant_mapping_value = constant_mapping_value
         self.initial_dimension = initial_dimension
         self.num_filters_per_level = number_filter_per_layer
+        self.size_feature_dimension = size_feature_dimension
 
     def compile(self, d_optimizer, g_optimizer, d_loss_fn, g_loss_fn):
         super(StyleGAN, self).compile()
@@ -134,7 +134,7 @@ class StyleGAN(Model, ABC):
         random_noise_vector.append(random_noise)
 
         for i in range(1, self.network_level):
-            resolution_feature = level_size_feature_dimension[-i]
+            resolution_feature = self.size_feature_dimension[-i]
             shape_feature = (batch_size, resolution_feature, resolution_feature, 1)
             random_noise = tensorflow.random.normal(shape=shape_feature)
             random_noise_vector.append(random_noise)
