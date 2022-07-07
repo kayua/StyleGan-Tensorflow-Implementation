@@ -4,7 +4,7 @@ import numpy
 import tensorflow
 from cv2 import cv2
 from keras import Model
-from PIL import Image
+
 from Engine.Loss import discriminator_loss_function
 from Engine.Loss import generator_loss_function
 
