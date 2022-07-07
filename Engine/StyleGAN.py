@@ -123,13 +123,13 @@ class StyleGAN(Model, ABC):
         with tensorflow.GradientTape() as tape:
             synthetic_images_generated = self.generator(input_mapping, training=True)
             discriminator_loss = self.discriminator(synthetic_images_generated, training=True)
-            g_loss = self.generator_loss(discriminator_loss)
+            generator_loss = self.generator_loss(discriminator_loss)
 
-        generator_update = tape.gradient(g_loss, self.generator.trainable_variables)
+        generator_update = tape.gradient(generator_loss, self.generator.trainable_variables)
         gradient_apply = zip(generator_update, self.generator.trainable_variables)
         self.generator_optimizer.apply_gradients(gradient_apply)
 
-        return {"discriminator_loss_function": discriminator_loss, "generator_loss_function": g_loss}
+        return {"discriminator_loss_function": discriminator_loss, "generator_loss_function": generator_loss}
 
     @staticmethod
     def resize_image(resolution_image, image_propagated):
