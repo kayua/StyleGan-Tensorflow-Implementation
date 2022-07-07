@@ -12,6 +12,8 @@ DEFAULT_CONSTANT_VALUE_MAPPING = 0.5
 DEFAULT_INITIAL_DIMENSION = 4
 DEFAULT_NUMBER_FILTERS_PER_LAYER = [256, 256, 256, 256, 256, 256, 256, 256, 256]
 DEFAULT_SIZE_FEATURE_DIMENSION = [512, 256, 128, 64, 32, 16, 8]
+DEFAULT_GENERATOR_OPTIMIZER = tensorflow.keras.optimizers.Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
+DEFAULT_DISCRIMINATOR_OPTIMIZER = tensorflow.keras.optimizers.Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
 
 
 class StyleGAN(Model, ABC):
@@ -42,8 +44,7 @@ class StyleGAN(Model, ABC):
         self.discriminator_loss = None
         self.generator_loss = None
 
-
-    def compile(self, discriminator_optimizer, generator_optimizer, discriminator_loss, generator_loss):
+    def compile(self, discriminator_optimizer=DEFAULT_DISCRIMINATOR_OPTIMIZER, generator_optimizer=DEFAULT_GENERATOR_OPTIMIZER, discriminator_loss, generator_loss, **kwargs):
         super(StyleGAN, self).compile()
         self.discriminator_optimizer = discriminator_optimizer
         self.generator_optimizer = generator_optimizer
@@ -81,7 +82,6 @@ class StyleGAN(Model, ABC):
         batch_size = tensorflow.shape(real_images)[0]
 
         for _ in range(self.number_discriminator_steps):
-
             random_latent_space = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
             dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
             constant_mapping_tensor = tensorflow.fill(dimension, self.constant_mapping_value)
@@ -92,7 +92,8 @@ class StyleGAN(Model, ABC):
                 synthetic_images_generated = self.generator(input_mapping, training=True)
                 synthetic_discriminator_loss = self.discriminator(synthetic_images_generated, training=True)
 
-                real_image_resize = self.resize_image(self.size_feature_dimension[-(self.network_level-1)], real_images)
+                real_image_resize = self.resize_image(self.size_feature_dimension[-(self.network_level - 1)],
+                                                      real_images)
                 real_discriminator_loss = self.discriminator(real_image_resize, training=True)
 
                 discriminator_loss = self.discriminator_loss(real_img=real_discriminator_loss,
@@ -140,7 +141,6 @@ class StyleGAN(Model, ABC):
         random_noise_vector.append(random_noise)
 
         for i in range(1, self.network_level):
-
             resolution_feature = self.size_feature_dimension[-i]
             shape_feature = (batch_size, resolution_feature, resolution_feature, 1)
             random_noise = tensorflow.random.normal(shape=shape_feature)
