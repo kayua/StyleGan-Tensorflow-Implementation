@@ -50,7 +50,7 @@ class Discriminator:
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(input_layer)
         gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
 
-        gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
+        gradient_flow = Conv2D(3, self.size_kernel_filters, padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
 
         gradient_flow = MaxPooling2D((2, 2))(gradient_flow)
