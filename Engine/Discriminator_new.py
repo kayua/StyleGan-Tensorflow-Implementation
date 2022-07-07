@@ -76,40 +76,35 @@ class Discriminator:
         gradient_flow = Conv2D(self.number_filters_per_layer[-1], (4, 4), padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
         gradient_flow = self.fully_connected_block(gradient_flow)
-
         gradient_flow = Model(input_feature, gradient_flow)
-        gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
+
         self.discriminator = gradient_flow
         self.discriminator_mapping = self.discriminator(resolution_mapping.output)
         self.discriminator_mapping = Model(resolution_mapping.input, self.discriminator_mapping)
         self.discriminator.summary()
-        print("BLOCO ----------------------")
+
 
 
     def add_level_discriminator(self, number_level):
 
         number_filters = self.number_filters_per_layer[-(number_level+1)]
-
         resolution_feature = self.level_feature_dimension[-number_level]
         next_number_filters = self.number_filters_per_layer[-(number_level+2)]
         resolution_mapping = self.color_mapping(resolution_feature, next_number_filters)
-
         input_feature = Input(shape=(resolution_feature, resolution_feature, next_number_filters))
-        kernel_filters = self.size_kernel_filters
 
-        gradient_flow = Conv2D(number_filters, kernel_filters, padding="same")(input_feature)
+        gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(input_feature)
         gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
-        gradient_flow = Conv2D(number_filters, kernel_filters, padding="same")(gradient_flow)
+        gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
         gradient_flow = AveragePooling2D()(gradient_flow)
-        #gradient_flow = self.discriminator(gradient_flow)
+        gradient_flow = self.discriminator(gradient_flow)
         gradient_flow = Model(input_feature, gradient_flow)
-        gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
+
         self.discriminator = gradient_flow
         self.discriminator_mapping = self.discriminator(resolution_mapping.output)
         self.discriminator_mapping = Model(resolution_mapping.input, self.discriminator_mapping)
         self.discriminator.summary()
-        print("***************************************")
 
 
 
