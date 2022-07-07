@@ -13,7 +13,7 @@ DEFAULT_VERBOSE_CONSTRUCTION = True
 DEFAULT_NUMBER_CHANNELS = 3
 DEFAULT_INITIAL_RESOLUTION = 4
 DEFAULT_DIMENSION_CONVOLUTION_KERNELS = (3, 3)
-DEFAULT_FILTER_PER_LAYER = [64, 64, 128, 128, 256, 256, 512, 512]
+DEFAULT_FILTER_PER_LAYER = [64, 64, 128, 128, 256, 128, 256, 512]
 DEFAULT_LEVEL_FEATURE_DIMENSION = [1024, 512, 256, 128, 64, 32, 16, 8]
 DEFAULT_THRESHOLD_ACTIVATION = 0.2
 
@@ -37,8 +37,7 @@ class Discriminator:
         self.level_feature_dimension = level_feature_dimension
         self.size_kernel_filters = DEFAULT_DIMENSION_CONVOLUTION_KERNELS
         self.threshold_activation = threshold_activation
-        self.input_discriminator = None
-        self.input_discriminator_mapping = None
+        self.discriminator_mapping = None
         self.discriminator = None
         self.first_level_discriminator = None
         #self.build_initial_block()
@@ -65,51 +64,55 @@ class Discriminator:
         return color_mapping
 
 
-
-    def convolutional_block(self, number_filters, resolution):
-
-        image_resolution = (resolution, resolution, 512)
-        input_layer = Input(shape=image_resolution, name="s")
-        gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(input_layer)
-        gradient_flow = LeakyReLU(number_filters)(gradient_flow)
-        gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
-        gradient_flow = LeakyReLU(number_filters)(gradient_flow)
-        gradient_flow = AveragePooling2D((2, 2))(gradient_flow)
-        input_layer = Model(input_layer, input_layer, name="sss")
-        modelo = self.discriminator.layers[1]
-        modelo = modelo(input_layer)
-        models = Model(modelo, self.discriminator)
-        models.summary()
-        exit()
-
-
-
-
     def build_initial_block(self):
 
-        number_filters = self.number_filters_per_layer[-1]
+        number_filters = self.number_filters_per_layer[-2]
         resolution_mapping = self.color_mapping(self.initial_resolution, number_filters)
         input_feature = Input(shape=(self.initial_resolution, self.initial_resolution, number_filters))
 
-        self.input_discriminator = None
-        self.input_discriminator_mapping = None
-        self.discriminator = None
-        self.first_level_discriminator = None
-
-        number_filters = self.number_filters_per_layer[-1]
-
-        gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")()
-        self.input_discriminator = gradient_flow
-        gradient_flow = LeakyReLU(number_filters)(gradient_flow)
-        gradient_flow = Conv2D(number_filters, (4, 4), padding="same")(gradient_flow)
-        gradient_flow = LeakyReLU(number_filters)(gradient_flow)
+        kernel_filters = self.size_kernel_filters
+        gradient_flow = Conv2D(self.number_filters_per_layer[-1], kernel_filters, padding="same")(input_feature)
+        gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
+        gradient_flow = Conv2D(self.number_filters_per_layer[-1], (4, 4), padding="same")(gradient_flow)
+        gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
         gradient_flow = self.fully_connected_block(gradient_flow)
 
-        gradient_flow = Model(input_mapping, gradient_flow)
-
+        gradient_flow = Model(input_feature, gradient_flow)
         gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         self.discriminator = gradient_flow
+        self.discriminator_mapping = self.discriminator(resolution_mapping.output)
+        self.discriminator_mapping = Model(resolution_mapping.input, self.discriminator_mapping)
         self.discriminator.summary()
+        print("BLOCO ----------------------")
+
+
+    def add_level_discriminator(self, number_level):
+
+        number_filters = self.number_filters_per_layer[-(number_level+1)]
+
+        resolution_feature = self.level_feature_dimension[-number_level]
+        next_number_filters = self.number_filters_per_layer[-(number_level+2)]
+        resolution_mapping = self.color_mapping(resolution_feature, next_number_filters)
+
+        input_feature = Input(shape=(resolution_feature, resolution_feature, next_number_filters))
+        kernel_filters = self.size_kernel_filters
+
+        gradient_flow = Conv2D(number_filters, kernel_filters, padding="same")(input_feature)
+        gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
+        gradient_flow = Conv2D(number_filters, kernel_filters, padding="same")(gradient_flow)
+        gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
+        gradient_flow = AveragePooling2D()(gradient_flow)
+        #gradient_flow = self.discriminator(gradient_flow)
+        gradient_flow = Model(input_feature, gradient_flow)
+        gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
+        self.discriminator = gradient_flow
+        self.discriminator_mapping = self.discriminator(resolution_mapping.output)
+        self.discriminator_mapping = Model(resolution_mapping.input, self.discriminator_mapping)
+        self.discriminator.summary()
+        print("***************************************")
+
+
+
 
     @staticmethod
     def fully_connected_block(input_layer):
@@ -117,9 +120,13 @@ class Discriminator:
         gradient_flow = Dense(1)(gradient_flow)
         return gradient_flow
 
-    def get_discriminator(self, level_discriminator):
-        return self.discriminator
+
+
+
 
 discriminator_instance = Discriminator()
 
-discriminator_instance.color_mapping(4)
+discriminator_instance.build_initial_block()
+discriminator_instance.add_level_discriminator(1)
+discriminator_instance.add_level_discriminator(2)
+#discriminator_instance.add_level_discriminator(2)
