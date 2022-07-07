@@ -13,6 +13,7 @@ DEFAULT_NETWORK_LEVEL = 2
 DEFAULT_CONSTANT_VALUE_MAPPING = 0.5
 DEFAULT_INITIAL_DIMENSION = 4
 DEFAULT_NUMBER_FILTERS_PER_LAYER = [256, 256, 256, 256, 256, 256, 256, 256, 256]
+DEFAULT_SIZE_FEATURE_DIMENSION = [512, 256, 128, 64, 32, 16, 8]
 
 
 class StyleGAN(Model, ABC):
@@ -31,7 +32,7 @@ class StyleGAN(Model, ABC):
         self.network_level = network_level
         self.generator = generator
         self.number_discriminator_steps = number_discriminator_steps
-        self.gp_weight = gradient_penalty_alpha
+        self.gradient_penalty_alpha = gradient_penalty_alpha
         self.latent_dimension = latent_dimension
         self.constant_mapping_value = constant_mapping_value
         self.initial_dimension = initial_dimension
@@ -92,7 +93,7 @@ class StyleGAN(Model, ABC):
                                                     fake_img=synthetic_discriminator_loss)
 
                 gradient_update = self.gradient_penalty(batch_size, real_image_resize, synthetic_images_generated)
-                discriminator_loss = discriminator_loss + gradient_update * self.gp_weight
+                discriminator_loss = discriminator_loss + gradient_update * self.gradient_penalty_alpha
 
             discriminator_update = tape.gradient(discriminator_loss, self.discriminator.trainable_variables)
             gradient_apply = zip(discriminator_update, self.discriminator.trainable_variables)
