@@ -137,6 +137,24 @@ class StyleGAN(Model, ABC):
         image_propagated = tensorflow.cast(image_propagated, tensorflow.float32)
         return image_propagated
 
+    def generate_images(self, latent_noise=None, noise_level=None, number_images=5, path_output="Results/"):
+
+        if latent_noise is None:
+            random_latent_space = tensorflow.random.normal(shape=(number_images, self.latent_dimension, 1))
+        else:
+            random_latent_space = latent_noise
+
+        if noise_level is None:
+            random_noise_synthesis = self.generate_random_noise(number_images)
+
+        dimension = [number_images, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
+        constant_mapping_tensor = tensorflow.fill(dimension, self.constant_mapping_value)
+
+        input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
+
+
+
+
     def generate_random_noise(self, batch_size):
 
         random_noise_vector = []
