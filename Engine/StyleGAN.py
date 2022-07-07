@@ -2,6 +2,8 @@ from abc import ABC
 import tensorflow
 from keras import Model
 
+from Engine.Loss import discriminator_loss_function, generator_loss_function
+
 DEFAULT_DISCRIMINATOR = None
 DEFAULT_GENERATOR = None
 DEFAULT_LATENT_DIMENSION = 256
@@ -14,7 +16,8 @@ DEFAULT_NUMBER_FILTERS_PER_LAYER = [256, 256, 256, 256, 256, 256, 256, 256, 256]
 DEFAULT_SIZE_FEATURE_DIMENSION = [512, 256, 128, 64, 32, 16, 8]
 DEFAULT_GENERATOR_OPTIMIZER = tensorflow.keras.optimizers.Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
 DEFAULT_DISCRIMINATOR_OPTIMIZER = tensorflow.keras.optimizers.Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
-
+DEFAULT_DISCRIMINATOR_LOSS = discriminator_loss_function
+DEFAULT_GENERATOR_LOSS = generator_loss_function
 
 class StyleGAN(Model, ABC):
 
@@ -44,7 +47,10 @@ class StyleGAN(Model, ABC):
         self.discriminator_loss = None
         self.generator_loss = None
 
-    def compile(self, discriminator_optimizer=DEFAULT_DISCRIMINATOR_OPTIMIZER, generator_optimizer=DEFAULT_GENERATOR_OPTIMIZER, discriminator_loss, generator_loss, **kwargs):
+    def compile(self, discriminator_optimizer=DEFAULT_DISCRIMINATOR_OPTIMIZER,
+                generator_optimizer=DEFAULT_GENERATOR_OPTIMIZER,
+                discriminator_loss=DEFAULT_DISCRIMINATOR_LOSS,
+                generator_loss=DEFAULT_GENERATOR_LOSS, **kwargs):
         super(StyleGAN, self).compile()
         self.discriminator_optimizer = discriminator_optimizer
         self.generator_optimizer = generator_optimizer
@@ -121,7 +127,7 @@ class StyleGAN(Model, ABC):
         gradient_apply = zip(gen_gradient, self.generator.trainable_variables)
         self.generator_optimizer.apply_gradients(gradient_apply)
 
-        return {"discriminator_loss": discriminator_loss, "generator_loss": g_loss}
+        return {"discriminator_loss_function": discriminator_loss, "generator_loss_function": g_loss}
 
     @staticmethod
     def resize_image(resolution_image, image_propagated):
