@@ -37,6 +37,11 @@ class StyleGAN(Model, ABC):
         self.initial_dimension = initial_dimension
         self.num_filters_per_level = number_filter_per_layer
         self.size_feature_dimension = size_feature_dimension
+        self.d_optimizer = None
+        self.g_optimizer = None
+        self.d_loss_fn = None
+        self.g_loss_fn = None
+
 
     def compile(self, d_optimizer, g_optimizer, d_loss_fn, g_loss_fn):
         super(StyleGAN, self).compile()
@@ -86,7 +91,7 @@ class StyleGAN(Model, ABC):
                 synthetic_images_generated = self.generator(input_mapping, training=True)
                 synthetic_discriminator_loss = self.discriminator(synthetic_images_generated, training=True)
 
-                real_image_resize = self.resize_image(8, real_images)
+                real_image_resize = self.resize_image(self.size_feature_dimension[-(self.network_level-1)], real_images)
                 real_discriminator_loss = self.discriminator(real_image_resize, training=True)
 
                 discriminator_loss = self.d_loss_fn(real_img=real_discriminator_loss,
