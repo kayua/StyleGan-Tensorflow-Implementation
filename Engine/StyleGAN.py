@@ -100,14 +100,10 @@ class StyleGAN(Model, ABC):
 
                 synthetic_images_generated = self.generator(input_mapping, training=True)
                 synthetic_discriminator_loss = self.discriminator(synthetic_images_generated, training=True)
-
-                real_image_resize = self.resize_image(self.size_feature_dimension[-(self.network_level - 1)],
-                                                      real_images)
+                image_new_dimension = self.size_feature_dimension[-(self.network_level - 1)]
+                real_image_resize = self.resize_image(image_new_dimension, real_images)
                 real_discriminator_loss = self.discriminator(real_image_resize, training=True)
-
-                discriminator_loss = self.discriminator_loss(real_img=real_discriminator_loss,
-                                                             fake_img=synthetic_discriminator_loss)
-
+                discriminator_loss = self.discriminator_loss(real_discriminator_loss, synthetic_discriminator_loss)
                 gradient_update = self.gradient_penalty(batch_size, real_image_resize, synthetic_images_generated)
                 discriminator_loss = discriminator_loss + gradient_update * self.gradient_penalty_alpha
 
