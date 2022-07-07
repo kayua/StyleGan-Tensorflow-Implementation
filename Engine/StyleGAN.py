@@ -125,8 +125,8 @@ class StyleGAN(Model, ABC):
             discriminator_loss = self.discriminator(synthetic_images_generated, training=True)
             g_loss = self.generator_loss(discriminator_loss)
 
-        gen_gradient = tape.gradient(g_loss, self.generator.trainable_variables)
-        gradient_apply = zip(gen_gradient, self.generator.trainable_variables)
+        generator_update = tape.gradient(g_loss, self.generator.trainable_variables)
+        gradient_apply = zip(generator_update, self.generator.trainable_variables)
         self.generator_optimizer.apply_gradients(gradient_apply)
 
         return {"discriminator_loss_function": discriminator_loss, "generator_loss_function": g_loss}
@@ -138,6 +138,7 @@ class StyleGAN(Model, ABC):
         image_propagated = tensorflow.image.resize(image_propagated, shape_image, method=interpolation_operator)
         image_propagated = tensorflow.cast(image_propagated, tensorflow.float32)
         return image_propagated
+
 
     def generate_random_noise(self, batch_size):
 
@@ -155,3 +156,34 @@ class StyleGAN(Model, ABC):
             random_noise_vector.append(random_noise)
 
         return random_noise_vector
+
+
+    def set_discriminator(self, discriminator):
+        self.discriminator = discriminator
+
+    def set_network_level(self, network_level):
+        self.network_level = network_level
+
+    def set_generator(self, generator):
+        self.generator = generator
+
+    def set_number_discriminator_steps(self, number_discriminator_steps):
+        self.number_discriminator_steps = number_discriminator_steps
+
+    def set_gradient_penalty_alpha(self, gradient_penalty_alpha):
+        self.gradient_penalty_alpha = gradient_penalty_alpha
+
+    def set_latent_dimension(self, latent_dimension):
+        self.latent_dimension = latent_dimension
+
+    def set_constant_mapping_value(self, constant_mapping_value):
+        self.constant_mapping_value = constant_mapping_value
+
+    def set_initial_dimension(self, initial_dimension):
+        self.initial_dimension = initial_dimension
+
+    def set_number_filters_per_level(self, number_filters_per_level):
+        self.num_filters_per_level = number_filters_per_level
+
+    def set_size_feature_dimension(self, size_feature_dimension):
+        self.size_feature_dimension = size_feature_dimension
