@@ -1,12 +1,13 @@
+import tensorflow
 from keras import Input
 from keras import Model
 from keras.layers import Conv2D
 from keras.layers import LeakyReLU
-from keras.layers import MaxPooling2D
+from keras.layers import MaxPooling2D, AveragePooling2D
 from keras.layers import Dense
 from keras.layers import LayerNormalization
 from keras.layers import Flatten
-
+from tfkerassurgeon import delete_layer, insert_layer
 DEFAULT_LOSS_FUNCTION = "binary_crossentropy"
 DEFAULT_OPTIMIZER_FUNCTION = "adam"
 DEFAULT_VERBOSE_CONSTRUCTION = True
@@ -38,12 +39,64 @@ class Discriminator:
         self.size_kernel_filters = DEFAULT_DIMENSION_CONVOLUTION_KERNELS
         self.threshold_activation = threshold_activation
         self.input_discriminator = None
-        self.discriminator_blocks = None
+        self.discriminator = None
         self.first_level_discriminator = None
+        self.build_initial_block()
+
+    @staticmethod
+    def mini_batch_std(input_tensor, epsilon=1e-8):
+        n, h, w, c = tensorflow.shape(input_tensor)
+        group_size = tensorflow.minimum(4, n)
+        x = tensorflow.reshape(input_tensor, [group_size, -1, h, w, c])
+        group_mean, group_var = tensorflow.nn.moments(x, axes=0, keepdims=False)
+        group_std = tensorflow.sqrt(group_var + epsilon)
+        avg_std = tensorflow.reduce_mean(group_std, axis=[1, 2, 3], keepdims=True)
+        x = tensorflow.tile(avg_std, [group_size, h, w, 1])
+        return tensorflow.concat([input_tensor, x], axis=-1)
+
+    def convolutional_block(self, number_filters, resolution):
+
+        image_resolution = (resolution, resolution, self.number_channels)
+        input_layer = Input(shape=image_resolution)
+        gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(input_layer)
+        gradient_flow = LeakyReLU(number_filters)(gradient_flow)
+        gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
+        gradient_flow = LeakyReLU(number_filters)(gradient_flow)
+        gradient_flow = AveragePooling2D((2, 2))(gradient_flow)
+        discriminator = self.discriminator
+        discriminator = delete_layer(discriminator.layers[0])
+        discriminator.summary()
+        exit()
+        discriminator = discriminator(gradient_flow)
+        image_resolution = (resolution, resolution, self.number_channels)
+        #discriminator = discriminator(gradient_flow)
+        discriminator = Model(input_layer, discriminator)
+        discriminator.summary()
+        exit()
+        gradient_flow = Model(input_layer, discriminator)
+        gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
+
+        self.discriminator = gradient_flow
+        self.discriminator.summary()
+
 
 
     def build_initial_block(self):
 
+        image_resolution = (self.initial_resolution, self.initial_resolution, self.number_channels)
+        input_layer = Input(shape=image_resolution)
+        number_filters = self.number_filters_per_layer[-1]
+        gradient_flow = input_layer
+        #gradient_flow = self.mini_batch_std(gradient_flow)
+        gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
+        gradient_flow = LeakyReLU(number_filters)(gradient_flow)
+        gradient_flow = Conv2D(number_filters, (4, 4), padding="same")(gradient_flow)
+        gradient_flow = LeakyReLU(number_filters)(gradient_flow)
+        gradient_flow = self.fully_connected_block(gradient_flow)
+        gradient_flow = Model(input_layer, gradient_flow)
+        gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
+        self.discriminator = gradient_flow
+        self.discriminator.summary()
 
     @staticmethod
     def fully_connected_block(input_layer):
@@ -51,8 +104,10 @@ class Discriminator:
         gradient_flow = Dense(1)(gradient_flow)
         return gradient_flow
 
-
+    def get_discriminator(self, level_discriminator):
+        return self.discriminator
 
 discriminator_instance = Discriminator()
 
 discriminator_instance.get_discriminator(2)
+discriminator_instance.convolutional_block(256, 8)
