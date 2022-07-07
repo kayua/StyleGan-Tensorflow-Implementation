@@ -37,16 +37,16 @@ class StyleGAN(Model, ABC):
         self.initial_dimension = initial_dimension
         self.num_filters_per_level = number_filter_per_layer
         self.size_feature_dimension = size_feature_dimension
-        self.d_optimizer = None
-        self.g_optimizer = None
+        self.discriminator_optimizer = None
+        self.generator_optimizer = None
         self.d_loss_fn = None
         self.g_loss_fn = None
 
 
     def compile(self, d_optimizer, g_optimizer, d_loss_fn, g_loss_fn):
         super(StyleGAN, self).compile()
-        self.d_optimizer = d_optimizer
-        self.g_optimizer = g_optimizer
+        self.discriminator_optimizer = d_optimizer
+        self.generator_optimizer = g_optimizer
         self.d_loss_fn = d_loss_fn
         self.g_loss_fn = g_loss_fn
 
@@ -102,7 +102,7 @@ class StyleGAN(Model, ABC):
 
             discriminator_update = tape.gradient(discriminator_loss, self.discriminator.trainable_variables)
             gradient_apply = zip(discriminator_update, self.discriminator.trainable_variables)
-            self.d_optimizer.apply_gradients(gradient_apply)
+            self.discriminator_optimizer.apply_gradients(gradient_apply)
 
         random_latent_space = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
         dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
@@ -117,7 +117,7 @@ class StyleGAN(Model, ABC):
 
         gen_gradient = tape.gradient(g_loss, self.generator.trainable_variables)
         gradient_apply = zip(gen_gradient, self.generator.trainable_variables)
-        self.g_optimizer.apply_gradients(gradient_apply)
+        self.generator_optimizer.apply_gradients(gradient_apply)
 
         return {"discriminator_loss": discriminator_loss, "generator_loss": g_loss}
 
