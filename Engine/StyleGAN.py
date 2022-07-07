@@ -39,16 +39,16 @@ class StyleGAN(Model, ABC):
         self.size_feature_dimension = size_feature_dimension
         self.discriminator_optimizer = None
         self.generator_optimizer = None
-        self.d_loss_fn = None
-        self.g_loss_fn = None
+        self.discriminator_loss = None
+        self.generator_loss = None
 
 
-    def compile(self, d_optimizer, g_optimizer, d_loss_fn, g_loss_fn):
+    def compile(self, discriminator_optimizer, generator_optimizer, discriminator_loss, generator_loss):
         super(StyleGAN, self).compile()
-        self.discriminator_optimizer = d_optimizer
-        self.generator_optimizer = g_optimizer
-        self.d_loss_fn = d_loss_fn
-        self.g_loss_fn = g_loss_fn
+        self.discriminator_optimizer = discriminator_optimizer
+        self.generator_optimizer = generator_optimizer
+        self.discriminator_loss = discriminator_loss
+        self.generator_loss = generator_loss
 
     def gradient_penalty(self, batch_size, real_images, fake_images):
 
@@ -81,6 +81,7 @@ class StyleGAN(Model, ABC):
         batch_size = tensorflow.shape(real_images)[0]
 
         for _ in range(self.number_discriminator_steps):
+
             random_latent_space = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
             dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
             constant_mapping_tensor = tensorflow.fill(dimension, self.constant_mapping_value)
@@ -94,8 +95,8 @@ class StyleGAN(Model, ABC):
                 real_image_resize = self.resize_image(self.size_feature_dimension[-(self.network_level-1)], real_images)
                 real_discriminator_loss = self.discriminator(real_image_resize, training=True)
 
-                discriminator_loss = self.d_loss_fn(real_img=real_discriminator_loss,
-                                                    fake_img=synthetic_discriminator_loss)
+                discriminator_loss = self.discriminator_loss(real_img=real_discriminator_loss,
+                                                             fake_img=synthetic_discriminator_loss)
 
                 gradient_update = self.gradient_penalty(batch_size, real_image_resize, synthetic_images_generated)
                 discriminator_loss = discriminator_loss + gradient_update * self.gradient_penalty_alpha
@@ -113,7 +114,7 @@ class StyleGAN(Model, ABC):
         with tensorflow.GradientTape() as tape:
             synthetic_images_generated = self.generator(input_mapping, training=True)
             discriminator_loss = self.discriminator(synthetic_images_generated, training=True)
-            g_loss = self.g_loss_fn(discriminator_loss)
+            g_loss = self.generator_loss(discriminator_loss)
 
         gen_gradient = tape.gradient(g_loss, self.generator.trainable_variables)
         gradient_apply = zip(gen_gradient, self.generator.trainable_variables)
@@ -139,6 +140,7 @@ class StyleGAN(Model, ABC):
         random_noise_vector.append(random_noise)
 
         for i in range(1, self.network_level):
+
             resolution_feature = self.size_feature_dimension[-i]
             shape_feature = (batch_size, resolution_feature, resolution_feature, 1)
             random_noise = tensorflow.random.normal(shape=shape_feature)
