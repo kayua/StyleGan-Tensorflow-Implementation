@@ -97,6 +97,7 @@ class StyleGAN(Model, ABC):
             input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
 
             with tensorflow.GradientTape() as tape:
+
                 synthetic_images_generated = self.generator(input_mapping, training=True)
                 synthetic_discriminator_loss = self.discriminator(synthetic_images_generated, training=True)
 

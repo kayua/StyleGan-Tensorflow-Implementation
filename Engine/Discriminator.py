@@ -59,8 +59,10 @@ class Discriminator:
         input_layer = Input(shape=(self.initial_resolution, self.initial_resolution, self.number_channels))
         number_layer = self.number_filters_per_layer[-1]
         self.first_level_discriminator = LayerNormalization()(input_layer)
-        self.first_level_discriminator = Conv2D(number_layer, self.size_kernel_filters, padding="same")(self.first_level_discriminator)
-        self.first_level_discriminator = Conv2D(number_layer, self.size_kernel_filters, padding="same")(self.first_level_discriminator)
+        self.first_level_discriminator = Conv2D(number_layer, self.size_kernel_filters,
+                                                padding="same")(self.first_level_discriminator)
+        self.first_level_discriminator = Conv2D(number_layer, self.size_kernel_filters,
+                                                padding="same")(self.first_level_discriminator)
         self.first_level_discriminator = self.fully_connected_block(self.first_level_discriminator)
         self.first_level_discriminator = Model(input_layer, self.first_level_discriminator)
 
