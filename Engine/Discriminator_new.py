@@ -38,9 +38,8 @@ class Discriminator:
         self.size_kernel_filters = DEFAULT_DIMENSION_CONVOLUTION_KERNELS
         self.threshold_activation = threshold_activation
         self.input_discriminator = None
+        self.input_discriminator_mapping = None
         self.discriminator = None
-
-        self.discriminator_mapping = None
         self.first_level_discriminator = None
         #self.build_initial_block()
 
@@ -57,10 +56,10 @@ class Discriminator:
 
 
 
-    def color_mapping(self, resolution):
+    def color_mapping(self, resolution, number_features):
         input_layer = Input(shape=(resolution, resolution, self.number_channels))
         weight_kernels = tensorflow.keras.initializers.Ones()
-        color_mapping = Conv2D(512, (1, 1), kernel_initializer=weight_kernels, trainable=False)(input_layer)
+        color_mapping = Conv2D(number_features, (1, 1), kernel_initializer=weight_kernels, trainable=False)(input_layer)
         color_mapping = Model(input_layer, color_mapping)
         color_mapping.summary()
         return color_mapping
@@ -88,13 +87,14 @@ class Discriminator:
 
     def build_initial_block(self):
 
-        exit()
-        resolution_mapping = (self.initial_resolution, self.initial_resolution, self.number_channels)
-        input_mapping = Input(shape=resolution_mapping)
+        number_filters = self.number_filters_per_layer[-1]
+        resolution_mapping = self.color_mapping(self.initial_resolution, number_filters)
+        input_feature = Input(shape=(self.initial_resolution, self.initial_resolution, number_filters))
 
-        resolution_feature = (self.initial_resolution, self.initial_resolution, self.number_filters_per_layer[-1])
-        input_feature = Input(shape=resolution_feature)
-
+        self.input_discriminator = None
+        self.input_discriminator_mapping = None
+        self.discriminator = None
+        self.first_level_discriminator = None
 
         number_filters = self.number_filters_per_layer[-1]
 
