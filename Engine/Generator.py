@@ -36,8 +36,8 @@ class Generator:
 
     def __init__(self, latent_dimension=DEFAULT_LATENT_DIMENSION, num_neurons_mapping=DEFAULT_NUMBER_NEURONS_MAPPING,
                  num_mapping_blocks=DEFAULT_NUMBER_MAPPING_BLOCKS, initial_dimension=DEFAULT_INITIAL_FEATURE_DIMENSION,
-                 initial_num_channels=DEFAULT_INITIAL_NUMBER_CHANNELS, loss_function=DEFAULT_LOSS_FUNCTION,
-                 number_output_channels=DEFAULT_NUMBER_OUTPUT_CHANNELS, optimizer_function=DEFAULT_OPTIMIZER_FUNCTION,
+                 loss_function=DEFAULT_LOSS_FUNCTION, number_output_channels=DEFAULT_NUMBER_OUTPUT_CHANNELS,
+                 optimizer_function=DEFAULT_OPTIMIZER_FUNCTION,
                  size_kernel_filters=DEFAULT_DIMENSION_CONVOLUTION_KERNELS, num_filters_per_level=None,
                  num_synthesis_block=DEFAULT_NUMBER_SYNTHESIS_BLOCKS):
 
@@ -47,7 +47,7 @@ class Generator:
         self.num_neurons_mapping = num_neurons_mapping
         self.num_mapping_blocks = num_mapping_blocks
         self.initial_dimension = initial_dimension
-        self.initial_num_channels = initial_num_channels
+        self.initial_num_channels = DEFAULT_NUMBER_FILTERS_PER_LEVEL[-1]
         self.number_output_channels = number_output_channels
         self.size_kernel_filters = size_kernel_filters
         self.num_synthesis_block = num_synthesis_block
