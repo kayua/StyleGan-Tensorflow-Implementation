@@ -13,7 +13,7 @@ DEFAULT_VERBOSE_CONSTRUCTION = True
 DEFAULT_NUMBER_CHANNELS = 3
 DEFAULT_INITIAL_RESOLUTION = 4
 DEFAULT_DIMENSION_CONVOLUTION_KERNELS = (3, 3)
-DEFAULT_FILTER_PER_LAYER = [64, 64, 128, 128, 256, 128, 256, 512]
+DEFAULT_FILTER_PER_LAYER = [64, 64, 128, 128, 256, 256, 512, 512]
 DEFAULT_LEVEL_FEATURE_DIMENSION = [1024, 512, 256, 128, 64, 32, 16, 8]
 DEFAULT_THRESHOLD_ACTIVATION = 0.2
 
@@ -40,7 +40,7 @@ class Discriminator:
         self.discriminator_mapping = None
         self.discriminator = None
         self.first_level_discriminator = None
-        #self.build_initial_block()
+
 
     @staticmethod
     def mini_batch_std(input_tensor, epsilon=1e-8):
@@ -60,7 +60,6 @@ class Discriminator:
         weight_kernels = tensorflow.keras.initializers.Ones()
         color_mapping = Conv2D(number_features, (1, 1), kernel_initializer=weight_kernels, trainable=False)(input_layer)
         color_mapping = Model(input_layer, color_mapping)
-        color_mapping.summary()
         return color_mapping
 
 
@@ -71,6 +70,7 @@ class Discriminator:
         input_feature = Input(shape=(self.initial_resolution, self.initial_resolution, number_filters))
 
         kernel_filters = self.size_kernel_filters
+
         gradient_flow = Conv2D(self.number_filters_per_layer[-1], kernel_filters, padding="same")(input_feature)
         gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
         gradient_flow = Conv2D(self.number_filters_per_layer[-1], (4, 4), padding="same")(gradient_flow)
@@ -81,7 +81,6 @@ class Discriminator:
         self.discriminator = gradient_flow
         self.discriminator_mapping = self.discriminator(resolution_mapping.output)
         self.discriminator_mapping = Model(resolution_mapping.input, self.discriminator_mapping)
-        self.discriminator.summary()
 
 
 
@@ -124,4 +123,7 @@ discriminator_instance = Discriminator()
 discriminator_instance.build_initial_block()
 discriminator_instance.add_level_discriminator(1)
 discriminator_instance.add_level_discriminator(2)
+discriminator_instance.add_level_discriminator(3)
+discriminator_instance.add_level_discriminator(4)
+discriminator_instance.add_level_discriminator(5)
 #discriminator_instance.add_level_discriminator(2)
