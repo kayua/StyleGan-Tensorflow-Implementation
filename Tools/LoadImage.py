@@ -43,7 +43,7 @@ class LoadImage:
         residual = len(self.image_list)%self.size_batch
 
         self.image_loaded = numpy.array(self.image_list[0:len(self.image_list) - residual])
-
+        self.image_loaded = self.image_loaded + self.image_loaded
 
     def get_dataset_image(self):
 

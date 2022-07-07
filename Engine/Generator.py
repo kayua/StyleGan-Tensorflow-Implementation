@@ -3,14 +3,13 @@ import logging
 import tensorflow
 from keras import Input, activations
 from keras import Model
-from keras.layers import Conv2D, Activation
 from keras.layers import Add
-from keras.layers import Flatten
+from keras.layers import Conv2D, Activation
 from keras.layers import Dense
+from keras.layers import Flatten
 from keras.layers import LeakyReLU
 from keras.layers import Reshape
 from keras.layers import UpSampling2D
-from tensorflow.python.ops.gen_math_ops import Tanh
 
 from Engine.Layers.AdaIN import AdaIN
 
