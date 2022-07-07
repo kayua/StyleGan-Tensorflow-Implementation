@@ -39,7 +39,7 @@ class Discriminator:
         self.threshold_activation = threshold_activation
         self.discriminator_mapping = None
         self.discriminator = None
-        self.discriminator_level = 0
+        self.discriminator_level = 1
         self.first_level_discriminator = None
         self.build_initial_block()
 
@@ -67,7 +67,6 @@ class Discriminator:
         number_filters = self.number_filters_per_layer[-2]
         resolution_mapping = self.color_mapping(self.initial_resolution, number_filters)
         input_feature = Input(shape=(self.initial_resolution, self.initial_resolution, number_filters))
-        self.discriminator_level = 2
         kernel_filters = self.size_kernel_filters
 
         gradient_flow = Conv2D(self.number_filters_per_layer[-1], kernel_filters, padding="same")(input_feature)
@@ -105,9 +104,10 @@ class Discriminator:
 
     def get_discriminator(self, number_level):
 
-        for i in range(1, number_level):
+        for i in range(self.discriminator_level, number_level):
 
             self.add_level_discriminator(i)
+
         return self.discriminator_mapping
     @staticmethod
     def fully_connected_block(input_layer):
