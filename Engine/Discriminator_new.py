@@ -1,14 +1,11 @@
 import tensorflow
-from keras import Input, Sequential
+from keras import Input
 from keras import Model
-from keras.engine.keras_tensor import KerasTensor
+from keras.layers import AveragePooling2D
 from keras.layers import Conv2D
-from keras.layers import LeakyReLU
-from keras.layers import MaxPooling2D, AveragePooling2D
 from keras.layers import Dense
-from keras.layers import LayerNormalization
 from keras.layers import Flatten
-from tensorflow import TensorSpec
+from keras.layers import LeakyReLU
 
 DEFAULT_LOSS_FUNCTION = "binary_crossentropy"
 DEFAULT_OPTIMIZER_FUNCTION = "adam"
@@ -42,8 +39,10 @@ class Discriminator:
         self.threshold_activation = threshold_activation
         self.input_discriminator = None
         self.discriminator = None
+
+        self.discriminator_mapping = None
         self.first_level_discriminator = None
-        self.build_initial_block()
+        #self.build_initial_block()
 
     @staticmethod
     def mini_batch_std(input_tensor, epsilon=1e-8):
@@ -56,10 +55,16 @@ class Discriminator:
         x = tensorflow.tile(avg_std, [group_size, h, w, 1])
         return tensorflow.concat([input_tensor, x], axis=-1)
 
-    @staticmethod
-    def color_mapping(input_layer):
 
-        return Conv2D(3, (1, 1), padding="same")(input_layer)
+
+    def color_mapping(self, resolution):
+        input_layer = Input(shape=(resolution, resolution, self.number_channels))
+        weight_kernels = tensorflow.keras.initializers.Ones()
+        color_mapping = Conv2D(512, (1, 1), kernel_initializer=weight_kernels, trainable=False)(input_layer)
+        color_mapping = Model(input_layer, color_mapping)
+        color_mapping.summary()
+        return color_mapping
+
 
 
     def convolutional_block(self, number_filters, resolution):
@@ -83,18 +88,25 @@ class Discriminator:
 
     def build_initial_block(self):
 
-        image_resolution = (self.initial_resolution, self.initial_resolution, self.number_channels)
+        exit()
+        resolution_mapping = (self.initial_resolution, self.initial_resolution, self.number_channels)
+        input_mapping = Input(shape=resolution_mapping)
 
-        input_layer = Input(shape=image_resolution)
+        resolution_feature = (self.initial_resolution, self.initial_resolution, self.number_filters_per_layer[-1])
+        input_feature = Input(shape=resolution_feature)
+
+
         number_filters = self.number_filters_per_layer[-1]
-        gradient_flow = self.color_mapping(input_layer)
-        #gradient_flow = self.mini_batch_std(gradient_flow)
-        gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
+
+        gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")()
+        self.input_discriminator = gradient_flow
         gradient_flow = LeakyReLU(number_filters)(gradient_flow)
         gradient_flow = Conv2D(number_filters, (4, 4), padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(number_filters)(gradient_flow)
         gradient_flow = self.fully_connected_block(gradient_flow)
-        gradient_flow = Model(input_layer, gradient_flow)
+
+        gradient_flow = Model(input_mapping, gradient_flow)
+
         gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         self.discriminator = gradient_flow
         self.discriminator.summary()
@@ -110,5 +122,4 @@ class Discriminator:
 
 discriminator_instance = Discriminator()
 
-discriminator_instance.get_discriminator(2)
-discriminator_instance.convolutional_block(256, 8)
+discriminator_instance.color_mapping(4)
