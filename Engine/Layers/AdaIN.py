@@ -27,10 +27,10 @@ class AdaIN(Layer):
         style_std = Reshape((1, 1, 1))(style_std)
         style_std = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(style_std)
 
-        content_mean = Reshape((1, 1, 256))(content_mean)
+        content_mean = Reshape((1, 1, content.shape[3]))(content_mean)
         content_mean = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(content_mean)
 
-        content_std = Reshape((1, 1, 256))(content_std)
+        content_std = Reshape((1, 1, content.shape[3]))(content_std)
         content_std = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(content_std)
 
         style_mean = Reshape((1, 1, 1))(style_mean)
