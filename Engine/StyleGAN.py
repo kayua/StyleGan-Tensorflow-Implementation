@@ -156,6 +156,12 @@ class StyleGAN(Model, ABC):
 
         input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
 
+        images = self.generator(input_mapping)
+
+        for i, images in enumerate(images):
+
+            print(i)
+            print(images.shape)
 
 
 
