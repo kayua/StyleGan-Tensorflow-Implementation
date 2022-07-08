@@ -1,4 +1,4 @@
-from keras.layers import Reshape
+from keras.layers import Reshape, UpSampling2D
 from keras.utils import conv_utils
 import tensorflow
 from tensorflow.python.layers.base import Layer
@@ -19,16 +19,16 @@ class AdaIN(Layer):
 
         content = inputs[0]
         style = inputs[1]
-        content_mean, content_std = self.get_mean_std(content)
-        style_mean, style_std = self.get_mean_std(style)
+        gradient_flow_means, content_std = self.get_mean_std(content)
+        style_mean, style_stander_deviation = self.get_mean_std(style)
 
         dimension_expanded = (content.shape[1], content.shape[1])
 
-        style_std = Reshape((1, 1, 1))(style_std)
-        style_std = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(style_std)
+        style_stander_deviation = Reshape((1, 1, 1))(style_stander_deviation)
+        style_stander_deviation = UpSampling2D(size=dimension_expanded)(style_stander_deviation)
 
-        content_mean = Reshape((1, 1, content.shape[3]))(content_mean)
-        content_mean = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(content_mean)
+        gradient_flow_means = Reshape((1, 1, content.shape[3]))(gradient_flow_means)
+        gradient_flow_means = UpSampling2D(size=dimension_expanded)(gradient_flow_means)
 
         content_std = Reshape((1, 1, content.shape[3]))(content_std)
         content_std = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(content_std)
@@ -36,7 +36,7 @@ class AdaIN(Layer):
         style_mean = Reshape((1, 1, 1))(style_mean)
         style_mean = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(style_mean)
 
-        return style_std * (content - content_mean) / content_std + style_mean
+        return style_stander_deviation * (content - gradient_flow_means) / content_std + style_mean
 
     @staticmethod
     def get_mean_std(x, epsilon=1e-5):
