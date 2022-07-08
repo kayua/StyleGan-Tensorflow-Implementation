@@ -6,9 +6,12 @@ from keras.layers import Conv2D
 from keras.layers import Dense
 from keras.layers import Flatten
 from keras.layers import LeakyReLU
+from keras.optimizer_v1 import Adam
 
-DEFAULT_LOSS_FUNCTION = "binary_crossentropy"
-DEFAULT_OPTIMIZER_FUNCTION = "adam"
+from Neural import discriminator_loss
+
+DEFAULT_LOSS_FUNCTION = discriminator_loss
+DEFAULT_OPTIMIZER_FUNCTION = Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
 DEFAULT_VERBOSE_CONSTRUCTION = True
 DEFAULT_NUMBER_CHANNELS = 3
 DEFAULT_INITIAL_RESOLUTION = 4
@@ -43,17 +46,17 @@ class Discriminator:
         self.first_level_discriminator = None
         self.build_initial_block()
 
-
     @staticmethod
-    def mini_batch_std(input_tensor, epsilon=1e-8):
-        n, h, w, c = tensorflow.shape(input_tensor)
-        group_size = tensorflow.minimum(4, n)
-        x = tensorflow.reshape(input_tensor, [group_size, -1, h, w, c])
-        group_mean, group_var = tensorflow.nn.moments(x, axes=0, keepdims=False)
+    def mini_batch_stander(input_tensor, epsilon=1e-8):
+        batch_size, dimension_x, dimension_y, channels = tensorflow.shape(input_tensor)
+        group_size = tensorflow.minimum(4, batch_size)
+        dimension_shape = [group_size, -1, dimension_x, dimension_y, channels]
+        gradient_flow = tensorflow.reshape(input_tensor, dimension_shape)
+        group_mean, group_var = tensorflow.nn.moments(gradient_flow, axes=0, keepdims=False)
         group_std = tensorflow.sqrt(group_var + epsilon)
-        avg_std = tensorflow.reduce_mean(group_std, axis=[1, 2, 3], keepdims=True)
-        x = tensorflow.tile(avg_std, [group_size, h, w, 1])
-        return tensorflow.concat([input_tensor, x], axis=-1)
+        average_stander = tensorflow.reduce_mean(group_std, axis=[1, 2, 3], keepdims=True)
+        gradient_flow = tensorflow.tile(average_stander, [group_size, dimension_x, dimension_y, 1])
+        return tensorflow.concat([input_tensor, gradient_flow], axis=-1)
 
     def color_mapping(self, resolution, number_features):
         input_layer = Input(shape=(resolution, resolution, self.number_channels))
@@ -88,7 +91,6 @@ class Discriminator:
         resolution_mapping = self.color_mapping(resolution_feature, next_number_filters)
         input_feature = Input(shape=(resolution_feature, resolution_feature, next_number_filters))
 
-        self.discriminator_level += 1
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(input_feature)
         gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
@@ -100,15 +102,16 @@ class Discriminator:
         self.discriminator = gradient_flow
         self.discriminator_mapping = self.discriminator(resolution_mapping.output)
         self.discriminator_mapping = Model(resolution_mapping.input, self.discriminator_mapping)
+        self.discriminator_level += 1
         self.discriminator.summary()
 
     def get_discriminator(self, number_level):
 
         for i in range(self.discriminator_level, number_level):
-
             self.add_level_discriminator(i)
 
         return self.discriminator_mapping
+
     @staticmethod
     def fully_connected_block(input_layer):
         gradient_flow = Flatten()(input_layer)
