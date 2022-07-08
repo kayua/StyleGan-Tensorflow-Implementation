@@ -28,6 +28,7 @@ image_training = image_instance.get_dataset_image()
 
 
 for level in range(min_level, max_level):
+
     generator_model = generator_instance.get_generator(level)
     discriminator_model = discriminator_instance.get_discriminator(level)
     styleGan = StyleGAN(discriminator=discriminator_model, generator=generator_model, number_discriminator_steps=2, network_level=level)

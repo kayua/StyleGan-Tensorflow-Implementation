@@ -65,7 +65,7 @@ class StyleGAN(Model, ABC):
         self.discriminator_loss = discriminator_loss
         self.generator_loss = generator_loss
 
-    def gradient_penalty(self, batch_size, real_images, fake_images):
+    def __gradient_penalty(self, batch_size, real_images, fake_images):
 
         random_noise = tensorflow.random.normal([batch_size, 1, 1, 1], 0.0, 1.0)
         divergence = fake_images - real_images
@@ -80,7 +80,7 @@ class StyleGAN(Model, ABC):
         return tensorflow.reduce_mean((stander_reduction - 1.0) ** 2)
 
     @staticmethod
-    def tensor_mapping(random_noise, constant_mapping, latent_input):
+    def __tensor_mapping(random_noise, constant_mapping, latent_input):
 
         input_mapping = {}
 
@@ -99,17 +99,17 @@ class StyleGAN(Model, ABC):
             random_latent_space = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
             dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
             constant_mapping_tensor = tensorflow.fill(dimension, self.constant_mapping_value)
-            random_noise_synthesis = self.generate_random_noise(batch_size)
-            input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
+            random_noise_synthesis = self.__generate_random_noise(batch_size)
+            input_mapping = self.__tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
 
             with tensorflow.GradientTape() as tape:
                 synthetic_images_generated = self.generator(input_mapping, training=True)
                 synthetic_discriminator_loss = self.discriminator(synthetic_images_generated, training=True)
                 image_new_dimension = self.size_feature_dimension[-(self.network_level - 1)]
-                real_image_resize = self.resize_image(image_new_dimension, real_images)
+                real_image_resize = self.__resize_image(image_new_dimension, real_images)
                 real_discriminator_loss = self.discriminator(real_image_resize, training=True)
                 discriminator_loss = self.discriminator_loss(real_discriminator_loss, synthetic_discriminator_loss)
-                gradient_update = self.gradient_penalty(batch_size, real_image_resize, synthetic_images_generated)
+                gradient_update = self.__gradient_penalty(batch_size, real_image_resize, synthetic_images_generated)
                 discriminator_loss = discriminator_loss + gradient_update * self.gradient_penalty_alpha
 
             discriminator_update = tape.gradient(discriminator_loss, self.discriminator.trainable_variables)
@@ -119,8 +119,8 @@ class StyleGAN(Model, ABC):
         random_latent_space = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
         dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
         constant_mapping_tensor = tensorflow.fill(dimension, self.constant_mapping_value)
-        random_noise_synthesis = self.generate_random_noise(batch_size)
-        input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
+        random_noise_synthesis = self.__generate_random_noise(batch_size)
+        input_mapping = self.__tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
 
         with tensorflow.GradientTape() as tape:
             synthetic_images_generated = self.generator(input_mapping, training=True)
@@ -133,7 +133,7 @@ class StyleGAN(Model, ABC):
 
         return {"discriminator_loss_function": discriminator_loss, "generator_loss_function": generator_loss}
 
-    def resize_image(self, resolution_image, image_propagated):
+    def __resize_image(self, resolution_image, image_propagated):
         interpolation_operator = self.reduce_dimension_image_method
         shape_image = (resolution_image, resolution_image)
         image_propagated = tensorflow.image.resize(image_propagated, shape_image, method=interpolation_operator)
@@ -149,7 +149,7 @@ class StyleGAN(Model, ABC):
             random_latent_space = latent_noise
 
         if noise_level is None:
-            random_noise_synthesis = self.generate_random_noise(number_images)
+            random_noise_synthesis = self.__generate_random_noise(number_images)
 
         else:
             random_noise_synthesis = noise_level
@@ -166,9 +166,7 @@ class StyleGAN(Model, ABC):
             new_image = numpy.array(img*256.0)
             cv2.imwrite('{}/image_level_{}_id_{}.jpg'.format(path_output, self.network_level, i), new_image)
 
-
-
-    def generate_random_noise(self, batch_size):
+    def __generate_random_noise(self, batch_size):
 
         random_noise_vector = []
 
