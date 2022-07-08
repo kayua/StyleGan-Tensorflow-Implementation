@@ -45,6 +45,7 @@ class Discriminator:
                  number_channels=DEFAULT_NUMBER_CHANNELS, initial_resolution=DEFAULT_INITIAL_RESOLUTION,
                  threshold_activation=DEFAULT_THRESHOLD_ACTIVATION, initial_level=DEFAULT_DISCRIMINATOR_LEVEL,
                  number_filters_per_layer=None, level_feature_dimension=None,
+                 size_kernel_filters=DEFAULT_DIMENSION_CONVOLUTION_KERNELS,
                  level_verbose=DEFAULT_VERBOSE_CONSTRUCTION):
 
         if number_filters_per_layer is None: number_filters_per_layer = DEFAULT_FILTER_PER_LAYER
@@ -57,7 +58,7 @@ class Discriminator:
         self.number_channels = number_channels
         self.number_filters_per_layer = number_filters_per_layer
         self.level_feature_dimension = level_feature_dimension
-        self.size_kernel_filters = DEFAULT_DIMENSION_CONVOLUTION_KERNELS
+        self.size_kernel_filters = size_kernel_filters
         self.threshold_activation = threshold_activation
         self.discriminator_level = initial_level
         self.level_verbose = level_verbose
@@ -66,19 +67,35 @@ class Discriminator:
         self.first_level_discriminator = None
         self.__build_initial_block()
 
+    def set_loss_function(self, loss_function):
+        self.loss_function = loss_function
 
+    def set_optimizer_function(self, optimizer_function):
+        self.optimizer_function = optimizer_function
 
+    def set_initial_resolution(self, initial_resolution):
+        self.initial_resolution = initial_resolution
 
+    def set_number_channels(self, number_channels):
+        self.number_channels = number_channels
 
+    def set_number_filters_per_layer(self, number_filters_per_layer):
+        self.number_filters_per_layer = number_filters_per_layer
 
+    def set_level_feature_dimension(self, level_feature_dimension):
+        self.level_feature_dimension = level_feature_dimension
 
+    def set_size_kernel_filters(self, size_kernel_filters):
+        self.size_kernel_filters = size_kernel_filters
 
+    def set_threshold_activation(self, threshold_activation):
+        self.threshold_activation = threshold_activation
 
+    def set_discriminator_level(self, initial_level):
+        self.discriminator_level = initial_level
 
-
-
-
-
+    def set_level_verbose(self, level_verbose):
+        self.level_verbose = level_verbose
 
     @staticmethod
     def __mini_batch_stander(input_tensor, epsilon=1e-8):
