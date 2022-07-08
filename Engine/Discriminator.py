@@ -130,7 +130,7 @@ class Discriminator:
         return self.level_verbose
 
 
-    def write_data_discriminator(self, discriminator_data_file):
+    def __write_data_discriminator(self, discriminator_data_file):
 
         discriminator_data = {"initial_resolution": self.initial_resolution,
                               "number_channels": self.number_channels,
