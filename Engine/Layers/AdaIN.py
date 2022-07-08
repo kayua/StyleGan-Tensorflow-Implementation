@@ -21,8 +21,8 @@ class AdaIN(Layer):
 
         gradient_flow_means, gradient_flow_stander_deviation = self.get_mean_std(gradient_flow)
         style_mean, style_stander_deviation = self.get_mean_std(style_flow)
-
-        dimension_expanded = (gradient_flow.shape[1], gradient_flow.shape[1])
+        gradient_flow_dimension = gradient_flow.shape[1]
+        dimension_expanded = (gradient_flow_dimension, gradient_flow_dimension)
 
         style_stander_deviation = Reshape((1, 1, 1))(style_stander_deviation)
         style_stander_deviation = UpSampling2D(size=dimension_expanded)(style_stander_deviation)
