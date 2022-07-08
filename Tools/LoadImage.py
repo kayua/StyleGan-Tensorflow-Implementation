@@ -30,7 +30,7 @@ class LoadImage:
         image = tensorflow.image.decode_png(image, channels=self.number_color_channels)
         image = tensorflow.image.convert_image_dtype(image, tensorflow.float32)
         image = tensorflow.image.resize(image, [self.image_width, self.image_height])
-        return numpy.array(numpy.asarray(image/127.5 - 1.0, dtype="float32"))
+        return numpy.array(numpy.asarray(image, dtype="float32"))
 
 
     def load_images(self):
