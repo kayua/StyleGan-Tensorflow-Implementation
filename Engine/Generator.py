@@ -85,6 +85,7 @@ class Generator:
 
         gradient_flow = Dense(self.latent_dimension)(gradient_flow)
         network_model = Model(latent_dimension_input, gradient_flow, name="Mapping_Network")
+        if self.level_verbose: color_mapping.summary()
         self.mapping_neural_network = network_model
         if DEFAULT_VERBOSE_CONSTRUCTION: self.mapping_neural_network.summary()
 

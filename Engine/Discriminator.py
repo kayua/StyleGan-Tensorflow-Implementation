@@ -7,8 +7,9 @@ __version__ = '{2}.{0}.{1}'
 __data__ = '2021/11/21'
 __credits__ = ['All']
 
-
+import logging
 import tensorflow
+
 from keras import Input
 from keras import Model
 from keras.layers import AveragePooling2D
@@ -19,6 +20,7 @@ from keras.layers import LeakyReLU
 from keras.optimizer_v1 import Adam
 from Neural import discriminator_loss
 
+tensorflow.get_logger().setLevel(logging.ERROR)
 DEFAULT_LOSS_FUNCTION = discriminator_loss
 DEFAULT_LEARNING_RATE = 0.0002
 DEFAULT_BETA_1 = 0.5
