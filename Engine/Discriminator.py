@@ -130,16 +130,17 @@ class Discriminator:
         return self.level_verbose
 
 
-    def write_data_discriminator(self):
+    def write_data_discriminator(self, discriminator_data_file):
 
         discriminator_data = {"initial_resolution": self.initial_resolution,
                               "number_channels": self.number_channels,
                               "threshold_activation": self.threshold_activation,
                               "discriminator_level": self.discriminator_level,
-                              "level_verbose": self.level_verbose}
+                              "level_verbose": self.level_verbose,
+                              "number_filters_per_layer": self.number_filters_per_layer,
+                              "level_feature_dimension": self.level_feature_dimension}
 
-
-        with open("sample.json", "w") as outfile:
+        with open("{}.json".format(discriminator_data_file), "w") as outfile:
             json.dump(discriminator_data, outfile)
 
 
