@@ -130,6 +130,24 @@ class Discriminator:
         return self.level_verbose
 
 
+    def __load_data_discriminator(self, discriminator_data_file):
+
+        with open("{}.json".format(discriminator_data_file)) as json_file:
+            data = json.load(json_file)
+
+            self.initial_resolution = data["initial_resolution"]
+            self.number_channels = data["number_channels"]
+            self.threshold_activation = data["threshold_activation"]
+            self.discriminator_level = data["discriminator_level"]
+
+                              "level_verbose": self.level_verbose,
+                              "number_filters_per_layer": self.number_filters_per_layer,
+                              "level_feature_dimension": self.level_feature_dimension}
+
+        with open("{}.json".format(discriminator_data_file), "w") as outfile:
+            json.dump(discriminator_data, outfile)
+
+
     def __write_data_discriminator(self, discriminator_data_file):
 
         discriminator_data = {"initial_resolution": self.initial_resolution,
