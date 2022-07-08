@@ -85,9 +85,8 @@ class Generator:
 
         gradient_flow = Dense(self.latent_dimension)(gradient_flow)
         network_model = Model(latent_dimension_input, gradient_flow, name="Mapping_Network")
-        if self.level_verbose: color_mapping.summary()
         self.mapping_neural_network = network_model
-        if DEFAULT_VERBOSE_CONSTRUCTION: self.mapping_neural_network.summary()
+        if self.level_verbose: self.mapping_neural_network.summary()
 
     def constant_mapping_block(self):
 
@@ -99,7 +98,7 @@ class Generator:
         gradient_flow = Model(latent_input, gradient_flow, name="Constant_Block")
         gradient_flow.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         self.constant_mapping_neural_network = gradient_flow
-        if DEFAULT_VERBOSE_CONSTRUCTION: self.constant_mapping_neural_network.summary()
+        if self.level_verbose: self.constant_mapping_neural_network.summary()
 
     def initial_block_synthesis(self, resolution_block, number_filters):
 
@@ -119,7 +118,8 @@ class Generator:
 
         initial_block_model = Model([input_flow, input_noise, input_latent], gradient_flow)
         initial_block_model.compile(loss=self.loss_function, optimizer=self.optimizer_function)
-        if DEFAULT_VERBOSE_CONSTRUCTION: initial_block_model.summary()
+
+        if self.level_verbose: initial_block_model.summary()
         return initial_block_model
 
     def non_initial_synthesis_block(self, resolution_block, number_filters):
@@ -144,7 +144,7 @@ class Generator:
 
         non_initial_block_model = Model([input_flow, input_noise, input_latent], gradient_flow)
         non_initial_block_model.compile(loss=self.loss_function, optimizer=self.optimizer_function)
-        if DEFAULT_VERBOSE_CONSTRUCTION: non_initial_block_model.summary()
+        if self.level_verbose: non_initial_block_model.summary()
         return non_initial_block_model
 
     def build_synthesis_block(self):
@@ -185,7 +185,7 @@ class Generator:
         output_mapping = Activation(activations.tanh)(output_mapping)
         output_mapping = Model(input_channels_mapping, output_mapping)
         output_mapping.compile(loss=self.loss_function, optimizer=self.optimizer_function)
-        if DEFAULT_VERBOSE_CONSTRUCTION: output_mapping.summary()
+        if self.level_verbose: output_mapping.summary()
         return output_mapping
 
     def get_generator(self, number_level):
@@ -196,6 +196,7 @@ class Generator:
 
         synthesis_model = Model(neural_input_layer, self.list_block_synthesis[number_level - 1])
         synthesis_model.compile(loss=self.loss_function, optimizer=self.optimizer_function)
+        if self.level_verbose: synthesis_model.summary()
 
         last_level_dimension = level_size_feature_dimension[number_level]
         last_level_filters = self.num_filters_per_level[number_level]
@@ -203,6 +204,7 @@ class Generator:
         neural_synthesis = self.output_channels_mapping(last_level_dimension, last_level_filters)
         neural_synthesis = neural_synthesis([synthesis_model.output])
         neural_synthesis = Model(synthesis_model.inputs, neural_synthesis, name="Synthesis_Block")
+        if self.level_verbose: neural_synthesis.summary()
 
         neural_input_layer = [self.list_level_noise_input[i] for i in range(number_level)]
         neural_input_layer.append(self.initial_gradient_flow)
@@ -210,7 +212,7 @@ class Generator:
 
         style_generator = neural_synthesis(neural_input_layer)
         style_generator = Model(neural_input_layer, style_generator, name="Generator")
-        style_generator.summary()
+        if self.level_verbose: style_generator.summary()
 
         return style_generator
 
