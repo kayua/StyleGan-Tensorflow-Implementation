@@ -1,5 +1,13 @@
-import logging
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
 
+__author__ = 'All'
+__email__ = '@unipampa.edu.br '
+__version__ = '{2}.{0}.{1}'
+__data__ = '2021/11/21'
+__credits__ = ['All']
+
+import logging
 import tensorflow
 from keras import Input
 from keras import activations
