@@ -86,17 +86,16 @@ class Discriminator:
         resolution_mapping = self.color_mapping(self.initial_resolution, number_filters)
         input_feature = Input(shape=(self.initial_resolution, self.initial_resolution, number_filters))
         kernel_filters = self.size_kernel_filters
-
         gradient_flow = Conv2D(self.number_filters_per_layer[-1], kernel_filters, padding="same")(input_feature)
         gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
         gradient_flow = Conv2D(self.number_filters_per_layer[-1], (4, 4), padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
         gradient_flow = self.fully_connected_block(gradient_flow)
         gradient_flow = Model(input_feature, gradient_flow)
-
         self.discriminator = gradient_flow
         self.discriminator_mapping = self.discriminator(resolution_mapping.output)
         self.discriminator_mapping = Model(resolution_mapping.input, self.discriminator_mapping)
+
 
     def add_level_discriminator(self, number_level):
 
