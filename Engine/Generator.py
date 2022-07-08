@@ -24,8 +24,8 @@ from keras.optimizer_v1 import Adam
 
 from Engine.Layers.AdaIN import AdaIN
 from Neural import generator_loss
+
 tensorflow.get_logger().setLevel(logging.ERROR)
-level_size_feature_dimension = [4, 4, 8, 16, 32, 64, 128, 256, 512]
 
 DEFAULT_VERBOSE_CONSTRUCTION = False
 DEFAULT_LATENT_DIMENSION = 256
@@ -41,10 +41,10 @@ DEFAULT_LEARNING_RATE = 0.0002
 DEFAULT_BETA_1 = 0.5
 DEFAULT_BETA_2 = 0.9
 DEFAULT_LOSS_FUNCTION = generator_loss
+DEFAULT_NUMBER_FILTERS_PER_LEVEL = [64, 64, 64, 64, 64, 64, 64, 64, 64]
+DEFAULT_FEATURE_SIZE = [4, 4, 8, 16, 32, 64, 128, 256, 512]
 DEFAULT_OPTIMIZER_FUNCTION = Adam(learning_rate=DEFAULT_LEARNING_RATE,
                                   beta_1=DEFAULT_BETA_1, beta_2=DEFAULT_BETA_2)
-
-DEFAULT_NUMBER_FILTERS_PER_LEVEL = [64, 64, 64, 64, 64, 64, 64, 64, 64]
 
 
 class Generator:
@@ -54,8 +54,9 @@ class Generator:
                  loss_function=DEFAULT_LOSS_FUNCTION, number_output_channels=DEFAULT_NUMBER_OUTPUT_CHANNELS,
                  optimizer_function=DEFAULT_OPTIMIZER_FUNCTION, level_verbose=DEFAULT_VERBOSE_CONSTRUCTION,
                  size_kernel_filters=DEFAULT_DIMENSION_CONVOLUTION_KERNELS, num_filters_per_level=None,
-                 num_synthesis_block=DEFAULT_NUMBER_SYNTHESIS_BLOCKS):
+                 num_synthesis_block=DEFAULT_NUMBER_SYNTHESIS_BLOCKS, feature_size=None):
 
+        if feature_size is None: feature_size = DEFAULT_FEATURE_SIZE
         if num_filters_per_level is None: num_filters_per_level = DEFAULT_NUMBER_FILTERS_PER_LEVEL
 
         self.latent_dimension = latent_dimension
@@ -67,6 +68,7 @@ class Generator:
         self.size_kernel_filters = size_kernel_filters
         self.num_synthesis_block = num_synthesis_block
         self.loss_function = loss_function
+        self.feature_size = feature_size
         self.optimizer_function = optimizer_function
         self.num_filters_per_level = num_filters_per_level
         self.level_verbose = level_verbose
@@ -238,7 +240,7 @@ class Generator:
         self.list_level_noise_input.append(input_noise)
 
         for i in range(self.num_synthesis_block - 1):
-            resolution_feature = level_size_feature_dimension[i + 1]
+            resolution_feature = self.feature_size[i + 1]
             output_resolution_feature = (resolution_feature * 2, resolution_feature * 2, 1)
             input_noise = Input(shape=output_resolution_feature, name="Input Noise {}".format(i + 2))
             self.list_level_noise_input.append(input_noise)
@@ -272,7 +274,7 @@ class Generator:
         synthesis_model.compile(loss=self.loss_function, optimizer=self.optimizer_function)
         if self.level_verbose: synthesis_model.summary()
 
-        last_level_dimension = level_size_feature_dimension[number_level]
+        last_level_dimension = self.feature_size[number_level]
         last_level_filters = self.num_filters_per_level[number_level]
 
         neural_synthesis = self.__output_channels_mapping(last_level_dimension, last_level_filters)
