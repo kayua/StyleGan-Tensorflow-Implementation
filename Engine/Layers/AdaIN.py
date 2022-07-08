@@ -17,26 +17,26 @@ class AdaIN(Layer):
 
     def call(self, inputs, **kwargs):
 
-        content = inputs[0]
-        style = inputs[1]
-        gradient_flow_means, content_std = self.get_mean_std(content)
-        style_mean, style_stander_deviation = self.get_mean_std(style)
+        gradient_flow = inputs[0]
+        style_flow = inputs[1]
+        gradient_flow_means, content_std = self.get_mean_std(gradient_flow)
+        style_mean, style_stander_deviation = self.get_mean_std(style_flow)
 
-        dimension_expanded = (content.shape[1], content.shape[1])
+        dimension_expanded = (gradient_flow.shape[1], gradient_flow.shape[1])
 
         style_stander_deviation = Reshape((1, 1, 1))(style_stander_deviation)
         style_stander_deviation = UpSampling2D(size=dimension_expanded)(style_stander_deviation)
 
-        gradient_flow_means = Reshape((1, 1, content.shape[3]))(gradient_flow_means)
+        gradient_flow_means = Reshape((1, 1, gradient_flow.shape[3]))(gradient_flow_means)
         gradient_flow_means = UpSampling2D(size=dimension_expanded)(gradient_flow_means)
 
-        content_std = Reshape((1, 1, content.shape[3]))(content_std)
+        content_std = Reshape((1, 1, gradient_flow.shape[3]))(content_std)
         content_std = UpSampling2D(size=dimension_expanded)(content_std)
 
         style_mean = Reshape((1, 1, 1))(style_mean)
         style_mean = UpSampling2D(size=dimension_expanded)(style_mean)
 
-        return style_stander_deviation * (content - gradient_flow_means) / content_std + style_mean
+        return style_stander_deviation * (gradient_flow - gradient_flow_means) / content_std + style_mean
 
     @staticmethod
     def get_mean_std(x, epsilon=1e-5):
