@@ -20,7 +20,6 @@ from keras.optimizer_v1 import Adam
 from Neural import discriminator_loss
 
 DEFAULT_LOSS_FUNCTION = discriminator_loss
-
 DEFAULT_LEARNING_RATE = 0.0002
 DEFAULT_BETA_1 = 0.5
 DEFAULT_BETA_2 = 0.9

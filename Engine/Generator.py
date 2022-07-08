@@ -1,23 +1,25 @@
 import logging
 
 import tensorflow
-from keras import Input, activations
+from keras import Input
+from keras import activations
 from keras import Model
 from keras.layers import Add
-from keras.layers import Conv2D, Activation
+from keras.layers import Conv2D
+from keras.layers import Activation
 from keras.layers import Dense
 from keras.layers import Flatten
 from keras.layers import LeakyReLU
 from keras.layers import Reshape
 from keras.layers import UpSampling2D
+from keras.optimizer_v1 import Adam
 
 from Engine.Layers.AdaIN import AdaIN
-
+from Neural import generator_loss
 tensorflow.get_logger().setLevel(logging.ERROR)
 level_size_feature_dimension = [4, 4, 8, 16, 32, 64, 128, 256, 512]
 
 DEFAULT_VERBOSE_CONSTRUCTION = False
-
 DEFAULT_LATENT_DIMENSION = 256
 DEFAULT_NUMBER_NEURONS_MAPPING = 512
 DEFAULT_NUMBER_MAPPING_BLOCKS = 4
@@ -27,8 +29,13 @@ DEFAULT_NUMBER_OUTPUT_CHANNELS = 3
 DEFAULT_THRESHOLD_RELU = 0.2
 DEFAULT_DIMENSION_CONVOLUTION_KERNELS = (3, 3)
 DEFAULT_NUMBER_SYNTHESIS_BLOCKS = 8
-DEFAULT_LOSS_FUNCTION = "binary_crossentropy"
-DEFAULT_OPTIMIZER_FUNCTION = "adam"
+DEFAULT_LEARNING_RATE = 0.0002
+DEFAULT_BETA_1 = 0.5
+DEFAULT_BETA_2 = 0.9
+DEFAULT_LOSS_FUNCTION = generator_loss
+DEFAULT_OPTIMIZER_FUNCTION = Adam(learning_rate=DEFAULT_LEARNING_RATE,
+                                  beta_1=DEFAULT_BETA_1, beta_2=DEFAULT_BETA_2)
+
 DEFAULT_NUMBER_FILTERS_PER_LEVEL = [64, 64, 64, 64, 64, 64, 64, 64, 64]
 
 
