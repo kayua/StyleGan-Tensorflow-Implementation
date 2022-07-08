@@ -7,6 +7,7 @@ __version__ = '{2}.{0}.{1}'
 __data__ = '2021/11/21'
 __credits__ = ['All']
 
+import json
 import logging
 import tensorflow
 from keras import Input
@@ -146,6 +147,37 @@ class Generator:
 
     def get_number_filters_per_level(self):
         return self.num_filters_per_level
+
+    def write_data_generator(self, discriminator_data_file):
+
+
+        discriminator_data = {"latent_dimension": self.latent_dimension,
+                              "num_neurons_mapping": self.num_neurons_mapping,
+                              "num_mapping_blocks": self.num_mapping_blocks,
+                              "initial_dimension": self.initial_dimension,
+                              "initial_num_channels": self.initial_num_channels,
+
+                              }
+
+        self.number_output_channels = number_output_channels
+        self.size_kernel_filters = size_kernel_filters
+        self.num_synthesis_block = num_synthesis_block
+        self.loss_function = loss_function
+        self.feature_size = feature_size
+        self.optimizer_function = optimizer_function
+        self.num_filters_per_level = num_filters_per_level
+        self.level_verbose = level_verbose
+
+
+
+
+
+
+
+
+        with open("{}.json".format(discriminator_data_file), "w") as outfile:
+            json.dump(discriminator_data, outfile)
+
 
     def __block_mapping_network(self):
 
