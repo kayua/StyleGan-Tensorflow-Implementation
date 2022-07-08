@@ -9,6 +9,7 @@ __credits__ = ['All']
 
 import logging
 import tensorflow
+import json
 
 from keras import Input
 from keras import Model
@@ -65,6 +66,7 @@ class Discriminator:
         self.discriminator_mapping = None
         self.discriminator = None
         self.first_level_discriminator = None
+
         self.__build_initial_block()
 
     def set_loss_function(self, loss_function):
@@ -126,6 +128,20 @@ class Discriminator:
 
     def get_level_verbose(self):
         return self.level_verbose
+
+
+    def write_data_discriminator(self):
+
+        discriminator_data = {"initial_resolution": self.initial_resolution,
+                              "number_channels": self.number_channels,
+                              "threshold_activation": self.threshold_activation,
+                              "discriminator_level": self.discriminator_level,
+                              "level_verbose": self.level_verbose}
+
+
+        with open("sample.json", "w") as outfile:
+            json.dump(discriminator_data, outfile)
+
 
     @staticmethod
     def __mini_batch_stander(input_tensor, epsilon=1e-8):
