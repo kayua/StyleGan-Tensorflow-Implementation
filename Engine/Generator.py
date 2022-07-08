@@ -37,7 +37,7 @@ class Generator:
     def __init__(self, latent_dimension=DEFAULT_LATENT_DIMENSION, num_neurons_mapping=DEFAULT_NUMBER_NEURONS_MAPPING,
                  num_mapping_blocks=DEFAULT_NUMBER_MAPPING_BLOCKS, initial_dimension=DEFAULT_INITIAL_FEATURE_DIMENSION,
                  loss_function=DEFAULT_LOSS_FUNCTION, number_output_channels=DEFAULT_NUMBER_OUTPUT_CHANNELS,
-                 optimizer_function=DEFAULT_OPTIMIZER_FUNCTION,
+                 optimizer_function=DEFAULT_OPTIMIZER_FUNCTION, level_verbose=DEFAULT_VERBOSE_CONSTRUCTION,
                  size_kernel_filters=DEFAULT_DIMENSION_CONVOLUTION_KERNELS, num_filters_per_level=None,
                  num_synthesis_block=DEFAULT_NUMBER_SYNTHESIS_BLOCKS):
 
@@ -54,6 +54,7 @@ class Generator:
         self.loss_function = loss_function
         self.optimizer_function = optimizer_function
         self.num_filters_per_level = num_filters_per_level
+        self.level_verbose = level_verbose
         self.list_block_synthesis = []
         self.list_level_noise_input = []
         self.input_block = None
@@ -92,7 +93,6 @@ class Generator:
         self.constant_mapping_neural_network = gradient_flow
         if DEFAULT_VERBOSE_CONSTRUCTION: self.constant_mapping_neural_network.summary()
 
-
     def initial_block_synthesis(self, resolution_block, number_filters):
 
         resolution_features_block = (resolution_block, resolution_block, number_filters)
@@ -120,7 +120,7 @@ class Generator:
         (resolution_block * 2, resolution_block * 2, number_filters)
 
         input_flow = Input(shape=feature_input_resolution)
-        input_noise = Input(shape=(resolution_block*2, resolution_block*2, 1))
+        input_noise = Input(shape=(resolution_block * 2, resolution_block * 2, 1))
         input_latent = Input(shape=self.latent_dimension)
         input_latent = Reshape((self.latent_dimension, 1))(input_latent)
 
@@ -156,7 +156,6 @@ class Generator:
         self.list_level_noise_input.append(input_noise)
 
         for i in range(self.num_synthesis_block - 1):
-
             resolution_feature = level_size_feature_dimension[i + 1]
             output_resolution_feature = (resolution_feature * 2, resolution_feature * 2, 1)
             input_noise = Input(shape=output_resolution_feature, name="Input Noise {}".format(i + 2))
