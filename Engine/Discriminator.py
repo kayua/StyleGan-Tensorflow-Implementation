@@ -111,17 +111,17 @@ class Discriminator:
     def get_initial_resolution(self):
         return self.initial_resolution
 
-    def get_number_channels(self, number_channels):
+    def get_number_channels(self):
         return self.number_channels
 
-    def set_number_filters_per_layer(self, number_filters_per_layer):
-        self.number_filters_per_layer = number_filters_per_layer
+    def get_number_filters_per_layer(self):
+        return self.number_filters_per_layer
 
-    def set_level_feature_dimension(self, level_feature_dimension):
-        self.level_feature_dimension = level_feature_dimension
+    def get_level_feature_dimension(self):
+        return self.level_feature_dimension
 
-    def set_size_kernel_filters(self, size_kernel_filters):
-        self.size_kernel_filters = size_kernel_filters
+    def get_size_kernel_filters(self):
+        return self.size_kernel_filters
 
     def set_threshold_activation(self, threshold_activation):
         self.threshold_activation = threshold_activation
