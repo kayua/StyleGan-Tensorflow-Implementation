@@ -1,7 +1,9 @@
-from keras.layers import Reshape, UpSampling2D
+from keras.layers import Reshape
+from keras.layers import UpSampling2D
 from keras.utils import conv_utils
 import tensorflow
 from tensorflow.python.layers.base import Layer
+
 
 
 class AdaIN(Layer):
@@ -19,8 +21,8 @@ class AdaIN(Layer):
 
         gradient_flow, style_flow = inputs[0], inputs[1]
 
-        gradient_flow_means, gradient_flow_stander_deviation = self.get_mean_std(gradient_flow)
-        style_mean, style_stander_deviation = self.get_mean_std(style_flow)
+        gradient_flow_means, gradient_flow_stander_deviation = self.get_stander_mean(gradient_flow)
+        style_mean, style_stander_deviation = self.get_stander_mean(style_flow)
         gradient_flow_dimension = gradient_flow.shape[1]
         dimension_expanded = (gradient_flow_dimension, gradient_flow_dimension)
 
@@ -37,14 +39,15 @@ class AdaIN(Layer):
         style_mean = UpSampling2D(size=dimension_expanded)(style_mean)
 
         divergence = (gradient_flow - gradient_flow_means)
+
         return style_stander_deviation * divergence / gradient_flow_stander_deviation + style_mean
 
     @staticmethod
-    def get_mean_std(x, epsilon=1e-5):
-        axes = [1, 2]
-        mean, variance = tensorflow.nn.moments(x, axes=axes, keepdims=True)
+    def get_stander_mean(gradient_flow, epsilon=1e-5):
+        expand_axis = [1, 2]
+        flow_mean, variance = tensorflow.nn.moments(gradient_flow, axes=expand_axis, keepdims=True)
         standard_deviation = tensorflow.sqrt(variance + epsilon)
-        return mean, standard_deviation
+        return flow_mean, standard_deviation
 
     def get_config(self):
         config = {'eps': self.eps}
