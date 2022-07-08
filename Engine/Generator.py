@@ -148,6 +148,28 @@ class Generator:
     def get_number_filters_per_level(self):
         return self.num_filters_per_level
 
+
+    def __load_data_generator(self, generator_data_file):
+
+        with open("{}.json".format(generator_data_file)) as json_file:
+            data = json.load(json_file)
+
+            "feature_size": self.feature_size,
+            "num_filters_per_level": self.num_filters_per_level,
+            "level_verbose": self.level_verbose
+                              }
+
+            self.latent_dimension = data["latent_dimension"]
+            self.num_neurons_mapping = data["num_neurons_mapping"]
+            self.num_mapping_blocks = data["num_mapping_blocks"]
+            self.initial_dimension = data["initial_dimension"]
+            self.initial_num_channels = data["initial_num_channels"]
+            self.number_output_channels = data["number_output_channels"]
+            self.size_kernel_filters = data["size_kernel_filters"]
+            self.num_synthesis_block = data["num_synthesis_block"]
+            self.feature_size = data["feature_size"]
+
+
     def __write_data_generator(self, generator_data_file):
 
         generator_data = {"latent_dimension": self.latent_dimension,
