@@ -162,8 +162,8 @@ class StyleGAN(Model, ABC):
         images = self.generator(input_mapping)
 
         for i, img in enumerate(images):
-            new_image = 1+img.numpy()
-            new_image = numpy.array(new_image*127.5)
+
+            new_image = numpy.array(img*256.0)
             cv2.imwrite('{}/image_level_{}_id_{}.jpg'.format(path_output, self.network_level, i), new_image)
 
 
