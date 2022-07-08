@@ -1,3 +1,12 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+__author__ = 'All'
+__email__ = '@unipampa.edu.br '
+__version__ = '{2}.{0}.{1}'
+__data__ = '2021/11/21'
+__credits__ = ['All']
+
 import tensorflow
 from keras import Input
 from keras import Model
@@ -113,8 +122,7 @@ class Discriminator:
 
     def get_discriminator(self, number_level):
 
-        for i in range(self.discriminator_level, number_level):
-            self.add_level_discriminator(i)
+        for i in range(self.discriminator_level, number_level): self.add_level_discriminator(i)
 
         return self.discriminator_mapping
 
