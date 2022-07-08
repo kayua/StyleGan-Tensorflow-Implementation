@@ -126,6 +126,7 @@ class Generator:
 
         gradient_flow = UpSampling2D((2, 2))(input_flow)
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
+        gradient_flow = LeakyReLU(DEFAULT_THRESHOLD_RELU)(gradient_flow)
         gradient_flow = Add()([gradient_flow, input_noise])
         gradient_flow = AdaIN()([gradient_flow, input_latent])
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(gradient_flow)
