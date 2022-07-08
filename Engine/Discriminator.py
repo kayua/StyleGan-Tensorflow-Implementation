@@ -41,7 +41,8 @@ class Discriminator:
     def __init__(self, loss_function=DEFAULT_LOSS_FUNCTION, optimizer_function=DEFAULT_OPTIMIZER_FUNCTION,
                  number_channels=DEFAULT_NUMBER_CHANNELS, initial_resolution=DEFAULT_INITIAL_RESOLUTION,
                  threshold_activation=DEFAULT_THRESHOLD_ACTIVATION, initial_level=DEFAULT_DISCRIMINATOR_LEVEL,
-                 number_filters_per_layer=None, level_feature_dimension=None):
+                 number_filters_per_layer=None, level_feature_dimension=None,
+                 level_verbose=DEFAULT_VERBOSE_CONSTRUCTION):
 
         if number_filters_per_layer is None: number_filters_per_layer = DEFAULT_FILTER_PER_LAYER
 
@@ -56,6 +57,7 @@ class Discriminator:
         self.size_kernel_filters = DEFAULT_DIMENSION_CONVOLUTION_KERNELS
         self.threshold_activation = threshold_activation
         self.discriminator_level = initial_level
+        self.level_verbose = level_verbose
         self.discriminator_mapping = None
         self.discriminator = None
         self.first_level_discriminator = None
@@ -74,10 +76,12 @@ class Discriminator:
         return tensorflow.concat([input_tensor, gradient_flow], axis=-1)
 
     def color_mapping(self, resolution, number_features):
+
         input_layer = Input(shape=(resolution, resolution, self.number_channels))
         weight_kernels = tensorflow.keras.initializers.Ones()
         color_mapping = Conv2D(number_features, (1, 1), kernel_initializer=weight_kernels, trainable=False)(input_layer)
         color_mapping = Model(input_layer, color_mapping)
+        if self.level_verbose: color_mapping.summary()
         return color_mapping
 
     def build_initial_block(self):
@@ -92,10 +96,12 @@ class Discriminator:
         gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
         gradient_flow = self.fully_connected_block(gradient_flow)
         gradient_flow = Model(input_feature, gradient_flow)
+        if self.level_verbose: gradient_flow.summary()
+
         self.discriminator = gradient_flow
         self.discriminator_mapping = self.discriminator(resolution_mapping.output)
         self.discriminator_mapping = Model(resolution_mapping.input, self.discriminator_mapping)
-
+        if self.level_verbose: self.discriminator_mapping.summary()
 
     def add_level_discriminator(self, number_level):
 
