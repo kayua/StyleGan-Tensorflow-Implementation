@@ -118,12 +118,13 @@ class Discriminator:
         gradient_flow = AveragePooling2D()(gradient_flow)
         gradient_flow = self.discriminator(gradient_flow)
         gradient_flow = Model(input_feature, gradient_flow)
+        if self.level_verbose: gradient_flow.summary()
 
         self.discriminator = gradient_flow
         self.discriminator_mapping = self.discriminator(resolution_mapping.output)
         self.discriminator_mapping = Model(resolution_mapping.input, self.discriminator_mapping)
         self.discriminator_level += 1
-        self.discriminator.summary()
+        if self.level_verbose: self.discriminator_mapping.summary()
 
     def get_discriminator(self, number_level):
 
