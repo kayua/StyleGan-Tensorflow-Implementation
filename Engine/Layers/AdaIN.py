@@ -31,10 +31,10 @@ class AdaIN(Layer):
         gradient_flow_means = UpSampling2D(size=dimension_expanded)(gradient_flow_means)
 
         content_std = Reshape((1, 1, content.shape[3]))(content_std)
-        content_std = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(content_std)
+        content_std = UpSampling2D(size=dimension_expanded)(content_std)
 
         style_mean = Reshape((1, 1, 1))(style_mean)
-        style_mean = tensorflow.keras.layers.UpSampling2D(size=dimension_expanded)(style_mean)
+        style_mean = UpSampling2D(size=dimension_expanded)(style_mean)
 
         return style_stander_deviation * (content - gradient_flow_means) / content_std + style_mean
 
