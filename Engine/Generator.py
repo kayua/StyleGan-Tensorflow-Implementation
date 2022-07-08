@@ -156,13 +156,14 @@ class Generator:
                               "num_mapping_blocks": self.num_mapping_blocks,
                               "initial_dimension": self.initial_dimension,
                               "initial_num_channels": self.initial_num_channels,
+                              "number_output_channels": self.number_output_channels,
+                              "size_kernel_filters": self.size_kernel_filters,
+                              "num_synthesis_block": self.num_synthesis_block,
+                              "loss_function": self.loss_function,
 
                               }
 
-        self.number_output_channels = number_output_channels
-        self.size_kernel_filters = size_kernel_filters
-        self.num_synthesis_block = num_synthesis_block
-        self.loss_function = loss_function
+
         self.feature_size = feature_size
         self.optimizer_function = optimizer_function
         self.num_filters_per_level = num_filters_per_level
