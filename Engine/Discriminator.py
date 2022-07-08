@@ -97,11 +97,6 @@ class Discriminator:
     def set_level_verbose(self, level_verbose):
         self.level_verbose = level_verbose
 
-
-
-
-
-
     def get_loss_function(self):
         return self.loss_function
 
@@ -123,26 +118,14 @@ class Discriminator:
     def get_size_kernel_filters(self):
         return self.size_kernel_filters
 
-    def set_threshold_activation(self, threshold_activation):
-        self.threshold_activation = threshold_activation
+    def get_threshold_activation(self):
+        return self.threshold_activation
 
-    def set_discriminator_level(self, initial_level):
-        self.discriminator_level = initial_level
+    def get_discriminator_level(self):
+        return self.discriminator_level
 
-    def set_level_verbose(self, level_verbose):
-        self.level_verbose = level_verbose
-
-
-
-
-
-
-
-
-
-
-
-
+    def get_level_verbose(self):
+        return self.level_verbose
 
     @staticmethod
     def __mini_batch_stander(input_tensor, epsilon=1e-8):
