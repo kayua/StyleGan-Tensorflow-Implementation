@@ -133,25 +133,17 @@ class Generator:
     def get_dimension_kernel_filters(self):
         return self.size_kernel_filters
 
-    def set_number_synthesis_block(self, number_synthesis_block):
-        self.num_synthesis_block = number_synthesis_block
+    def get_number_synthesis_block(self):
+        return self.num_synthesis_block
 
-    def set_loss_function(self, loss_function):
-        self.loss_function = loss_function
+    def get_loss_function(self):
+        return self.loss_function
 
-    def set_optimizer_function(self, optimizer_function):
-        self.optimizer_function = optimizer_function
+    def get_optimizer_function(self):
+        return self.optimizer_function
 
-    def set_number_filters_per_level(self, number_filter_per_level):
-        self.num_filters_per_level = number_filter_per_level
-
-
-
-
-
-
-
-
+    def get_number_filters_per_level(self):
+        return self.num_filters_per_level
 
     def __block_mapping_network(self):
 
@@ -297,4 +289,3 @@ class Generator:
         if self.level_verbose: style_generator.summary()
 
         return style_generator
-
