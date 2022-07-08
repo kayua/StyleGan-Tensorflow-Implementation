@@ -97,6 +97,53 @@ class Discriminator:
     def set_level_verbose(self, level_verbose):
         self.level_verbose = level_verbose
 
+
+
+
+
+
+    def get_loss_function(self):
+        return self.loss_function
+
+    def get_optimizer_function(self):
+        return self.optimizer_function
+
+    def get_initial_resolution(self):
+        return self.initial_resolution
+
+    def get_number_channels(self, number_channels):
+        return self.number_channels
+
+    def set_number_filters_per_layer(self, number_filters_per_layer):
+        self.number_filters_per_layer = number_filters_per_layer
+
+    def set_level_feature_dimension(self, level_feature_dimension):
+        self.level_feature_dimension = level_feature_dimension
+
+    def set_size_kernel_filters(self, size_kernel_filters):
+        self.size_kernel_filters = size_kernel_filters
+
+    def set_threshold_activation(self, threshold_activation):
+        self.threshold_activation = threshold_activation
+
+    def set_discriminator_level(self, initial_level):
+        self.discriminator_level = initial_level
+
+    def set_level_verbose(self, level_verbose):
+        self.level_verbose = level_verbose
+
+
+
+
+
+
+
+
+
+
+
+
+
     @staticmethod
     def __mini_batch_stander(input_tensor, epsilon=1e-8):
         batch_size, dimension_x, dimension_y, channels = tensorflow.shape(input_tensor)
