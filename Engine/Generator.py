@@ -112,27 +112,26 @@ class Generator:
     def set_number_filters_per_level(self, number_filter_per_level):
         self.num_filters_per_level = number_filter_per_level
 
-
     def get_latent_dimension(self):
         return self.latent_dimension
 
-    def set_number_neurons_mapping(self, number_neurons_mapping):
-        self.num_neurons_mapping = number_neurons_mapping
+    def get_number_neurons_mapping(self):
+        return self.num_neurons_mapping
 
-    def set_number_mapping_block(self, number_mapping_blocks):
-        self.num_mapping_blocks = number_mapping_blocks
+    def get_number_mapping_block(self):
+        return self.num_mapping_blocks
 
-    def set_initial_dimension(self, initial_dimension):
-        self.initial_dimension = initial_dimension
+    def get_initial_dimension(self):
+        return self.initial_dimension
 
-    def set_initial_number_channels(self, initial_number_channels):
-        self.initial_num_channels = initial_number_channels
+    def get_initial_number_channels(self):
+        return self.initial_num_channels
 
-    def set_number_output_channels(self, number_output_channels):
-        self.number_output_channels = number_output_channels
+    def get_number_output_channels(self):
+        return self.number_output_channels
 
-    def set_dimension_kernel_filters(self, dimension_filter_kernels):
-        self.size_kernel_filters = dimension_filter_kernels
+    def get_dimension_kernel_filters(self):
+        return self.size_kernel_filters
 
     def set_number_synthesis_block(self, number_synthesis_block):
         self.num_synthesis_block = number_synthesis_block
