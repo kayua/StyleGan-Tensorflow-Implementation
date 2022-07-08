@@ -21,6 +21,7 @@ from keras.optimizer_v1 import Adam
 from Neural import discriminator_loss
 
 tensorflow.get_logger().setLevel(logging.ERROR)
+
 DEFAULT_LOSS_FUNCTION = discriminator_loss
 DEFAULT_LEARNING_RATE = 0.0002
 DEFAULT_BETA_1 = 0.5
@@ -29,10 +30,11 @@ DEFAULT_VERBOSE_CONSTRUCTION = True
 DEFAULT_NUMBER_CHANNELS = 3
 DEFAULT_INITIAL_RESOLUTION = 4
 DEFAULT_DIMENSION_CONVOLUTION_KERNELS = (3, 3)
-DEFAULT_FILTER_PER_LAYER = [16, 16, 32, 32, 64, 64, 128, 128]
-DEFAULT_LEVEL_FEATURE_DIMENSION = [1024, 512, 256, 128, 64, 32, 16, 8]
 DEFAULT_THRESHOLD_ACTIVATION = 0.2
 DEFAULT_DISCRIMINATOR_LEVEL = 1
+DEFAULT_FILTER_PER_LAYER = [16, 16, 32, 32, 64, 64, 128, 128]
+DEFAULT_LEVEL_FEATURE_DIMENSION = [1024, 512, 256, 128, 64, 32, 16, 8]
+
 DEFAULT_OPTIMIZER_FUNCTION = Adam(learning_rate=DEFAULT_LEARNING_RATE,
                                   beta_1=DEFAULT_BETA_1, beta_2=DEFAULT_BETA_2)
 
@@ -62,10 +64,24 @@ class Discriminator:
         self.discriminator_mapping = None
         self.discriminator = None
         self.first_level_discriminator = None
-        self.build_initial_block()
+        self.__build_initial_block()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @staticmethod
-    def mini_batch_stander(input_tensor, epsilon=1e-8):
+    def __mini_batch_stander(input_tensor, epsilon=1e-8):
         batch_size, dimension_x, dimension_y, channels = tensorflow.shape(input_tensor)
         group_size = tensorflow.minimum(4, batch_size)
         dimension_shape = [group_size, -1, dimension_x, dimension_y, channels]
@@ -76,26 +92,26 @@ class Discriminator:
         gradient_flow = tensorflow.tile(average_stander, [group_size, dimension_x, dimension_y, 1])
         return tensorflow.concat([input_tensor, gradient_flow], axis=-1)
 
-    def color_mapping(self, resolution, number_features):
+    def __channels_mapping(self, resolution, number_features):
 
         input_layer = Input(shape=(resolution, resolution, self.number_channels))
         weight_kernels = tensorflow.keras.initializers.Ones()
-        color_mapping = Conv2D(number_features, (1, 1), kernel_initializer=weight_kernels, trainable=False)(input_layer)
-        color_mapping = Model(input_layer, color_mapping)
-        if self.level_verbose: color_mapping.summary()
-        return color_mapping
+        channels = Conv2D(number_features, (1, 1), kernel_initializer=weight_kernels, trainable=False)(input_layer)
+        channels = Model(input_layer, channels)
+        if self.level_verbose: channels.summary()
+        return channels
 
-    def build_initial_block(self):
+    def __build_initial_block(self):
 
         number_filters = self.number_filters_per_layer[-2]
-        resolution_mapping = self.color_mapping(self.initial_resolution, number_filters)
+        resolution_mapping = self.__channels_mapping(self.initial_resolution, number_filters)
         input_feature = Input(shape=(self.initial_resolution, self.initial_resolution, number_filters))
         kernel_filters = self.size_kernel_filters
         gradient_flow = Conv2D(self.number_filters_per_layer[-1], kernel_filters, padding="same")(input_feature)
         gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
         gradient_flow = Conv2D(self.number_filters_per_layer[-1], (4, 4), padding="same")(gradient_flow)
         gradient_flow = LeakyReLU(self.threshold_activation)(gradient_flow)
-        gradient_flow = self.fully_connected_block(gradient_flow)
+        gradient_flow = self.__fully_connected_block(gradient_flow)
         gradient_flow = Model(input_feature, gradient_flow)
         if self.level_verbose: gradient_flow.summary()
 
@@ -104,12 +120,12 @@ class Discriminator:
         self.discriminator_mapping = Model(resolution_mapping.input, self.discriminator_mapping)
         if self.level_verbose: self.discriminator_mapping.summary()
 
-    def add_level_discriminator(self, number_level):
+    def __add_level_discriminator(self, number_level):
 
         number_filters = self.number_filters_per_layer[-(number_level + 1)]
         resolution_feature = self.level_feature_dimension[-number_level]
         next_number_filters = self.number_filters_per_layer[-(number_level + 2)]
-        resolution_mapping = self.color_mapping(resolution_feature, next_number_filters)
+        resolution_mapping = self.__channels_mapping(resolution_feature, next_number_filters)
         input_feature = Input(shape=(resolution_feature, resolution_feature, next_number_filters))
 
         gradient_flow = Conv2D(number_filters, self.size_kernel_filters, padding="same")(input_feature)
@@ -129,12 +145,12 @@ class Discriminator:
 
     def get_discriminator(self, number_level):
 
-        for i in range(self.discriminator_level, number_level): self.add_level_discriminator(i)
+        for i in range(self.discriminator_level, number_level): self.__add_level_discriminator(i)
 
         return self.discriminator_mapping
 
     @staticmethod
-    def fully_connected_block(input_layer):
+    def __fully_connected_block(input_layer):
         gradient_flow = Flatten()(input_layer)
         gradient_flow = Dense(1)(gradient_flow)
         return gradient_flow
