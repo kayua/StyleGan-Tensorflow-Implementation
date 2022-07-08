@@ -15,7 +15,6 @@ DEFAULT_LOSS_FUNCTION = discriminator_loss
 DEFAULT_LEARNING_RATE = 0.0002
 DEFAULT_BETA_1 = 0.5
 DEFAULT_BETA_2 = 0.9
-DEFAULT_OPTIMIZER_FUNCTION = Adam(learning_rate=DEFAULT_LEARNING_RATE, beta_1=DEFAULT_BETA_1, beta_2=DEFAULT_BETA_2)
 DEFAULT_VERBOSE_CONSTRUCTION = True
 DEFAULT_NUMBER_CHANNELS = 3
 DEFAULT_INITIAL_RESOLUTION = 4
@@ -23,13 +22,16 @@ DEFAULT_DIMENSION_CONVOLUTION_KERNELS = (3, 3)
 DEFAULT_FILTER_PER_LAYER = [16, 16, 32, 32, 64, 64, 128, 128]
 DEFAULT_LEVEL_FEATURE_DIMENSION = [1024, 512, 256, 128, 64, 32, 16, 8]
 DEFAULT_THRESHOLD_ACTIVATION = 0.2
+DEFAULT_DISCRIMINATOR_LEVEL = 1
+DEFAULT_OPTIMIZER_FUNCTION = Adam(learning_rate=DEFAULT_LEARNING_RATE,
+                                  beta_1=DEFAULT_BETA_1, beta_2=DEFAULT_BETA_2)
 
 
 class Discriminator:
 
     def __init__(self, loss_function=DEFAULT_LOSS_FUNCTION, optimizer_function=DEFAULT_OPTIMIZER_FUNCTION,
                  number_channels=DEFAULT_NUMBER_CHANNELS, initial_resolution=DEFAULT_INITIAL_RESOLUTION,
-                 threshold_activation=DEFAULT_THRESHOLD_ACTIVATION,
+                 threshold_activation=DEFAULT_THRESHOLD_ACTIVATION, initial_level=DEFAULT_DISCRIMINATOR_LEVEL,
                  number_filters_per_layer=None, level_feature_dimension=None):
 
         if number_filters_per_layer is None: number_filters_per_layer = DEFAULT_FILTER_PER_LAYER
@@ -44,9 +46,9 @@ class Discriminator:
         self.level_feature_dimension = level_feature_dimension
         self.size_kernel_filters = DEFAULT_DIMENSION_CONVOLUTION_KERNELS
         self.threshold_activation = threshold_activation
+        self.discriminator_level = initial_level
         self.discriminator_mapping = None
         self.discriminator = None
-        self.discriminator_level = 1
         self.first_level_discriminator = None
         self.build_initial_block()
 
