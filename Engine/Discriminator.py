@@ -7,6 +7,7 @@ __version__ = '{2}.{0}.{1}'
 __data__ = '2021/11/21'
 __credits__ = ['All']
 
+
 import tensorflow
 from keras import Input
 from keras import Model
@@ -16,7 +17,6 @@ from keras.layers import Dense
 from keras.layers import Flatten
 from keras.layers import LeakyReLU
 from keras.optimizer_v1 import Adam
-
 from Neural import discriminator_loss
 
 DEFAULT_LOSS_FUNCTION = discriminator_loss
