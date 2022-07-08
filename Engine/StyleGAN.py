@@ -1,9 +1,9 @@
-from abc import ABC
-
 import numpy
 import tensorflow
 from cv2 import cv2
+from abc import ABC
 from keras import Model
+from keras.optimizer_v1 import Adam
 
 from Engine.Loss import discriminator_loss_function
 from Engine.Loss import generator_loss_function
@@ -18,8 +18,8 @@ DEFAULT_CONSTANT_VALUE_MAPPING = 0.5
 DEFAULT_INITIAL_DIMENSION = 4
 DEFAULT_NUMBER_FILTERS_PER_LAYER = [64, 64, 64, 64, 64, 64, 64, 64, 64]
 DEFAULT_SIZE_FEATURE_DIMENSION = [512, 256, 128, 64, 32, 16, 8]
-DEFAULT_GENERATOR_OPTIMIZER = tensorflow.keras.optimizers.Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
-DEFAULT_DISCRIMINATOR_OPTIMIZER = tensorflow.keras.optimizers.Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
+DEFAULT_GENERATOR_OPTIMIZER = Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
+DEFAULT_DISCRIMINATOR_OPTIMIZER = Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
 DEFAULT_DISCRIMINATOR_LOSS = discriminator_loss_function
 DEFAULT_GENERATOR_LOSS = generator_loss_function
 DEFAULT_DIMENSION_IMAGE_ALGORITHM = tensorflow.image.ResizeMethod.NEAREST_NEIGHBOR
@@ -64,6 +64,66 @@ class StyleGAN(Model, ABC):
         self.generator_optimizer = generator_optimizer
         self.discriminator_loss = discriminator_loss
         self.generator_loss = generator_loss
+
+    def set_discriminator(self, discriminator):
+        self.discriminator = discriminator
+
+    def set_network_level(self, network_level):
+        self.network_level = network_level
+
+    def set_generator(self, generator):
+        self.generator = generator
+
+    def set_number_discriminator_steps(self, number_discriminator_steps):
+        self.number_discriminator_steps = number_discriminator_steps
+
+    def set_gradient_penalty_alpha(self, gradient_penalty_alpha):
+        self.gradient_penalty_alpha = gradient_penalty_alpha
+
+    def set_latent_dimension(self, latent_dimension):
+        self.latent_dimension = latent_dimension
+
+    def set_constant_mapping_value(self, constant_mapping_value):
+        self.constant_mapping_value = constant_mapping_value
+
+    def set_initial_dimension(self, initial_dimension):
+        self.initial_dimension = initial_dimension
+
+    def set_number_filters_per_level(self, number_filters_per_level):
+        self.num_filters_per_level = number_filters_per_level
+
+    def set_size_feature_dimension(self, size_feature_dimension):
+        self.size_feature_dimension = size_feature_dimension
+
+    def get_discriminator(self):
+        return self.discriminator
+
+    def get_network_level(self):
+        return self.network_level
+
+    def get_generator(self):
+        return self.generator
+
+    def get_number_discriminator_steps(self):
+        return self.number_discriminator_steps
+
+    def get_gradient_penalty_alpha(self):
+        return self.gradient_penalty_alpha
+
+    def get_latent_dimension(self):
+        return self.latent_dimension
+
+    def get_constant_mapping_value(self):
+        return self.constant_mapping_value
+
+    def get_initial_dimension(self):
+        return self.initial_dimension
+
+    def get_number_filters_per_level(self):
+        return self.num_filters_per_level
+
+    def get_size_feature_dimension(self):
+        return self.size_feature_dimension
 
     def __gradient_penalty(self, batch_size, real_images, fake_images):
 
@@ -182,33 +242,3 @@ class StyleGAN(Model, ABC):
             random_noise_vector.append(random_noise)
 
         return random_noise_vector
-
-    def set_discriminator(self, discriminator):
-        self.discriminator = discriminator
-
-    def set_network_level(self, network_level):
-        self.network_level = network_level
-
-    def set_generator(self, generator):
-        self.generator = generator
-
-    def set_number_discriminator_steps(self, number_discriminator_steps):
-        self.number_discriminator_steps = number_discriminator_steps
-
-    def set_gradient_penalty_alpha(self, gradient_penalty_alpha):
-        self.gradient_penalty_alpha = gradient_penalty_alpha
-
-    def set_latent_dimension(self, latent_dimension):
-        self.latent_dimension = latent_dimension
-
-    def set_constant_mapping_value(self, constant_mapping_value):
-        self.constant_mapping_value = constant_mapping_value
-
-    def set_initial_dimension(self, initial_dimension):
-        self.initial_dimension = initial_dimension
-
-    def set_number_filters_per_level(self, number_filters_per_level):
-        self.num_filters_per_level = number_filters_per_level
-
-    def set_size_feature_dimension(self, size_feature_dimension):
-        self.size_feature_dimension = size_feature_dimension
