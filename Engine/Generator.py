@@ -148,7 +148,7 @@ class Generator:
     def get_number_filters_per_level(self):
         return self.num_filters_per_level
 
-    def write_data_generator(self, generator_data_file):
+    def __write_data_generator(self, generator_data_file):
 
         generator_data = {"latent_dimension": self.latent_dimension,
                           "num_neurons_mapping": self.num_neurons_mapping,
