@@ -37,8 +37,9 @@ class LoadImage:
 
         directory_images = glob.glob("{}/*".format(self.dataset_path))
 
-        for i in tqdm(directory_images):
-            self.image_list.append(self.parse_image(i))
+        for j in range(4):
+            for i in tqdm(directory_images):
+                self.image_list.append(self.parse_image(i))
 
         residual = len(self.image_list)%self.size_batch
 
