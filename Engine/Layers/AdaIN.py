@@ -17,8 +17,8 @@ class AdaIN(Layer):
 
     def call(self, inputs, **kwargs):
 
-        gradient_flow = inputs[0]
-        style_flow = inputs[1]
+        gradient_flow, style_flow = inputs[0], inputs[1]
+
         gradient_flow_means, gradient_flow_stander_deviation = self.get_mean_std(gradient_flow)
         style_mean, style_stander_deviation = self.get_mean_std(style_flow)
 
