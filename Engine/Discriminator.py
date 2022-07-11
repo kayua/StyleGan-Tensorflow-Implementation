@@ -18,6 +18,7 @@ from keras.layers import Conv2D
 from keras.layers import Dense
 from keras.layers import Flatten
 from keras.layers import LeakyReLU
+from keras.models import model_from_json
 from keras.optimizer_v1 import Adam
 from Neural import discriminator_loss
 
@@ -138,7 +139,19 @@ class Discriminator:
         self.discriminator_mapping.save_weights("model.h5")
         print("Saved model to disk")
 
-    def load_neural_network(self, ):
+    def load_neural_network(self, file_output_neural_network):
+
+        json_file = open('{}.json'.format(file_output_neural_network), 'r')
+        loaded_model_json = json_file.read()
+        json_file.close()
+        loaded_model = model_from_json(loaded_model_json)
+
+        loaded_model.load_weights("model.h5")
+        print("Loaded model from disk")
+
+
+
+
     def __load_data_discriminator(self, discriminator_data_file):
 
         with open("{}.json".format(discriminator_data_file)) as json_file:
