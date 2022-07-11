@@ -9,6 +9,7 @@ __credits__ = ['All']
 
 import json
 import logging
+import os
 
 import tensorflow
 from keras import Input
@@ -130,13 +131,14 @@ class Discriminator:
     def save_neural_network(self, neural_network_file):
 
         model_json = self.discriminator_mapping.to_json()
+        if not os.path.exists("{}/discriminator".format(neural_network_file)):
+            os.mkdir("{}/discriminator".format(neural_network_file))
 
         with open("{}.json".format(neural_network_file), "w") as json_file:
             json_file.write(model_json)
 
-        self.discriminator_mapping.save_weights("{}.h5".format(neural_network_file))
+        self.discriminator_mapping.save_weights("{}/discriminator/model.h5".format(neural_network_file))
         print("Saved model to disk")
-
 
     def load_discriminator(self, model_file):
 
@@ -182,7 +184,6 @@ class Discriminator:
 
         with open("{}.json".format(discriminator_data_file), "w") as outfile:
             json.dump(discriminator_data, outfile)
-
 
     @staticmethod
     def __mini_batch_stander(input_tensor, epsilon=1e-8):
