@@ -20,11 +20,10 @@ from keras.layers import Flatten
 from keras.layers import LeakyReLU
 from keras.models import model_from_json
 from keras.optimizer_v1 import Adam
-from Neural import discriminator_loss
 
 tensorflow.get_logger().setLevel(logging.ERROR)
 
-DEFAULT_LOSS_FUNCTION = discriminator_loss
+DEFAULT_LOSS_FUNCTION = "binary_crossentropy"
 DEFAULT_LEARNING_RATE = 0.0002
 DEFAULT_BETA_1 = 0.5
 DEFAULT_BETA_2 = 0.9
@@ -37,8 +36,7 @@ DEFAULT_DISCRIMINATOR_LEVEL = 1
 DEFAULT_FILTER_PER_LAYER = [16, 16, 32, 32, 64, 64, 128, 128]
 DEFAULT_LEVEL_FEATURE_DIMENSION = [1024, 512, 256, 128, 64, 32, 16, 8]
 
-DEFAULT_OPTIMIZER_FUNCTION = Adam(learning_rate=DEFAULT_LEARNING_RATE,
-                                  beta_1=DEFAULT_BETA_1, beta_2=DEFAULT_BETA_2)
+DEFAULT_OPTIMIZER_FUNCTION = "adam"
 
 
 class Discriminator:
