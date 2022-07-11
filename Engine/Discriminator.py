@@ -7,10 +7,10 @@ __version__ = '{2}.{0}.{1}'
 __data__ = '2021/11/21'
 __credits__ = ['All']
 
-import logging
-import tensorflow
 import json
+import logging
 
+import tensorflow
 from keras import Input
 from keras import Model
 from keras.layers import AveragePooling2D
@@ -19,7 +19,6 @@ from keras.layers import Dense
 from keras.layers import Flatten
 from keras.layers import LeakyReLU
 from keras.models import model_from_json
-from keras.optimizer_v1 import Adam
 
 tensorflow.get_logger().setLevel(logging.ERROR)
 

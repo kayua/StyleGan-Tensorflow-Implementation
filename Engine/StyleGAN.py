@@ -3,7 +3,7 @@ import tensorflow
 from cv2 import cv2
 from abc import ABC
 from keras import Model
-from keras.optimizer_v1 import Adam
+from keras.optimizer_v2.adam import Adam
 
 from Engine.Loss import discriminator_loss_function
 from Engine.Loss import generator_loss_function
