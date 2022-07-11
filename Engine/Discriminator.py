@@ -145,7 +145,6 @@ class Discriminator:
         self.load_neural_network("{}".format(model_file))
 
 
-
     def load_neural_network(self, file_output_neural_network):
 
         json_file = open('{}.json'.format(file_output_neural_network), 'r')
@@ -154,7 +153,6 @@ class Discriminator:
         self.discriminator_mapping = model_from_json(loaded_model_json)
         self.discriminator_mapping.load_weights("{}.h5".format(file_output_neural_network))
         print("Loaded model from disk")
-
 
     def load_data_discriminator(self, discriminator_data_file):
 
@@ -168,7 +166,6 @@ class Discriminator:
             self.level_verbose = data["level_verbose"]
             self.number_filters_per_layer = data["number_filters_per_layer"]
             self.level_feature_dimension = data["level_feature_dimension"]
-
 
     def write_data_discriminator(self, discriminator_data_file):
 
