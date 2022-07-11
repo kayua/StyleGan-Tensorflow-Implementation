@@ -139,6 +139,11 @@ class Discriminator:
         self.discriminator_mapping.save_weights("model.h5")
         print("Saved model to disk")
 
+    def load_discriminator(self, model_file):
+
+
+
+
     def load_neural_network(self, file_output_neural_network):
 
         json_file = open('{}.json'.format(file_output_neural_network), 'r')
