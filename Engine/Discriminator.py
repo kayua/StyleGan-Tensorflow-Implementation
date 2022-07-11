@@ -144,11 +144,9 @@ class Discriminator:
         json_file = open('{}.json'.format(file_output_neural_network), 'r')
         loaded_model_json = json_file.read()
         json_file.close()
-        loaded_model = model_from_json(loaded_model_json)
-        loaded_model.load_weights("{}.h5".format(file_output_neural_network))
+        self.discriminator_mapping = model_from_json(loaded_model_json)
+        self.discriminator_mapping.load_weights("{}.h5".format(file_output_neural_network))
         print("Loaded model from disk")
-
-
 
 
     def __load_data_discriminator(self, discriminator_data_file):
