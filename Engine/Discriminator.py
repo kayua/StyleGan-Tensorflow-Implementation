@@ -133,6 +133,7 @@ class Discriminator:
     def save_neural_network(self, file_output_neural_network):
 
         model_json = self.discriminator_mapping.to_json()
+
         with open("{}.json".format(file_output_neural_network), "w") as json_file:
             json_file.write(model_json)
 
@@ -143,7 +144,6 @@ class Discriminator:
 
         self.load_data_discriminator("{}_data".format(model_file))
         self.load_neural_network("{}".format(model_file))
-
 
     def load_neural_network(self, file_output_neural_network):
 
