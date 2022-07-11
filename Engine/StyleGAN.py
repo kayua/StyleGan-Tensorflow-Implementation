@@ -217,7 +217,7 @@ class StyleGAN(Model, ABC):
         dimension = [number_images, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
         constant_mapping_tensor = tensorflow.fill(dimension, self.constant_mapping_value)
 
-        input_mapping = self.tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
+        input_mapping = self.__tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
 
         images = self.generator(input_mapping)
 

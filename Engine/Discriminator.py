@@ -127,14 +127,14 @@ class Discriminator:
     def get_level_verbose(self):
         return self.level_verbose
 
-    def save_neural_network(self, file_output_neural_network):
+    def save_neural_network(self, neural_network_file):
 
         model_json = self.discriminator_mapping.to_json()
 
-        with open("{}.json".format(file_output_neural_network), "w") as json_file:
+        with open("{}.json".format(neural_network_file), "w") as json_file:
             json_file.write(model_json)
 
-        self.discriminator_mapping.save_weights("model.h5")
+        self.discriminator_mapping.save_weights("{}.h5".format(neural_network_file))
         print("Saved model to disk")
 
 
