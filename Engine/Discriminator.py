@@ -140,6 +140,7 @@ class Discriminator:
         self.discriminator_mapping.save_weights("model.h5")
         print("Saved model to disk")
 
+
     def load_discriminator(self, model_file):
 
         self.load_data_discriminator("{}_data".format(model_file))
