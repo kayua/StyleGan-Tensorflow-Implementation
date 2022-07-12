@@ -146,6 +146,7 @@ class Generator:
     def get_optimizer_function(self):
         return self.optimizer_function
 
+
     def get_number_filters_per_level(self):
         return self.num_filters_per_level
 
