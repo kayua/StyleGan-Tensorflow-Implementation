@@ -80,6 +80,8 @@ class Generator:
         self.initial_gradient_flow = None
         self.mapping_neural_network = None
         self.constant_mapping_neural_network = None
+        self.final_model = None
+        self.pretrained_model = False
         self.__build_blocks()
 
     def set_latent_dimension(self, latent_dimension):
@@ -154,12 +156,14 @@ class Generator:
 
             with open("{}/discriminator/{}_level_{}.json".format(path_models, prefix_model, i), "w") as json_file:
                 print(self.list_block_synthesis[i])
-                precompile_model = Model(self.list_block_synthesis[i].input, self.list_block_synthesis[i].output)
+                precompile_model = Model(self.list_block_synthesis[i], self.list_block_synthesis[i].output)
                 json_file.write(precompile_model.to_json())
 
             precompile_model.save_weights("{}/discriminator/{}_level_{}.h5".format(path_models, prefix_model, i))
 
     def load_synthesis_block(self, path_models, prefix_model):
+
+        self.pretrained_model = True
 
         for i in range(self.num_synthesis_block):
 
@@ -281,7 +285,6 @@ class Generator:
     def __non_initial_synthesis_block(self, resolution_block, number_filters):
 
         feature_input_resolution = (resolution_block, resolution_block, number_filters)
-        (resolution_block * 2, resolution_block * 2, number_filters)
 
         input_flow = Input(shape=feature_input_resolution)
         input_noise = Input(shape=(resolution_block * 2, resolution_block * 2, 1))
@@ -369,5 +372,9 @@ class Generator:
         style_generator = neural_synthesis(neural_input_layer)
         style_generator = Model(neural_input_layer, style_generator, name="Generator")
         if self.level_verbose: style_generator.summary()
+
+        if self.pretrained_model:
+
+            self.final_model = style_generator
 
         return style_generator
