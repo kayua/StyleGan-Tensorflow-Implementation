@@ -131,13 +131,13 @@ class Discriminator:
     def save_neural_network(self, path_models, prefix_model):
 
         model_json = self.discriminator_mapping.to_json()
-        if not os.path.exists("{}/discriminator".format(path_models)):
-            os.mkdir("{}/discriminator".format(path_models))
+        if not os.path.exists("{}/Discriminator".format(path_models)):
+            os.mkdir("{}/Discriminator".format(path_models))
 
-        with open("{}/discriminator/{}.json".format(path_models, prefix_model), "w") as json_file:
+        with open("{}/Discriminator/{}.json".format(path_models, prefix_model), "w") as json_file:
             json_file.write(model_json)
 
-        self.discriminator_mapping.save_weights("{}/discriminator/{}.h5".format(path_models, prefix_model))
+        self.discriminator_mapping.save_weights("{}/Discriminator/{}.h5".format(path_models, prefix_model))
         print("Saved model to disk")
 
     def load_discriminator(self, path_model, model_file):
