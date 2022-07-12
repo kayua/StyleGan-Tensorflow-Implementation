@@ -182,9 +182,10 @@ class Discriminator:
                               "level_verbose": self.level_verbose,
                               "number_filters_per_layer": self.number_filters_per_layer,
                               "level_feature_dimension": self.level_feature_dimension}
-
+        print("---------------------------------------")
         with open("{}/discriminator/{}_data.json".format(path_models, prefix_model), "w") as outfile:
-            json.dump(discriminator_data, outfile)
+            outfile.write(json.dumps(discriminator_data, ensure_ascii=False))
+
 
     @staticmethod
     def __mini_batch_stander(input_tensor, epsilon=1e-8):
