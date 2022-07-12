@@ -216,10 +216,7 @@ class Generator:
         self.constant_mapping_neural_network.save_weights("{}/generator/{}_mapping.h5".format(path_model, model_file))
         print("Saved model to disk")
 
-
-
-
-    def write_data_generator(self, generator_data_file):
+    def write_data_generator(self, path_model, model_file):
 
         generator_data = {"latent_dimension": self.latent_dimension,
                           "num_neurons_mapping": self.num_neurons_mapping,
@@ -234,7 +231,7 @@ class Generator:
                           "level_verbose": self.level_verbose
                           }
 
-        with open("{}.json".format(generator_data_file), "w") as outfile:
+        with open("{}/generator/{}_data.json".format(path_model, model_file), "w") as outfile:
             json.dump(generator_data, outfile)
 
     def __block_mapping_network(self):
