@@ -148,6 +148,7 @@ class Generator:
         return self.num_filters_per_level
 
 
+
     def load_neural_network(self, path_model, model_file):
 
         json_file = open('{}/generator/{}.json'.format(path_model, model_file), 'r')
@@ -156,15 +157,6 @@ class Generator:
         self.discriminator_mapping = model_from_json(loaded_model_json)
         self.discriminator_mapping.load_weights('{}/generator/{}.h5'.format(path_model, model_file))
         print("Loaded model from disk")
-
-
-
-
-
-
-
-
-
 
     def load_data_generator(self, generator_data_file):
 
@@ -182,6 +174,14 @@ class Generator:
             self.feature_size = data["feature_size"]
             self.num_filters_per_level = data["num_filters_per_level"]
             self.level_verbose = data["level_verbose"]
+
+    def save_neural_network(self, path_model, model_file):
+
+
+
+
+
+
 
     def write_data_generator(self, generator_data_file):
 
