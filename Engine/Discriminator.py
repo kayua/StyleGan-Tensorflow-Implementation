@@ -151,13 +151,13 @@ class Discriminator:
         self.save_neural_network(path_model, model_file)
         self.write_data_discriminator(path_model, model_file)
 
-    def load_neural_network(self, file_output_neural_network):
+    def load_neural_network(self, path_model, model_file):
 
-        json_file = open('{}.json'.format(file_output_neural_network), 'r')
+        json_file = open('{}/discriminator/{}.json'.format(path_model, model_file), 'r')
         loaded_model_json = json_file.read()
         json_file.close()
         self.discriminator_mapping = model_from_json(loaded_model_json)
-        self.discriminator_mapping.load_weights("{}.h5".format(file_output_neural_network))
+        self.discriminator_mapping.load_weights('{}/discriminator/{}.h5'.format(path_model, model_file))
         print("Loaded model from disk")
 
     def load_data_discriminator(self, path_models, prefix_model):
