@@ -185,6 +185,23 @@ class Generator:
         with open("{}/Generator/{}_data.json".format(path_model, model_file), "w") as outfile:
             json.dump(generator_data, outfile)
 
+    def load_data_generator(self, path_models, prefix_model):
+
+        with open("{}/discriminator/{}_data.json".format(path_models, prefix_model)) as json_file:
+            data = json.load(json_file)
+
+            self.latent_dimension = data["latent_dimension"]
+            self.num_neurons_mapping = data["num_neurons_mapping"]
+            self.num_mapping_blocks = data["num_mapping_blocks"]
+            self.initial_dimension = data["initial_dimension"]
+            self.initial_num_channels = data["initial_num_channels"]
+            self.number_output_channels = data["number_output_channels"]
+            self.size_kernel_filters = data["size_kernel_filters"]
+            self.num_synthesis_block = data["num_synthesis_block"]
+            self.feature_size = data["feature_size"]
+            self.num_filters_per_level = data["num_filters_per_level"]
+            self.level_verbose = data["level_verbose"]
+
 
     def __block_mapping_network(self):
 

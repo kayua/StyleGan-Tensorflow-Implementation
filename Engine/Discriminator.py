@@ -147,7 +147,6 @@ class Discriminator:
 
     def save_discriminator(self, path_model, model_file):
 
-
         self.save_neural_network(path_model, model_file)
         self.write_data_discriminator(path_model, model_file)
 
