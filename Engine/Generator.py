@@ -186,12 +186,15 @@ class Generator:
             self.num_filters_per_level = data["num_filters_per_level"]
             self.level_verbose = data["level_verbose"]
 
-    def save_neural_network(self, path_model, model_file):
 
-        if not os.path.exists("{}/generator".format(path_model)):
-            os.mkdir("{}/generator".format(path_model))
+    def save_discriminator(self, path_models, prefix_model):
 
-        self.save_mapping_network(path_model, model_file)
+        if not os.path.exists("{}/generator".format(path_models)):
+            os.mkdir("{}/generator".format(path_models))
+
+        self.save_mapping_network(path_models, prefix_model)
+        self.save_constant_mapping_network(path_model, model_file)
+
 
     def save_mapping_network(self, path_model, model_file):
 
@@ -212,6 +215,9 @@ class Generator:
 
         self.constant_mapping_neural_network.save_weights("{}/generator/{}_mapping.h5".format(path_model, model_file))
         print("Saved model to disk")
+
+
+
 
     def write_data_generator(self, generator_data_file):
 
