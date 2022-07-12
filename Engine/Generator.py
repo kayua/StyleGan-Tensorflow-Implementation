@@ -187,24 +187,14 @@ class Generator:
             self.level_verbose = data["level_verbose"]
 
 
-    def save_discriminator(self, path_models, prefix_model):
+    def save_generator(self, path_models, prefix_model):
 
         if not os.path.exists("{}/generator".format(path_models)):
             os.mkdir("{}/generator".format(path_models))
 
-        self.save_mapping_network(path_models, prefix_model)
+        self.save_synthesis_block(path_models, prefix_model)
         self.save_constant_mapping_network(path_models, prefix_model)
         self.write_data_generator(path_models, prefix_model)
-
-    def save_mapping_network(self, path_model, model_file):
-
-        model_json = self.mapping_neural_network.to_json()
-
-        with open("{}/generator/{}_mapping.json".format(path_model, model_file), "w") as json_file:
-            json_file.write(model_json)
-
-        self.mapping_neural_network.save_weights("{}/generator/{}_mapping.h5".format(path_model, model_file))
-        print("Saved model to disk")
 
     def save_constant_mapping_network(self, path_model, model_file):
 
