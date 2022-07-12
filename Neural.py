@@ -37,6 +37,6 @@ for level in range(min_level, max_level):
     discriminator_instance.save_discriminator("saved_models", "model")
     discriminator_instance.load_discriminator("saved_models", "model")
     generator_instance.save_generator("saved_models", "model")
-    #discriminator_instance.load_discriminator("saved_models", "model")
+    discriminator_instance.load_discriminator("saved_models", "model")
     styleGan.generate_images()
     exit()

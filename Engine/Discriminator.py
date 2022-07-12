@@ -152,16 +152,16 @@ class Discriminator:
 
     def load_neural_network(self, path_model, model_file):
 
-        json_file = open('{}/discriminator/{}.json'.format(path_model, model_file), 'r')
+        json_file = open('{}/Discriminator/{}.json'.format(path_model, model_file), 'r')
         loaded_model_json = json_file.read()
         json_file.close()
         self.discriminator_mapping = model_from_json(loaded_model_json)
-        self.discriminator_mapping.load_weights('{}/discriminator/{}.h5'.format(path_model, model_file))
+        self.discriminator_mapping.load_weights('{}/Discriminator/{}.h5'.format(path_model, model_file))
         print("Loaded model from disk")
 
     def load_data_discriminator(self, path_models, prefix_model):
 
-        with open("{}/discriminator/{}_data.json".format(path_models, prefix_model)) as json_file:
+        with open("{}/Discriminator/{}_data.json".format(path_models, prefix_model)) as json_file:
             data = json.load(json_file)
 
             self.initial_resolution = data["initial_resolution"]
@@ -182,7 +182,7 @@ class Discriminator:
                               "number_filters_per_layer": self.number_filters_per_layer,
                               "level_feature_dimension": self.level_feature_dimension}
 
-        with open("{}/discriminator/{}_data.json".format(path_models, prefix_model), "w") as outfile:
+        with open("{}/Discriminator/{}_data.json".format(path_models, prefix_model), "w") as outfile:
             outfile.write(json.dumps(discriminator_data, ensure_ascii=False))
 
 
