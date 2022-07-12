@@ -240,6 +240,7 @@ class StyleGAN(Model, ABC):
         random_noise_vector.append(random_noise)
 
         for i in range(1, self.network_level):
+
             resolution_feature = self.size_feature_dimension[-i]
             shape_feature = (batch_size, resolution_feature, resolution_feature, 1)
             random_noise = tensorflow.random.normal(shape=shape_feature)
