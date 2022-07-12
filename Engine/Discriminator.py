@@ -128,16 +128,16 @@ class Discriminator:
     def get_level_verbose(self):
         return self.level_verbose
 
-    def save_neural_network(self, neural_network_file):
+    def save_neural_network(self, path_models, prefix_model):
 
         model_json = self.discriminator_mapping.to_json()
-        if not os.path.exists("{}/discriminator".format(neural_network_file)):
-            os.mkdir("{}/discriminator".format(neural_network_file))
+        if not os.path.exists("{}/discriminator".format(path_models)):
+            os.mkdir("{}/discriminator".format(path_models))
 
-        with open("{}.json".format(neural_network_file), "w") as json_file:
+        with open("{}/discriminator/{}.json".format(path_models, prefix_model), "w") as json_file:
             json_file.write(model_json)
 
-        self.discriminator_mapping.save_weights("{}/discriminator/model.h5".format(neural_network_file))
+        self.discriminator_mapping.save_weights("{}/discriminator/{}.h5".format(path_models, prefix_model))
         print("Saved model to disk")
 
     def load_discriminator(self, model_file):
@@ -145,10 +145,10 @@ class Discriminator:
         self.load_data_discriminator("{}_data".format(model_file))
         self.load_neural_network("{}".format(model_file))
 
-    def save_discriminator(self, model_file):
+    def save_discriminator(self, path_model, model_file):
 
-        self.write_data_discriminator("{}_data".format(model_file))
-        self.save_neural_network("{}".format(model_file))
+        #self.write_data_discriminator("{}_data".format(model_file))
+        self.save_neural_network(path_model, model_file)
 
     def load_neural_network(self, file_output_neural_network):
 

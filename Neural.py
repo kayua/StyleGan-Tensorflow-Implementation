@@ -34,5 +34,5 @@ for level in range(min_level, max_level):
     styleGan = StyleGAN(discriminator=discriminator_model, generator=generator_model, number_discriminator_steps=2, network_level=level)
     styleGan.compile(discriminator_optimizer=discriminator_optimizer, generator_optimizer=generator_optimizer, generator_loss=generator_loss, discriminator_loss=discriminator_loss)
     styleGan.fit(image_training, batch_size=32, steps_per_epoch=16, epochs=1)
-    discriminator_instance.save_neural_network("saved_models/model")
+    discriminator_instance.save_neural_network("saved_models", "model")
     styleGan.generate_images()
