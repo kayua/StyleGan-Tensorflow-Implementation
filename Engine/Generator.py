@@ -9,6 +9,7 @@ __credits__ = ['All']
 
 import json
 import logging
+import os
 
 import tensorflow
 from keras import Input
@@ -177,6 +178,8 @@ class Generator:
 
     def save_neural_network(self, path_model, model_file):
 
+        if not os.path.exists("{}/generator".format(path_model)):
+            os.mkdir("{}/generator".format(path_model))
 
 
 
