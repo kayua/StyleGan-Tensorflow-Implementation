@@ -371,10 +371,16 @@ class Generator:
 
         style_generator = neural_synthesis(neural_input_layer)
         style_generator = Model(neural_input_layer, style_generator, name="Generator")
+
         if self.level_verbose: style_generator.summary()
 
         if self.pretrained_model:
 
+            style_generator = self.final_model
+
+        else:
+
             self.final_model = style_generator
+
 
         return style_generator
