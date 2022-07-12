@@ -60,9 +60,9 @@ class Generator:
         if feature_size is None: feature_size = DEFAULT_FEATURE_SIZE
         if num_filters_per_level is None: num_filters_per_level = DEFAULT_NUMBER_FILTERS_PER_LEVEL
 
-        self.latent_dimension = latent_dimension #
-        self.num_neurons_mapping = num_neurons_mapping #
-        self.num_mapping_blocks = num_mapping_blocks #
+        self.latent_dimension = latent_dimension
+        self.num_neurons_mapping = num_neurons_mapping
+        self.num_mapping_blocks = num_mapping_blocks
         self.initial_dimension = initial_dimension
         self.initial_num_channels = DEFAULT_NUMBER_FILTERS_PER_LEVEL[-1]
         self.number_output_channels = number_output_channels
@@ -149,15 +149,6 @@ class Generator:
         return self.num_filters_per_level
 
 
-
-    def load_neural_network(self, path_model, model_file):
-
-        json_file = open('{}/generator/{}.json'.format(path_model, model_file), 'r')
-        loaded_model_json = json_file.read()
-        json_file.close()
-        self.discriminator_mapping = model_from_json(loaded_model_json)
-        self.discriminator_mapping.load_weights('{}/generator/{}.h5'.format(path_model, model_file))
-        print("Loaded model from disk")
 
     def load_data_generator(self, generator_data_file):
 
