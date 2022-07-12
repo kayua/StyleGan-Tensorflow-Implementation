@@ -146,10 +146,8 @@ class Generator:
     def get_optimizer_function(self):
         return self.optimizer_function
 
-
     def get_number_filters_per_level(self):
         return self.num_filters_per_level
-
 
     def save_model(self, path_models, prefix_model):
 
@@ -160,7 +158,6 @@ class Generator:
         self.final_model.save_weights("{}/Generator/{}.h5".format(path_models, prefix_model))
         print("Saved model to disk")
 
-
     def save_generator(self, path_models, prefix_model):
 
         if not os.path.exists("{}/Generator".format(path_models)):
@@ -168,7 +165,6 @@ class Generator:
 
         self.save_model(path_models, prefix_model)
         self.write_data_generator(path_models, prefix_model)
-
 
     def write_data_generator(self, path_model, model_file):
 
@@ -188,8 +184,9 @@ class Generator:
         with open("{}/Generator/{}_data.json".format(path_model, model_file), "w") as outfile:
             json.dump(generator_data, outfile)
 
-
     def load_data_generator(self, path_models, prefix_model):
+
+        self.final_model = True
 
         with open("{}/discriminator/{}_data.json".format(path_models, prefix_model)) as json_file:
 
