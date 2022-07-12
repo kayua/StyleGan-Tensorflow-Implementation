@@ -132,6 +132,7 @@ class StyleGAN(Model, ABC):
         update_score = real_images + random_noise * divergence
 
         with tensorflow.GradientTape() as gradient_penalty_reduce:
+
             gradient_penalty_reduce.watch(update_score)
             discriminator_result = self.discriminator(update_score, training=True)
 
