@@ -140,10 +140,10 @@ class Discriminator:
         self.discriminator_mapping.save_weights("{}/discriminator/{}.h5".format(path_models, prefix_model))
         print("Saved model to disk")
 
-    def load_discriminator(self, model_file):
+    def load_discriminator(self, path_model, model_file):
 
-        self.load_data_discriminator("{}_data".format(model_file))
-        self.load_neural_network("{}".format(model_file))
+        self.load_data_discriminator(path_model, model_file)
+        self.load_neural_network(path_model, model_file)
 
     def save_discriminator(self, path_model, model_file):
 
@@ -160,9 +160,9 @@ class Discriminator:
         self.discriminator_mapping.load_weights("{}.h5".format(file_output_neural_network))
         print("Loaded model from disk")
 
-    def load_data_discriminator(self, discriminator_data_file):
+    def load_data_discriminator(self, path_models, prefix_model):
 
-        with open("{}.json".format(discriminator_data_file)) as json_file:
+        with open("{}/discriminator/{}_data.json".format(path_models, prefix_model)) as json_file:
             data = json.load(json_file)
 
             self.initial_resolution = data["initial_resolution"]
@@ -170,8 +170,8 @@ class Discriminator:
             self.threshold_activation = data["threshold_activation"]
             self.discriminator_level = data["discriminator_level"]
             self.level_verbose = data["level_verbose"]
-            self.number_filters_per_layer = data["number_filters_per_layer"]
-            self.level_feature_dimension = data["level_feature_dimension"]
+            self.number_filters_per_layer = list(data["number_filters_per_layer"])
+            self.level_feature_dimension = list(data["level_feature_dimension"])
 
     def write_data_discriminator(self, path_models, prefix_model):
 
@@ -182,7 +182,7 @@ class Discriminator:
                               "level_verbose": self.level_verbose,
                               "number_filters_per_layer": self.number_filters_per_layer,
                               "level_feature_dimension": self.level_feature_dimension}
-        print("---------------------------------------")
+
         with open("{}/discriminator/{}_data.json".format(path_models, prefix_model), "w") as outfile:
             outfile.write(json.dumps(discriminator_data, ensure_ascii=False))
 
