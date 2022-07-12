@@ -149,6 +149,7 @@ class Generator:
     def get_number_filters_per_level(self):
         return self.num_filters_per_level
 
+
     def save_model(self, path_models, prefix_model):
 
         model_json = self.final_model.to_json()
@@ -166,6 +167,7 @@ class Generator:
 
         self.save_model(path_models, prefix_model)
         self.write_data_generator(path_models, prefix_model)
+
 
     def write_data_generator(self, path_model, model_file):
 
@@ -185,9 +187,11 @@ class Generator:
         with open("{}/Generator/{}_data.json".format(path_model, model_file), "w") as outfile:
             json.dump(generator_data, outfile)
 
+
     def load_data_generator(self, path_models, prefix_model):
 
         with open("{}/discriminator/{}_data.json".format(path_models, prefix_model)) as json_file:
+
             data = json.load(json_file)
 
             self.latent_dimension = data["latent_dimension"]
@@ -201,7 +205,6 @@ class Generator:
             self.feature_size = data["feature_size"]
             self.num_filters_per_level = data["num_filters_per_level"]
             self.level_verbose = data["level_verbose"]
-
 
     def __block_mapping_network(self):
 
