@@ -153,6 +153,7 @@ class Generator:
         for i in range(self.num_synthesis_block):
 
             with open("{}/discriminator/{}_level_{}.json".format(path_models, prefix_model, i), "w") as json_file:
+                print(self.list_block_synthesis[i])
                 precompile_model = Model(self.list_block_synthesis[i].input, self.list_block_synthesis[i].output)
                 json_file.write(precompile_model.to_json())
 
