@@ -181,6 +181,9 @@ class Generator:
         if not os.path.exists("{}/generator".format(path_model)):
             os.mkdir("{}/generator".format(path_model))
 
+
+    def save_mapping_network(self, ):
+
         model_json = self.mapping_neural_network.to_json()
 
         with open("{}/generator/{}_mapping.json".format(path_model, model_file), "w") as json_file:
@@ -188,8 +191,6 @@ class Generator:
 
         self.mapping_neural_network.save_weights("{}/generator/{}_mapping.h5".format(path_model, model_file))
         print("Saved model to disk")
-
-
 
 
     def write_data_generator(self, generator_data_file):
