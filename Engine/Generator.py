@@ -195,7 +195,6 @@ class Generator:
 
     def save_constant_mapping_network(self, path_model, model_file):
 
-
         model_json = self.constant_mapping_neural_network.to_json()
 
         with open("{}/generator/{}_mapping.json".format(path_model, model_file), "w") as json_file:
