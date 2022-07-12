@@ -150,36 +150,14 @@ class Generator:
     def get_number_filters_per_level(self):
         return self.num_filters_per_level
 
-    def load_synthesis_block(self, path_models, prefix_model):
+    def save_model(self, path_models, prefix_model):
 
-        self.pretrained_model = True
+        model_json = self.final_model.to_json()
+        with open("{}/Generator/{}.json".format(path_models, prefix_model), "w") as json_file:
+            json_file.write(model_json)
 
-        for i in range(self.num_synthesis_block):
-
-            json_file = open("{}/discriminator/{}_level_{}.json".format(path_models, prefix_model, i), 'r')
-            loaded_model_json = json_file.read()
-            json_file.close()
-            self.list_block_synthesis[i] = model_from_json(loaded_model_json)
-            self.list_block_synthesis[i].load_weights("{}/discriminator/{}_level_{}.h5".format(path_models, prefix_model, i))
-
-        print("Loaded model from disk")
-
-    def load_data_generator(self, generator_data_file):
-
-        with open("{}.json".format(generator_data_file)) as json_file:
-
-            data = json.load(json_file)
-            self.latent_dimension = data["latent_dimension"]
-            self.num_neurons_mapping = data["num_neurons_mapping"]
-            self.num_mapping_blocks = data["num_mapping_blocks"]
-            self.initial_dimension = data["initial_dimension"]
-            self.initial_num_channels = data["initial_num_channels"]
-            self.number_output_channels = data["number_output_channels"]
-            self.size_kernel_filters = data["size_kernel_filters"]
-            self.num_synthesis_block = data["num_synthesis_block"]
-            self.feature_size = data["feature_size"]
-            self.num_filters_per_level = data["num_filters_per_level"]
-            self.level_verbose = data["level_verbose"]
+        self.final_model.save_weights("{}/Generator/{}.h5".format(path_models, prefix_model))
+        print("Saved model to disk")
 
 
     def save_generator(self, path_models, prefix_model):
@@ -187,7 +165,7 @@ class Generator:
         if not os.path.exists("{}/generator".format(path_models)):
             os.mkdir("{}/generator".format(path_models))
 
-        self.
+        self.save_model(path_models, prefix_model)
         self.write_data_generator(path_models, prefix_model)
 
     def write_data_generator(self, path_model, model_file):
