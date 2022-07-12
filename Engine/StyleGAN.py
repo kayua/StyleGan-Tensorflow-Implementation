@@ -157,6 +157,7 @@ class StyleGAN(Model, ABC):
         batch_size = tensorflow.shape(real_images)[0]
 
         for _ in range(self.number_discriminator_steps):
+
             random_latent_space = tensorflow.random.normal(shape=(batch_size, self.latent_dimension, 1))
             dimension = [batch_size, self.initial_dimension, self.initial_dimension, self.num_filters_per_level[0]]
             constant_mapping_tensor = tensorflow.fill(dimension, self.constant_mapping_value)
