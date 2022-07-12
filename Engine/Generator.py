@@ -150,17 +150,6 @@ class Generator:
     def get_number_filters_per_level(self):
         return self.num_filters_per_level
 
-    def save_synthesis_block(self, path_models, prefix_model):
-
-        for i in range(self.num_synthesis_block):
-
-            with open("{}/discriminator/{}_level_{}.json".format(path_models, prefix_model, i), "w") as json_file:
-                print(self.list_block_synthesis[i])
-                precompile_model = Model(self.list_block_synthesis[i], self.list_block_synthesis[i].output)
-                json_file.write(precompile_model.to_json())
-
-            precompile_model.save_weights("{}/discriminator/{}_level_{}.h5".format(path_models, prefix_model, i))
-
     def load_synthesis_block(self, path_models, prefix_model):
 
         self.pretrained_model = True
@@ -198,19 +187,8 @@ class Generator:
         if not os.path.exists("{}/generator".format(path_models)):
             os.mkdir("{}/generator".format(path_models))
 
-        self.save_synthesis_block(path_models, prefix_model)
-        self.save_constant_mapping_network(path_models, prefix_model)
+        self.
         self.write_data_generator(path_models, prefix_model)
-
-    def save_constant_mapping_network(self, path_model, model_file):
-
-        model_json = self.constant_mapping_neural_network.to_json()
-
-        with open("{}/generator/{}_mapping.json".format(path_model, model_file), "w") as json_file:
-            json_file.write(model_json)
-
-        self.constant_mapping_neural_network.save_weights("{}/generator/{}_mapping.h5".format(path_model, model_file))
-        print("Saved model to disk")
 
     def write_data_generator(self, path_model, model_file):
 
