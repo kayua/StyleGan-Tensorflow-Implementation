@@ -163,6 +163,7 @@ class StyleGAN(Model, ABC):
             input_mapping = self.__tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
 
             with tensorflow.GradientTape() as tape:
+
                 synthetic_images_generated = self.generator(input_mapping, training=True)
                 synthetic_discriminator_loss = self.discriminator(synthetic_images_generated, training=True)
                 image_new_dimension = self.size_feature_dimension[-(self.network_level - 1)]
@@ -183,6 +184,7 @@ class StyleGAN(Model, ABC):
         input_mapping = self.__tensor_mapping(random_noise_synthesis, constant_mapping_tensor, random_latent_space)
 
         with tensorflow.GradientTape() as tape:
+
             synthetic_images_generated = self.generator(input_mapping, training=True)
             discriminator_loss = self.discriminator(synthetic_images_generated, training=True)
             generator_loss = self.generator_loss(discriminator_loss)
