@@ -160,6 +160,7 @@ class Generator:
     def load_synthesis_block(self, path_models, prefix_model):
 
         for i in range(self.num_synthesis_block):
+
             json_file = open("{}/discriminator/{}_level_{}.json".format(path_models, prefix_model, i), 'r')
             loaded_model_json = json_file.read()
             json_file.close()
