@@ -182,7 +182,7 @@ class Generator:
                           "level_verbose": self.level_verbose
                           }
 
-        with open("{}/generator/{}_data.json".format(path_model, model_file), "w") as outfile:
+        with open("{}/Generator/{}_data.json".format(path_model, model_file), "w") as outfile:
             json.dump(generator_data, outfile)
 
 
