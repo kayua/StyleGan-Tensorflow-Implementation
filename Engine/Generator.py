@@ -149,7 +149,6 @@ class Generator:
 
     def save_synthesis_block(self, path_models, prefix_model):
 
-
         for i in range(self.num_synthesis_block):
 
             with open("{}/discriminator/{}_level_{}.json".format(path_models, prefix_model, i), "w") as json_file:
