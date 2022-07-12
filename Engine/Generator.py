@@ -153,9 +153,10 @@ class Generator:
         for i in range(self.num_synthesis_block):
 
             with open("{}/discriminator/{}_level_{}.json".format(path_models, prefix_model, i), "w") as json_file:
-                json_file.write(self.list_block_synthesis[i])
+                precompile_model = Model(self.list_block_synthesis[i].input, self.list_block_synthesis[i].output)
+                json_file.write(precompile_model.to_json())
 
-            self.list_block_synthesis[i].save_weights("{}/discriminator/{}_level_{}.h5".format(path_models, prefix_model, i))
+            precompile_model.save_weights("{}/discriminator/{}_level_{}.h5".format(path_models, prefix_model, i))
 
     def load_synthesis_block(self, path_models, prefix_model):
 
