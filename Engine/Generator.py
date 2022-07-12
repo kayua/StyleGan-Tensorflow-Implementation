@@ -234,6 +234,7 @@ class Generator:
         with open("{}/generator/{}_data.json".format(path_model, model_file), "w") as outfile:
             json.dump(generator_data, outfile)
 
+
     def __block_mapping_network(self):
 
         shape_latent_mapping = (self.latent_dimension, 1)
