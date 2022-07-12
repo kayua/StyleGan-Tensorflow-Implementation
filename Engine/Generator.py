@@ -161,8 +161,8 @@ class Generator:
 
     def save_generator(self, path_models, prefix_model):
 
-        if not os.path.exists("{}/generator".format(path_models)):
-            os.mkdir("{}/generator".format(path_models))
+        if not os.path.exists("{}/Generator".format(path_models)):
+            os.mkdir("{}/Generator".format(path_models))
 
         self.save_model(path_models, prefix_model)
         self.write_data_generator(path_models, prefix_model)
