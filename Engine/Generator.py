@@ -146,7 +146,19 @@ class Generator:
         return self.num_filters_per_level
 
 
-    def __load_data_generator(self, generator_data_file):
+    def load_neural_network(self):
+
+
+
+
+
+
+
+
+
+
+
+    def load_data_generator(self, generator_data_file):
 
         with open("{}.json".format(generator_data_file)) as json_file:
 
@@ -163,7 +175,7 @@ class Generator:
             self.num_filters_per_level = data["num_filters_per_level"]
             self.level_verbose = data["level_verbose"]
 
-    def __write_data_generator(self, generator_data_file):
+    def write_data_generator(self, generator_data_file):
 
         generator_data = {"latent_dimension": self.latent_dimension,
                           "num_neurons_mapping": self.num_neurons_mapping,
