@@ -193,8 +193,8 @@ class Generator:
             os.mkdir("{}/generator".format(path_models))
 
         self.save_mapping_network(path_models, prefix_model)
-        self.save_constant_mapping_network(path_model, model_file)
-
+        self.save_constant_mapping_network(path_models, prefix_model)
+        self.write_data_generator(path_models, prefix_model)
 
     def save_mapping_network(self, path_model, model_file):
 
