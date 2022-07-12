@@ -23,6 +23,7 @@ from keras.layers import Flatten
 from keras.layers import LeakyReLU
 from keras.layers import Reshape
 from keras.layers import UpSampling2D
+from keras.models import model_from_json
 
 from Engine.Layers.AdaIN import AdaIN
 
@@ -156,6 +157,16 @@ class Generator:
 
             self.list_block_synthesis[i].save_weights("{}/discriminator/{}_level_{}.h5".format(path_models, prefix_model, i))
 
+    def load_synthesis_block(self, path_models, prefix_model):
+
+        for i in range(self.num_synthesis_block):
+            json_file = open("{}/discriminator/{}_level_{}.json".format(path_models, prefix_model, i), 'r')
+            loaded_model_json = json_file.read()
+            json_file.close()
+            self.list_block_synthesis[i] = model_from_json(loaded_model_json)
+            self.list_block_synthesis[i].load_weights("{}/discriminator/{}_level_{}.h5".format(path_models, prefix_model, i))
+
+        print("Loaded model from disk")
 
     def load_data_generator(self, generator_data_file):
 
