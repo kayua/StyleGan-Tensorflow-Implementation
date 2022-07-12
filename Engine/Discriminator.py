@@ -147,8 +147,9 @@ class Discriminator:
 
     def save_discriminator(self, path_model, model_file):
 
-        #self.write_data_discriminator("{}_data".format(model_file))
+
         self.save_neural_network(path_model, model_file)
+        self.write_data_discriminator(path_model, model_file)
 
     def load_neural_network(self, file_output_neural_network):
 
@@ -172,7 +173,7 @@ class Discriminator:
             self.number_filters_per_layer = data["number_filters_per_layer"]
             self.level_feature_dimension = data["level_feature_dimension"]
 
-    def write_data_discriminator(self, discriminator_data_file):
+    def write_data_discriminator(self, path_models, prefix_model):
 
         discriminator_data = {"initial_resolution": self.initial_resolution,
                               "number_channels": self.number_channels,
@@ -182,7 +183,7 @@ class Discriminator:
                               "number_filters_per_layer": self.number_filters_per_layer,
                               "level_feature_dimension": self.level_feature_dimension}
 
-        with open("{}.json".format(discriminator_data_file), "w") as outfile:
+        with open("{}/discriminator/{}_data.json".format(path_models, prefix_model), "w") as outfile:
             json.dump(discriminator_data, outfile)
 
     @staticmethod
