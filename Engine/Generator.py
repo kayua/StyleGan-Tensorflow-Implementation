@@ -23,7 +23,6 @@ from keras.layers import Flatten
 from keras.layers import LeakyReLU
 from keras.layers import Reshape
 from keras.layers import UpSampling2D
-from keras.models import model_from_json
 
 from Engine.Layers.AdaIN import AdaIN
 
